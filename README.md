@@ -2,6 +2,13 @@ lap_srn implement based tf
 
 ### dependency
 
+```
+pip install ipython --user
+pip install h5py --user
+sudo apt-get install libopencv-dev python-opencv
+```
+
+
 `git clone https://github.com/LabForComputationalVision/matlabPyrTools.git ./src/evaluation_mat/matlabPyrTools`
 
 
