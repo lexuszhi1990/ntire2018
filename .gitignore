@@ -1,0 +1,8 @@
+datasets
+log
+ckpt
+tmp
+
+*.pyc
+.*.py
+*.swp
