@@ -4,6 +4,9 @@ from __future__ import print_function
 
 import tensorflow as tf
 
+def mse(target, base):
+  return tf.sqrt(tf.reduce_mean(tf.square(tf.subtract(target, base))))
+
 def tf_flag_setup(flags):
 
   flags.DEFINE_string('dataset_dir', './datasets/train', "folder to save data")

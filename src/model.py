@@ -19,7 +19,7 @@ class LapSRN(object):
     self.reconstructed_imgs = []
     self.extracted_features = []
 
-  def __call__(self, inputs, reuse=False):
+  def forward(self, inputs, reuse=False):
     with tf.variable_scope(self.scope) as vs:
       if reuse:
         vs.reuse_variables()
@@ -45,4 +45,18 @@ class LapSRN(object):
 
   @property
   def vars(self):
-      return [var for var in tf.trainable_variables() if self.scope in var.name]
+    return [var for var in tf.trainable_variables() if self.scope in var.name]
+
+  def l1_charbonnier_loss(self, gt_imgs):
+    eps = 1e-6
+    error = tf.sqrt(tf.add(tf.square(tf.subtract(gt_imgs, self.sr_imgs[-1])), eps))
+
+    return tf.reduce_sum(error)
+
+  def l2_loss(self, gt_imgs):
+    # diff = (X - Z) .^ 2;
+    # Y = 0.5 * sum(diff(:));
+    diff = tf.square(tf.subtract(gt_imgs, self.sr_imgs[-1]))
+    error = 0.5 * tf.reduce_sum(diff)
+
+    return error
