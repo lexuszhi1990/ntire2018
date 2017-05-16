@@ -54,6 +54,13 @@ class DataSet(object):
     self.gt_imgs = glob(os.path.join(self.path, '*_gt.png'))
     self.batch_idxs = len(self.gt_imgs) // self.batch_size
 
+  def finished(self):
+    return self.idx == self.batch_idxs
+
+  def restore(self):
+    self.idx = 0
+    np.random.shuffle(self.gt_imgs)
+
   def next(self):
     if self.idx == self.batch_idxs:
       return None
@@ -61,10 +68,11 @@ class DataSet(object):
     batch_files = self.gt_imgs[self.idx*self.batch_size:(self.idx+1)*self.batch_size]
     batch_gt = [get_image(batch_file, is_crop=self.is_crop) for batch_file in batch_files]
     batch_inputs = [im_resize(img, 1.0/self.upscale_ratio) for img in batch_gt]
+    batch_reconstructed_imgs = [[im_resize(img, np.exp2(1)) for img in batch_inputs], [im_resize(img, np.exp2(2)) for img in batch_inputs]]
 
     self.idx += 1
 
-    return transform(batch_gt), transform(batch_inputs)
+    return transform(batch_gt), transform(batch_inputs), transform(batch_reconstructed_imgs)
 
 # generate the training images
 def generate_images(file_op, image_dir, base_dir='./', is_trainning=True):

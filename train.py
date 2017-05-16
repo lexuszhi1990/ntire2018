@@ -8,7 +8,8 @@ import pprint
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.utils import setup_project, sess_configure, tf_flag_setup, mse
+from src.data import DataSet
+from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
 
 # for log infos
 pp = pprint.PrettyPrinter()
@@ -23,34 +24,52 @@ tf_flag_setup(flags)
 def train(graph, sess_conf, options):
   print('start to train')
 
+  # define training variables here
+  batch_size = FLAGS.batch_size
+  dataset_dir = FLAGS.dataset_dir
+  gpu_id = FLAGS.gpu_id
+  lr = FLAGS.lr
+  g_decay_rate = FLAGS.g_decay_rate
+  g_decay_steps = FLAGS.g_decay_steps
+  ckpt_dir = FLAGS.ckpt_dir
+  continued_training = FLAGS.continued_training
+  max_steps = FLAGS.max_steps
+  g_log_dir = FLAGS.g_log_dir
+  debug = FLAGS.debug
+
+  step = 1
+  data_reader = DataSet(path=dataset_dir, batch_size=batch_size)
+
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
-    with tf.device("/gpu:{}".format(str(FLAGS.gpu_id))):
-      batch_gt_img, batch_input_img = read_images(path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size)
+    with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      # define global variables
+      inputs = tf.placeholder(tf.float32, [1, None, None, 3])
+      gt_imgs = tf.placeholder(tf.float32, [1, None, None, 3])
+      model = LapSRN(inputs, gt_imgs)
+      model.forward()
+      loss = model.l1_charbonnier_loss()
+
+      g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
+      gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
+      batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
+      g_loss_sum = tf.summary.scalar("g_loss", loss)
+
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
-      inputs = tf.placeholder(tf.float32, [1, 256, 256, 3])
-      gt_imgs = tf.placeholder(tf.float32, [1, 256, 256, 3])
-
-      model = LapSRN()
-      model.forward(inputs)
-      loss = model.l1_charbonnier_loss(gt_imgs)
-
-      # loss
-      lr = tf.train.exponential_decay(FLAGS.lr, counter, decay_rate=FLAGS.g_decay_rate, decay_steps=FLAGS.g_decay_steps, staircase=True)
+      lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
       opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
       # g_opt = tf.train.AdamOptimizer(lr, beta1=0.5)
       grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
+      g_lr_sum = tf.summary.scalar("g_lr", lr)
 
-      # restore generator
+      # restore model
       all_variables = tf.global_variables()
       saver = tf.train.Saver(all_variables, max_to_keep=10)
-      ckpt = tf.train.get_checkpoint_state(FLAGS.ckpt_dir)
-      if ckpt and FLAGS.continued_training:
+      ckpt = tf.train.get_checkpoint_state(ckpt_dir)
+      if ckpt and continued_training:
         saver.restore(sess, ckpt.model_checkpoint_path)
         info('restore the g from %s', ckpt.model_checkpoint_path)
-        if FLAGS.debug:
+        if debug:
           [print(v.name) for v in all_variables]
           print("all D variable" , len(all_variables))
           print("all global_variables" , len(tf.global_variables()))
@@ -58,6 +77,35 @@ def train(graph, sess_conf, options):
       else:
         info('there is no ckpt for g...')
         sess.run(tf.variables_initializer(set(all_variables)))
+
+      # rebuild log dir
+      if tf.gfile.Exists(g_log_dir):
+        tf.gfile.DeleteRecursively(g_log_dir)
+      tf.gfile.MakeDirs(g_log_dir)
+      summary_writer = tf.summary.FileWriter(g_log_dir, sess.graph)
+
+      g_sum_all = tf.summary.merge([g_output_sum, gt_sum, batch_input_sum, g_loss_sum, g_lr_sum])
+
+      while step <= max_steps:
+        if data_reader.finished():
+          data_reader.restore()
+
+        batch_gt, batch_inputs, reconstructed_imgs = data_reader.next()
+        print(batch_gt.shape)
+        if step % 50 == 0:
+          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
+          info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+          summary_writer.add_summary(merged, step)
+        else:
+          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, reconstructed_imgs: reconstructed_imgs})
+          info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+
+        if step % 150 == 1:
+          model_name = "laprcn-model-%s.ckpt"%time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time()))
+          saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
+          info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
+
+        step += 1
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
