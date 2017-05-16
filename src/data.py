@@ -4,8 +4,8 @@ import cv2
 import scipy.misc
 import numpy as np
 
-def im_resize(img, ratio):
-  return scipy.misc.imresize(img, ratio)
+def im_resize(img, ratio, interp='bilinear'):
+  return scipy.misc.imresize(img, ratio, interp=interp)
 
 def imread(path, is_grayscale = False):
   if (is_grayscale):
@@ -81,15 +81,13 @@ class DataSet(object):
 
     batch_files = self.gt_imgs[self.idx*self.batch_size:(self.idx+1)*self.batch_size]
     batch_gt = [get_image(batch_file, is_crop=self.is_crop) for batch_file in batch_files]
-    batch_inputs = [im_resize(img, 1.0/self.upscale_ratio) for img in batch_gt]
+    batch_inputs = [im_resize(img, 1.0/self.upscale_ratio, interp='bicubic') for img in batch_gt]
 
     self.idx += 1
 
     return transform(batch_gt), transform(batch_inputs)
 
-
 def generate_images(image_dir, base_dir, default_size=[312, 480]):
-
   print 'generate_images at ' + image_dir
   image_list = glob(image_dir + '*.*')
   for image_ab_path in image_list:
@@ -106,15 +104,20 @@ def generate_images(image_dir, base_dir, default_size=[312, 480]):
     img_gt_name = image_basename + '_gt.png'
     img_d4_name = image_basename + '_d4.png'
     cv2.imwrite(os.path.join(base_dir, img_gt_name), crop_img)
-    cv2.imwrite(os.path.join(base_dir, img_d4_name), img_d4)
+    # cv2.imwrite(os.path.join(base_dir, img_d4_name), img_d4)
 
     print(os.path.join(base_dir, img_gt_name))
 
 def generate_train_images(rebuild=False):
+  '''
+    usage:
+    from src.data import generate_train_images
+  '''
   train_dir = './dataset/train'
 
   train_image_dirs = [
-                      '/Users/david/mnt/dataset/image_SRF_4/'
+                      './dataset/coco_selected/',
+                      './dataset/bsd300_train/'
                      ]
 
   if rebuild == True:
@@ -123,4 +126,5 @@ def generate_train_images(rebuild=False):
     os.mkdir(train_dir)
 
   for image_dir in train_image_dirs:
-    generate_images(train_file_op, image_dir, train_dir)
+    generate_images(image_dir, train_dir)
+
