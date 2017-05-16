@@ -37,30 +37,29 @@ def train(graph, sess_conf, options):
   g_log_dir = FLAGS.g_log_dir
   debug = FLAGS.debug
 
-
   step = 1
   data_reader = DataSet(path=dataset_dir, batch_size=batch_size, image_size=[78, 120])
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      inputs = tf.placeholder(tf.float32, [1, None, None, 3])
-      gt_imgs = tf.placeholder(tf.float32, [1, None, None, 3])
+      inputs = tf.placeholder(tf.float32, [batch_size, None, None, 3])
+      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, 3])
       model = LapSRN(inputs, gt_imgs, image_size=data_reader.image_size)
       model.extract_features()
       model.reconstruct()
-      l1_loss = model.l1_charbonnier_loss()
+      loss = model.l1_charbonnier_loss()
 
       g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
       gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
-      g_loss_sum = tf.summary.scalar("g_loss", l1_loss)
+      g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
       opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
       # g_opt = tf.train.AdamOptimizer(lr, beta1=0.5)
-      grads = opt.compute_gradients(l1_loss, var_list=model.vars)
+      grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)
 
@@ -94,11 +93,11 @@ def train(graph, sess_conf, options):
 
         batch_gt, batch_inputs = data_reader.next()
         if step % 50 == 0:
-          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, l1_loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
+          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
           info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
           summary_writer.add_summary(merged, step)
         else:
-          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, l1_loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
+          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
           info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
 
         if step % 150 == 1:

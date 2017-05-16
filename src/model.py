@@ -57,13 +57,15 @@ class LapSRN(object):
 
   def l1_charbonnier_loss(self):
     eps = 1e-6
-    error = tf.sqrt(tf.add(tf.square(tf.subtract(self.gt_imgs, self.sr_imgs[-1])), eps))
+    diff = tf.subtract(self.gt_imgs, self.sr_imgs[-1])
+    error = tf.sqrt( diff * diff + eps)
+    loss  = tf.reduce_mean(error)
 
-    return tf.reduce_sum(error)
+    return loss
 
   def l2_loss(self):
     # diff = (X - Z) .^ 2;
     # Y = 0.5 * sum(diff(:));
     diff = tf.square(tf.subtract(self.gt_imgs, self.sr_imgs[-1]))
 
-    return 0.5 * tf.reduce_sum(diff)
+    return 0.5 * tf.reduce_mean(diff)
