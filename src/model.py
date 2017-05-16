@@ -5,26 +5,22 @@ import tensorflow.contrib.layers as layers
 from src.ops import *
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_imgs, reconstructed_imgs, upscale_factor=4, filter_num=64):
+  def __init__(self, inputs, gt_imgs, upscale_factor=4, filter_num=64, image_size = [64, 64]):
     self.scope = 'lap_srn'
     self.filter_num = filter_num
     self.upscale_factor = upscale_factor
-    self.level = np.log2(self.upscale_factor).astype(int)
+    self.level = np.log2(upscale_factor).astype(int)
     self.residual_depth = 10
     self.kernel_size = 3
-    self.width = 64
-    self.height = 64
+    self.height = image_size[0]
+    self.width = image_size[1]
 
     self.inputs = inputs
     self.gt_imgs = gt_imgs
-    self.reconstructed_imgs = reconstructed_imgs
 
     self.sr_imgs = []
+    self.reconstructed_imgs = []
     self.extracted_features = []
-
-  @property
-  def vars(self):
-    return [var for var in tf.trainable_variables() if self.scope in var.name]
 
   def extract_features(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
@@ -42,9 +38,22 @@ class LapSRN(object):
         net = layers.conv2d(net, 3, kernel_size=self.kernel_size, padding='SAME', activation_fn=None, scope='level_{}_features'.format(str(l)))
         self.extracted_features.append(net)
 
-  def reconstruct(self):
-    for l in xrange(self.level):
-      self.sr_imgs.append(tf.nn.tanh(self.reconstructed_imgs[l] + self.extracted_features[l]))
+  def reconstruct(self, reuse=False):
+    with tf.variable_scope(self.scope) as vs:
+      if reuse:
+        vs.reuse_variables()
+
+      base_images = self.inputs
+      for l in xrange(self.level):
+        base_images = tf.image.resize_bilinear(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=True, name='level_{}_biliear'.format(str(l)))
+        self.reconstructed_imgs.append(base_images)
+
+      for l in xrange(self.level):
+        self.sr_imgs.append(tf.nn.tanh(self.reconstructed_imgs[l] + self.extracted_features[l]))
+
+  @property
+  def vars(self):
+    return [var for var in tf.trainable_variables() if self.scope in var.name]
 
   def l1_charbonnier_loss(self):
     eps = 1e-6

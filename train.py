@@ -22,50 +22,52 @@ FLAGS = flags.FLAGS
 tf_flag_setup(flags)
 
 def train(graph, sess_conf, options):
-  print('start to train')
+  print('starts to train')
 
   # define training variables here
   batch_size = FLAGS.batch_size
   dataset_dir = FLAGS.dataset_dir
+  g_ckpt_dir = FLAGS.g_ckpt_dir
   gpu_id = FLAGS.gpu_id
   lr = FLAGS.lr
   g_decay_rate = FLAGS.g_decay_rate
   g_decay_steps = FLAGS.g_decay_steps
-  ckpt_dir = FLAGS.ckpt_dir
   continued_training = FLAGS.continued_training
   max_steps = FLAGS.max_steps
   g_log_dir = FLAGS.g_log_dir
   debug = FLAGS.debug
 
+
   step = 1
-  data_reader = DataSet(path=dataset_dir, batch_size=batch_size)
+  data_reader = DataSet(path=dataset_dir, batch_size=batch_size, image_size=[78, 120])
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
       inputs = tf.placeholder(tf.float32, [1, None, None, 3])
       gt_imgs = tf.placeholder(tf.float32, [1, None, None, 3])
-      model = LapSRN(inputs, gt_imgs)
-      model.forward()
-      loss = model.l1_charbonnier_loss()
+      model = LapSRN(inputs, gt_imgs, image_size=data_reader.image_size)
+      model.extract_features()
+      model.reconstruct()
+      l1_loss = model.l1_charbonnier_loss()
 
       g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
       gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
-      g_loss_sum = tf.summary.scalar("g_loss", loss)
+      g_loss_sum = tf.summary.scalar("g_loss", l1_loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
       opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
       # g_opt = tf.train.AdamOptimizer(lr, beta1=0.5)
-      grads = opt.compute_gradients(loss, var_list=model.vars)
+      grads = opt.compute_gradients(l1_loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)
 
       # restore model
       all_variables = tf.global_variables()
       saver = tf.train.Saver(all_variables, max_to_keep=10)
-      ckpt = tf.train.get_checkpoint_state(ckpt_dir)
+      ckpt = tf.train.get_checkpoint_state(g_ckpt_dir)
       if ckpt and continued_training:
         saver.restore(sess, ckpt.model_checkpoint_path)
         info('restore the g from %s', ckpt.model_checkpoint_path)
@@ -90,14 +92,13 @@ def train(graph, sess_conf, options):
         if data_reader.finished():
           data_reader.restore()
 
-        batch_gt, batch_inputs, reconstructed_imgs = data_reader.next()
-        print(batch_gt.shape)
+        batch_gt, batch_inputs = data_reader.next()
         if step % 50 == 0:
-          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
+          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, l1_loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
           info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
           summary_writer.add_summary(merged, step)
         else:
-          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, reconstructed_imgs: reconstructed_imgs})
+          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, l1_loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs})
           info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
 
         if step % 150 == 1:

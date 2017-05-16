@@ -17,9 +17,9 @@ def tf_flag_setup(flags):
   flags.DEFINE_string('dataset', 'set14', "folder to save data")
   flags.DEFINE_integer('gpu_id', 0, "max epoch to train")
   flags.DEFINE_integer('max_steps', 40000, "max epoch to train")
-  flags.DEFINE_integer('batch_size', 1, "batch size")
+  flags.DEFINE_integer('batch_size', 10, "batch size")
 
-  flags.DEFINE_string('ckpt_dir', './ckpt/lapsrn', "folder to save generator train models")
+  flags.DEFINE_string('g_ckpt_dir', './ckpt/lapsrn', "folder to save generator train models")
 
   flags.DEFINE_string('g_log_dir', './log/lapsrn-g', "folder to log generator train models")
 
@@ -43,6 +43,9 @@ def setup_project(FLAGS):
 
   if tf.gfile.Exists('./ckpt') == False:
     tf.gfile.MakeDirs('./ckpt')
+
+  if tf.gfile.Exists(FLAGS.g_ckpt_dir) == False:
+    tf.gfile.MakeDirs(FLAGS.g_ckpt_dir)
 
 def sess_configure(log_device_placement=False, memory_per=0.95):
   config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=log_device_placement)
