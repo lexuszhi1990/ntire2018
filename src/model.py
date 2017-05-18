@@ -27,15 +27,15 @@ class LapSRN(object):
       if reuse:
         vs.reuse_variables()
 
-      net = layers.conv2d(self.inputs, self.filter_num, kernel_size=self.kernel_size, padding='SAME', activation_fn=lrelu, scope='init')
+      net = layers.conv2d_transpose(self.inputs, self.filter_num, kernel_size=self.kernel_size, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='init')
 
       for l in xrange(self.level):
         for d in range(self.residual_depth):
-          net = layers.conv2d(net, self.filter_num, kernel_size=self.kernel_size, scope='level_{}_residual_{}'.format(str(l), str(d)))
-        net = layers.conv2d_transpose(net, self.filter_num, kernel_size=self.kernel_size, stride=2, padding='VALID', activation_fn=lrelu, scope='level_{}_transpose'.format(str(l)))
-        net = net[:,0:-1, 0:-1, :]
+          net = layers.conv2d(net, self.filter_num, kernel_size=self.kernel_size, biases_initializer=None, scope='level_{}_residual_{}'.format(str(l), str(d)))
+        net = layers.conv2d_transpose(net, self.filter_num, kernel_size=4, stride=2, padding='VALID', activation_fn=lrelu, biases_initializer=None, scope='level_{}_transpose'.format(str(l)))
+        net = net[:,0:-2, 0:-2, :]
 
-        net = layers.conv2d(net, 3, kernel_size=self.kernel_size, padding='SAME', activation_fn=None, scope='level_{}_features'.format(str(l)))
+        net = layers.conv2d(net, 3, kernel_size=self.kernel_size, padding='SAME', activation_fn=None, biases_initializer=None, scope='level_{}_features'.format(str(l)))
         self.extracted_features.append(net)
 
   def reconstruct(self, reuse=False):
@@ -45,7 +45,8 @@ class LapSRN(object):
 
       base_images = self.inputs
       for l in xrange(self.level):
-        base_images = tf.image.resize_bilinear(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=True, name='level_{}_biliear'.format(str(l)))
+        # base_images = tf.image.resize_bilinear(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=True, name='level_{}_biliear'.format(str(l)))
+        base_images = tf.image.resize_bicubic(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=False, name='level_{}_biliear'.format(str(l)))
         self.reconstructed_imgs.append(base_images)
 
       for l in xrange(self.level):
