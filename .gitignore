@@ -1,4 +1,5 @@
-dataset
+dataset/train
+dataset/test
 log
 ckpt
 tmp

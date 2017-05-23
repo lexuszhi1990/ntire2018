@@ -1,12 +1,13 @@
 import numpy as np
 import tensorflow as tf
-import tensorflow.contrib.layers as layers
+import layer
 
 from src.ops import *
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_imgs, upscale_factor=4, filter_num=64, image_size = [64, 64]):
+  def __init__(self, inputs, gt_imgs, upscale_factor=4, filter_num=64, image_size = [24, 24], is_training=True):
     self.scope = 'lap_srn'
+    self.is_training = is_training
     self.filter_num = filter_num
     self.upscale_factor = upscale_factor
     self.level = np.log2(upscale_factor).astype(int)
