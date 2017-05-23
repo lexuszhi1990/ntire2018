@@ -1,23 +1,23 @@
 import numpy as np
 import tensorflow as tf
-import layer
 
-from src.ops import *
+from src.layer import *
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_imgs, upscale_factor=4, filter_num=64, image_size = [24, 24], is_training=True):
-    self.scope = 'lap_srn'
-    self.is_training = is_training
-    self.filter_num = filter_num
-    self.upscale_factor = upscale_factor
-    self.level = np.log2(upscale_factor).astype(int)
-    self.residual_depth = 10
-    self.kernel_size = 3
+  def __init__(self, inputs, gt_imgs, image_size, is_training, upscale_factor=4, filter_num=64, scope = 'lap_srn'):
+    self.scope = scope
+    self.inputs = inputs
+    self.gt_imgs = gt_imgs
     self.height = image_size[0]
     self.width = image_size[1]
 
-    self.inputs = inputs
-    self.gt_imgs = gt_imgs
+    self.upscale_factor = upscale_factor
+    self.level = np.log2(upscale_factor).astype(int)
+    self.filter_num = filter_num
+    self.is_training = is_training
+    self.residual_depth = 10
+    self.kernel_size = 3
+    self.batch_size, _, _, self.channel = tf.Tensor.get_shape(inputs).as_list()
 
     self.sr_imgs = []
     self.reconstructed_imgs = []
@@ -28,15 +28,26 @@ class LapSRN(object):
       if reuse:
         vs.reuse_variables()
 
-      net = layers.conv2d_transpose(self.inputs, self.filter_num, kernel_size=self.kernel_size, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='init')
+      with tf.variable_scope('init'):
+        x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
+        x = tf.nn.relu(x)
 
       for l in xrange(self.level):
         for d in range(self.residual_depth):
-          net = layers.conv2d(net, self.filter_num, kernel_size=self.kernel_size, biases_initializer=None, scope='level_{}_residual_{}'.format(str(l), str(d)))
-        net = layers.conv2d_transpose(net, self.filter_num, kernel_size=4, stride=2, padding='VALID', activation_fn=lrelu, biases_initializer=None, scope='level_{}_transpose'.format(str(l)))
-        net = net[:,0:-2, 0:-2, :]
+          with tf.variable_scope('level_{}_residual_{}'.format(str(l), str(d))):
+            x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num, self.filter_num], [self.batch_size, self.height, self.width, self.filter_num], stride=2)
+            x = batch_normalize(x, self.is_training)
+            x = tf.nn.relu(x)
 
-        net = layers.conv2d(net, 3, kernel_size=self.kernel_size, padding='SAME', activation_fn=None, biases_initializer=None, scope='level_{}_features'.format(str(l)))
+        upscale_width = self.width*np.exp2(l+1).astype(int)
+        upscale_height = self.height*np.exp2(l+1).astype(int)
+        with tf.variable_scope('level_{}_upscaled'.format(str(l), str(d))):
+          x = deconv_layer(x, [2, 2, self.filter_num, self.filter_num], [self.batch_size, upscale_height, upscale_width, self.filter_num], stride=2)
+          x = batch_normalize(x, self.is_training)
+          x = tf.nn.relu(x)
+
+        with tf.variable_scope('level_{}_img'.format(str(l), str(d))):
+          net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscale_height, upscale_width, self.channel], stride=1)
         self.extracted_features.append(net)
 
   def reconstruct(self, reuse=False):
@@ -46,12 +57,12 @@ class LapSRN(object):
 
       base_images = self.inputs
       for l in xrange(self.level):
-        # base_images = tf.image.resize_bilinear(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=True, name='level_{}_biliear'.format(str(l)))
         base_images = tf.image.resize_bicubic(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=False, name='level_{}_biliear'.format(str(l)))
         self.reconstructed_imgs.append(base_images)
 
       for l in xrange(self.level):
-        self.sr_imgs.append(tf.nn.tanh(self.reconstructed_imgs[l] + self.extracted_features[l]))
+        # self.sr_imgs.append(tf.nn.tanh(self.reconstructed_imgs[l] + self.extracted_features[l]))
+        self.sr_imgs.append(self.reconstructed_imgs[l] + self.extracted_features[l])
 
   @property
   def vars(self):
