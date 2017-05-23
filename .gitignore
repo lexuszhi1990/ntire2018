@@ -5,5 +5,7 @@ ckpt
 tmp
 
 *.pyc
+*.h5
 .*.py
 *.swp
+*.DS_Store
