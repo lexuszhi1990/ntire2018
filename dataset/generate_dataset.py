@@ -48,45 +48,6 @@ def get_image(image_path, resize_height=256, resize_width=256, is_crop=False, is
 
   return img
 
-class DataSet(object):
-  def __init__(self, path="./dataset/train", batch_size=16, image_size=[64,64], upscale_ratio=4):
-    self.path = path
-    self.batch_size = batch_size
-    self.upscale_ratio = upscale_ratio
-    self.image_size = image_size
-    self.is_crop = False
-    self.shuffle = False
-    self.is_grayscale = False
-
-    self.gt_imgs = None
-    self.batch_idxs = -1
-    self.idx = 0
-
-    self.read()
-
-  def read(self):
-    self.gt_imgs = glob(os.path.join(self.path, '*_gt.png'))
-    self.batch_idxs = len(self.gt_imgs) // self.batch_size
-
-  def finished(self):
-    return self.idx == self.batch_idxs
-
-  def restore(self):
-    self.idx = 0
-    np.random.shuffle(self.gt_imgs)
-
-  def next(self):
-    if self.idx == self.batch_idxs:
-      return None
-
-    batch_files = self.gt_imgs[self.idx*self.batch_size:(self.idx+1)*self.batch_size]
-    batch_gt = [get_image(batch_file, is_crop=self.is_crop) for batch_file in batch_files]
-    batch_inputs = [im_resize(img, 1.0/self.upscale_ratio, interp='bicubic') for img in batch_gt]
-
-    self.idx += 1
-
-    return transform(batch_gt), transform(batch_inputs)
-
 def generate_images(image_dir, base_dir, default_size=[312, 480]):
   print 'generate_images at ' + image_dir
   image_list = glob(image_dir + '*.*')
