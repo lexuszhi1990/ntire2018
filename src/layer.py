@@ -29,7 +29,7 @@ def conv_layer(x, filter_shape, stride, trainable=True):
         padding='SAME')
 
 
-def deconv_layer(x, filter_shape, output_shape, stride, padding="SAME", trainable=True):
+def deconv_layer(x, filter_shape, output_shape, stride, padding="SAME", data_format='NCHW', name=None, trainable=True):
     filter_ = tf.get_variable(
         name='weight',
         shape=filter_shape,
@@ -41,7 +41,9 @@ def deconv_layer(x, filter_shape, output_shape, stride, padding="SAME", trainabl
         filter=filter_,
         output_shape=output_shape,
         padding=padding,
-        strides=[1, stride, stride, 1])
+        strides=[1, stride, stride, 1],
+        data_format=data_format,
+        name=name)
 
 
 def max_pooling_layer(x, size, stride):
