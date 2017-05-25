@@ -71,6 +71,13 @@ function [data, label] = generate_training_dataset(data_path, dataset)
     data(:, :, :, count) = single(gt_img_r0);
     y_img_r0 = imrotate(yc_img, 0);
     label(:, :, :, count) = single(y_img_r0);
+
+    % 0 degree
+    count=count+1;
+    gt_img_r180 = imrotate(gt_img, 180);
+    data(:, :, :, count) = single(gt_img_r180);
+    y_img_r180 = imrotate(yc_img, 180);
+    label(:, :, :, count) = single(y_img_r180);
   end
 
   order = randperm(count);
