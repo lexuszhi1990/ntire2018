@@ -8,7 +8,7 @@ import pprint
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.data import DataSet
+from src.dataset import DatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
 
 # for log infos
