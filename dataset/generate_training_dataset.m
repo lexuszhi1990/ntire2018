@@ -9,8 +9,8 @@ function [data, label] = generate_training_dataset(data_path, dataset)
   f_lst = [f_lst; dir(fullfile(dataDir, '*.png'))];
 
   count = 0;
-  default_width = 120;
-  default_height = 120;
+  default_width = 240;
+  default_height = 240;
   data = zeros(default_width, default_height, 3, 1);
   label = zeros(default_width, default_height,1, 1);
   %% writing to HDF5
@@ -96,6 +96,6 @@ function [data, label] = generate_training_dataset(data_path, dataset)
       created_flag = true;
       totalct = curr_dat_sz(end);
   end
-  h5disp(savepath);
+  % h5disp(savepath);
 
   return;
