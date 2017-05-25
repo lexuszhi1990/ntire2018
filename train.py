@@ -57,7 +57,7 @@ def train(graph, sess_conf, options):
       g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
       gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
-      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(inputs, size=[data_reader.gt_height, data_reader.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=True)), max_outputs=2)
+      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(inputs, size=[data_reader.gt_height, data_reader.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
@@ -98,13 +98,13 @@ def train(graph, sess_conf, options):
           batch_inputs, batch_gt = data_reader.next(step-1)
           if step % 50 == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
-            info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+            info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
             summary_writer.add_summary(merged, step + epoch*data_reader.batch_ids)
           else:
             apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
-            info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+            info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
-        model_name = "laprcn-model-%s.ckpt"%time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time()))
+        model_name = "laprcn-{}-{}.ckpt".format(epoch, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
         saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
         info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
