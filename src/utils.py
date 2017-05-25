@@ -15,7 +15,7 @@ def tf_flag_setup(flags):
 
   flags.DEFINE_string('dataset_dir', './dataset/train.h5', "the dataset path")
   flags.DEFINE_integer('gpu_id', 0, "max epoch to train")
-  flags.DEFINE_integer('max_steps', 40000, "max epoch to train")
+  flags.DEFINE_integer('epoches', 5, "max epoch to train")
   flags.DEFINE_integer('batch_size', 10, "batch size")
 
   flags.DEFINE_string('g_ckpt_dir', './ckpt/lapsrn', "folder to save generator train models")

@@ -34,13 +34,12 @@ def train(graph, sess_conf, options):
   upscale_factor = FLAGS.upscale_factor
   is_training_mode = FLAGS.is_training_mode
   continued_training = FLAGS.continued_training
-  max_steps = FLAGS.max_steps
+  epoches = FLAGS.epoches
   g_log_dir = FLAGS.g_log_dir
   debug = FLAGS.debug
 
   lr = FLAGS.lr
 
-  step = 1
   data_reader = DatasetFromHdf5(path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
@@ -58,9 +57,10 @@ def train(graph, sess_conf, options):
       g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
       gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
+      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(inputs, size=[data_reader.gt_height, data_reader.gt_width], method=tf.image.ResizeMethod.BICUBIC)), max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
-      counter = tf.(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
+      counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
       opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
       # g_opt = tf.train.AdamOptimizer(lr, beta1=0.5)
@@ -70,7 +70,7 @@ def train(graph, sess_conf, options):
 
       # restore model
       all_variables = tf.global_variables()
-      saver = tf.train.Saver(all_variables, max_to_keep=10)
+      saver = tf.train.Saver(all_variables, max_to_keep=3)
       ckpt = tf.train.get_checkpoint_state(g_ckpt_dir)
       if ckpt and continued_training:
         saver.restore(sess, ckpt.model_checkpoint_path)
@@ -90,28 +90,24 @@ def train(graph, sess_conf, options):
       tf.gfile.MakeDirs(g_log_dir)
       summary_writer = tf.summary.FileWriter(g_log_dir, sess.graph)
 
-      g_sum_all = tf.summary.merge([g_output_sum, gt_sum, batch_input_sum, g_loss_sum, g_lr_sum])
+      g_sum_all = tf.summary.merge([g_output_sum, gt_sum, batch_input_sum, g_loss_sum, g_lr_sum, gt_bicubic_sum])
 
-      while step <= max_steps:
-        if data_reader.finished(step):
-          info("stop training...")
-          break;
+      for epoch in xrange(epoches):
+        for step in xrange(1, data_reader.len):
 
-        batch_inputs, batch_gt = data_reader.next(step-1)
-        if step % 50 == 0:
-          merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
-          info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
-          summary_writer.add_summary(merged, step)
-        else:
-          apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
-          info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+          batch_inputs, batch_gt = data_reader.next(step-1)
+          if step % 50 == 0:
+            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
+            info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
+            summary_writer.add_summary(merged, step)
+          else:
+            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
+            info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
 
-        if step % 150 == 1:
-          model_name = "laprcn-model-%s.ckpt"%time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time()))
-          saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
-          info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
-
-        step += 1
+          if step % 150 == 0:
+            model_name = "laprcn-model-%s.ckpt"%time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time()))
+            saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
+            info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
@@ -123,4 +119,6 @@ def main(_):
   train(graph, sess_conf, FLAGS)
 
 if __name__ == '__main__':
+  # usage:
+  #   python train.py --gpu_id=1 --dataset_dir=./dataset/train.h5 --batch_size=20
   tf.app.run()

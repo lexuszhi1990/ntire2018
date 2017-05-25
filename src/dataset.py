@@ -11,6 +11,7 @@ class DatasetFromHdf5(object):
     self.hf = h5py.File(self.path)
     self.data = self.hf.get('data')
     self.label = self.hf.get('label')
+    self.len = self.data.len()
 
     _, self.channel, self.gt_height, self.gt_width = np.shape(self.data)
     self.input_image_size = [self.gt_height/self.upscale, self.gt_width/self.upscale]

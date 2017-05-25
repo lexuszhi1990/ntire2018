@@ -1,32 +1,32 @@
 function [data, label] = generate_training_dataset(data_path, dataset)
   % generate_training_dataset('/home/mcc207/datasets', '291')
-  % data_path='/home/mcc207/datasets'
-  % dataset = '291'
+  % generate_training_dataset('./', 'coco_selected')
+
   dataDir = fullfile(data_path, dataset);
   f_lst = [];
   f_lst = [f_lst; dir(fullfile(dataDir, '*.jpg'))];
   f_lst = [f_lst; dir(fullfile(dataDir, '*.bmp'))];
+  f_lst = [f_lst; dir(fullfile(dataDir, '*.png'))];
 
   count = 0;
-  default_width = 96;
-  default_height = 96;
+  default_width = 120;
+  default_height = 120;
   data = zeros(default_width, default_height, 3, 1);
   label = zeros(default_width, default_height,1, 1);
   %% writing to HDF5
-  chunksz = 10;
+  chunksz = 64;
   created_flag = false;
   totalct = 0;
-  savepath = ['./train_sr_images_' num2str(default_width) '_x41.h5'];
+  savepath = ['./train_dataset_' dataset '.h5'];
 
-  folder = fullfile('data', dataset);
-  mkdir(folder);
+  folder = fullfile('./dataset', dataset);
+  % mkdir(folder);
 
   for f_iter = 1:numel(f_lst)
     f_info = f_lst(f_iter);
     if f_info.name == '.'
         continue;
     end
-    % disp(f_info);
 
     f_path = fullfile(dataDir,f_info.name);
     img_raw = imread(f_path);
@@ -72,12 +72,14 @@ function [data, label] = generate_training_dataset(data_path, dataset)
     y_img_r0 = imrotate(yc_img, 0);
     label(:, :, :, count) = single(y_img_r0);
 
-    % 0 degree
+    % 90 degree
     count=count+1;
     gt_img_r180 = imrotate(gt_img, 180);
     data(:, :, :, count) = single(gt_img_r180);
     y_img_r180 = imrotate(yc_img, 180);
     label(:, :, :, count) = single(y_img_r180);
+
+    disp(f_path);
   end
 
   order = randperm(count);
