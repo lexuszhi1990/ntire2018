@@ -29,7 +29,7 @@ def conv_layer(x, filter_shape, stride, trainable=True):
         padding='SAME')
 
 
-def deconv_layer(x, filter_shape, output_shape, stride, padding="SAME", data_format='NCHW', name=None, trainable=True):
+def deconv_layer(x, filter_shape, output_shape, stride, padding="SAME", data_format='NHWC', name=None, trainable=True):
     filter_ = tf.get_variable(
         name='weight',
         shape=filter_shape,

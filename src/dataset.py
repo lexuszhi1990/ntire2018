@@ -7,9 +7,13 @@ class DatasetFromHdf5(object):
     self.path = path
     self.batch_size = batch_size
     self.upscale = upscale
+
     self.hf = h5py.File(self.path)
     self.data = self.hf.get('data')
     self.label = self.hf.get('label')
+
+    _, self.channel, self.gt_height, self.gt_width = np.shape(self.data)
+    self.input_image_size = [self.gt_height/self.upscale, self.gt_width/self.upscale]
 
   def transform(self, image):
     return np.array(image)/127.5 - 1.
@@ -23,9 +27,12 @@ class DatasetFromHdf5(object):
       aa = [np.expand_dims(x, axis=-1) for x in aa]
     return aa
 
-  def next(self, index):
-    batch_label = self.label[index*self.batch_size:(index+1)*self.batch_size]
-    batch_label = self.batch_transpose(batch_label)
-    batch_data = self.batch_resize(batch_label)
+  def finished(self, step):
+    return step >= self.data.len()/self.batch_size
 
-    return self.transform(batch_data), self.transform(batch_label)
+  def next(self, index):
+    batch_label = self.data[index*self.batch_size:(index+1)*self.batch_size]
+    batch_label = self.batch_transpose(batch_label)
+    batch_input = self.batch_resize(batch_label)
+
+    return self.transform(batch_input), self.transform(batch_label)

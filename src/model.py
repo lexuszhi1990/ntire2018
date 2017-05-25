@@ -33,22 +33,26 @@ class LapSRN(object):
         x = tf.nn.relu(x)
 
       for l in xrange(self.level):
+        # current width and height for current stage.
+        width = self.width*np.exp2(l).astype(int)
+        height = self.height*np.exp2(l).astype(int)
+
         for d in range(self.residual_depth):
           with tf.variable_scope('level_{}_residual_{}'.format(str(l), str(d))):
-            x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num, self.filter_num], [self.batch_size, self.height, self.width, self.filter_num], stride=2)
+            x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num, self.filter_num], [self.batch_size, height, width, self.filter_num], stride=1)
             x = batch_normalize(x, self.is_training)
             x = tf.nn.relu(x)
-
-        upscale_width = self.width*np.exp2(l+1).astype(int)
-        upscale_height = self.height*np.exp2(l+1).astype(int)
+        # current upscaled width and height for current stage.
+        upscaled_width = self.width*np.exp2(l+1).astype(int)
+        upscaled_height = self.height*np.exp2(l+1).astype(int)
         with tf.variable_scope('level_{}_upscaled'.format(str(l), str(d))):
-          x = deconv_layer(x, [2, 2, self.filter_num, self.filter_num], [self.batch_size, upscale_height, upscale_width, self.filter_num], stride=2)
+          x = deconv_layer(x, [2, 2, self.filter_num, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.filter_num], stride=2)
           x = batch_normalize(x, self.is_training)
           x = tf.nn.relu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(l), str(d))):
-          net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscale_height, upscale_width, self.channel], stride=1)
-        self.extracted_features.append(net)
+          net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=1)
+          self.extracted_features.append(net)
 
   def reconstruct(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:

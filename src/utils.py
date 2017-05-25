@@ -13,8 +13,7 @@ def transform_reverse(image):
 
 def tf_flag_setup(flags):
 
-  flags.DEFINE_string('dataset_dir', './dataset/train', "folder to save data")
-  flags.DEFINE_string('dataset', 'set14', "folder to save data")
+  flags.DEFINE_string('dataset_dir', './dataset/train.h5', "the dataset path")
   flags.DEFINE_integer('gpu_id', 0, "max epoch to train")
   flags.DEFINE_integer('max_steps', 40000, "max epoch to train")
   flags.DEFINE_integer('batch_size', 10, "batch size")
@@ -29,6 +28,7 @@ def tf_flag_setup(flags):
 
   flags.DEFINE_integer('upscale_factor', 4, "upscale factor")
 
+  flags.DEFINE_bool('is_training_mode', True, "whether continued training from last ckpt")
   flags.DEFINE_bool('continued_training', False, "whether continued training from last ckpt")
   flags.DEFINE_bool('debug', False, "whether or not to print debug messages")
 
