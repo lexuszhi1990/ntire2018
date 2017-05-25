@@ -93,13 +93,13 @@ def train(graph, sess_conf, options):
       g_sum_all = tf.summary.merge([g_output_sum, gt_sum, gt_bicubic_sum, batch_input_sum, g_loss_sum, g_lr_sum])
 
       for epoch in xrange(epoches):
-        for step in xrange(1, data_reader.len//data_reader.batch_size):
+        for step in xrange(1, data_reader.batch_ids):
 
           batch_inputs, batch_gt = data_reader.next(step-1)
           if step % 50 == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
             info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)
-            summary_writer.add_summary(merged, step)
+            summary_writer.add_summary(merged, step + epoch*data_reader.batch_ids)
           else:
             apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
             info("at %d step, lr_: %.5f, g_loss: %.5f", step, lr_, loss_)

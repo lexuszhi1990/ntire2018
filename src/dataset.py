@@ -3,7 +3,7 @@ import h5py
 import cv2
 
 class DatasetFromHdf5(object):
-  def __init__(self, path="./dataset/train.h5", batch_size=10, upscale=4):
+  def __init__(self, path, batch_size=10, upscale=4):
     self.path = path
     self.batch_size = batch_size
     self.upscale = upscale
@@ -12,6 +12,7 @@ class DatasetFromHdf5(object):
     self.data = self.hf.get('data')
     self.label = self.hf.get('label')
     self.len = self.data.len()
+    self.batch_ids = self.data.len() // self.batch_size
 
     _, self.channel, self.gt_height, self.gt_width = np.shape(self.data)
     self.input_image_size = [self.gt_height/self.upscale, self.gt_width/self.upscale]
