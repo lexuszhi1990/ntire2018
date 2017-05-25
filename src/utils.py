@@ -8,8 +8,8 @@ def mse(target, base):
   return tf.sqrt(tf.reduce_mean(tf.square(tf.subtract(target, base))))
 
 def transform_reverse(image):
-  # return tf.multiply(tf.add(image, 1.0), 127.5)
-  return tf.divide(tf.add(image, 1.0), 2.0)
+  return tf.cast(tf.multiply(tf.add(image, 1.0), 127.5), tf.uint8)
+  # return tf.divide(tf.add(image, 1.0), 2.0)
 
 def tf_flag_setup(flags):
 

@@ -90,10 +90,10 @@ def train(graph, sess_conf, options):
       tf.gfile.MakeDirs(g_log_dir)
       summary_writer = tf.summary.FileWriter(g_log_dir, sess.graph)
 
-      g_sum_all = tf.summary.merge([g_output_sum, gt_sum, batch_input_sum, g_loss_sum, g_lr_sum, gt_bicubic_sum])
+      g_sum_all = tf.summary.merge([g_output_sum, gt_sum, gt_bicubic_sum, batch_input_sum, g_loss_sum, g_lr_sum])
 
       for epoch in xrange(epoches):
-        for step in xrange(1, data_reader.len):
+        for step in xrange(1, data_reader.len//data_reader.batch_size):
 
           batch_inputs, batch_gt = data_reader.next(step-1)
           if step % 50 == 0:
