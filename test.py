@@ -12,16 +12,22 @@ import tensorflow as tf
 
 from src.model import LapSRN
 from src.utils import sess_configure
+from src.evalution import psnr as compute_psnr
+from src.evalution import _SSIMForMultiScale as compute_ssim
 
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
 parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
-parser.add_argument("--image", default="./dataset/test.png", type=str, help="image path")
+parser.add_argument("--image", default="./dataset", type=str, help="image path or single image")
+parser.add_argument("--output_dir", default="./dataset", type=str, help="image path")
 parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
 parser.add_argument("--channel", default=3, type=int, help="input image channel, Default: 4")
-# parser.add_argument("--cuda", action="store_true", help="use cuda?")
 
-# usage: python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
+# usage:
+# single image:
+#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
+# for dataset:
+#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/set5/GT --output_dir=./dataset/set5/lapsrn --scale=4 --channel=3
 
 opt = parser.parse_args()
 batch_size = 2
@@ -35,25 +41,29 @@ def load_img_with_expand_dims(img_path):
 
   return inputs, (height, width)
 
-def upscaled_img_path(img_path, upscale_factor):
+def upscaled_img_path(img_path, upscale_factor,output_dir=None):
   img_name = os.path.basename(img_path).split('.')[0]
   upscaled_img_name =  "{}_lapsrn_x{}.png".format(img_name, str(upscale_factor))
-  return os.path.join(os.path.dirname(img_path), upscaled_img_name)
+  if output_dir != None and os.path.isdir(output_dir):
+    dir = output_dir
+  else:
+    dir = os.path.dirname(img_path)
+  return os.path.join(dir, upscaled_img_name)
 
 def transform_reverse(images):
-  images = (images+1.)/2. * 255.0
-  images[images<0] = 0
-  images[images>255.] = 255.
+  images = (images + 1.) * 127.5
+  # images[images<0] = 0
+  # images[images>255.] = 255.
 
-  return images
+  return np.clip(images, 0, 255.)
 
-def generator():
+def generator(input_img, output_path):
 
-  if not tf.gfile.Exists(opt.image):
-    print('\nCannot find --original_image.\n')
+  if not tf.gfile.Exists(input_img):
+    print('\nCannot find .\n')
     return
 
-  batch_images, img_size = load_img_with_expand_dims(opt.image)
+  batch_images, img_size = load_img_with_expand_dims(input_img)
 
   graph = tf.Graph()
   sess_conf = sess_configure()
@@ -89,10 +99,29 @@ def generator():
       upscaled_img = sess.run(model.sr_imgs[-1], feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
 
-      print("It takes {}s for processing".format(elapsed_time))
-
       transformed_img = transform_reverse(upscaled_img)
-      cv2.imwrite(upscaled_img_path(opt.image, opt.scale), transformed_img[0])
+      cv2.imwrite(output_path, transformed_img[0])
+
+      print("It takes {}s for processing\n".format(elapsed_time))
+      print("save image at {}\n".format(output_path))
 
 if __name__ == '__main__':
-  generator()
+
+  if not os.path.exists(opt.output_dir):
+    os.mkdir(opt.output_dir)
+
+  if os.path.isdir(opt.image):
+    list = os.listdir(opt.image)
+    for image in list:
+      filepath = os.path.join(opt.image, image)
+      if os.path.isfile(filepath):
+        print(filepath)
+        output_img_path = upscaled_img_path(filepath, opt.scale, opt.output_dir)
+        generator(filepath, output_img_path)
+
+  elif os.path.isfile(opt.image):
+    output_img_path = upscaled_img_path(opt.image, opt.scale, opt.output_dir)
+    generator(opt.image, output_img_path)
+  else:
+    print("please set correct input")
+
