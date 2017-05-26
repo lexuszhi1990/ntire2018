@@ -1,6 +1,4 @@
-dataset/train
-dataset/train_bak
-dataset/test
+dataset
 log
 ckpt
 tmp
