@@ -4,7 +4,7 @@ import tensorflow as tf
 from src.layer import *
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_imgs, image_size, is_training, upscale_factor=4, filter_num=64, scope = 'lap_srn'):
+  def __init__(self, inputs, gt_imgs, image_size, is_training, upscale_factor=4, filter_num=64, scope='lap_srn'):
     self.scope = scope
     self.inputs = inputs
     self.gt_imgs = gt_imgs
