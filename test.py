@@ -29,7 +29,7 @@ batch_size = 2
 def load_img_with_expand_dims(img_path):
   img = cv2.imread(img_path, opt.channel)
   img = np.array(img)/127.5 - 1.
-  _, height, width, _ = img.shape
+  height, width, _ = img.shape
   inputs = np.zeros((batch_size, height, width, opt.channel))
   inputs[0] = img
 
@@ -54,7 +54,6 @@ def generator():
     return
 
   batch_images, img_size = load_img_with_expand_dims(opt.image)
-  print(img_size)
 
   graph = tf.Graph()
   sess_conf = sess_configure()
@@ -92,7 +91,7 @@ def generator():
 
       print("It takes {}s for processing".format(elapsed_time))
 
-      transformed_img = upscaled_img(upscaled_img)
+      transformed_img = transform_reverse(upscaled_img)
       cv2.imwrite(upscaled_img_path(opt.image, opt.scale), transformed_img[0])
 
 if __name__ == '__main__':
