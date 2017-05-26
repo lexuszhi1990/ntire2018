@@ -28,9 +28,7 @@ batch_size = 2
 
 def load_img_with_expand_dims(img_path):
   img = cv2.imread(img_path, opt.channel)
-  img = np.expand_dims(img, axis=0)
   img = np.array(img)/127.5 - 1.
-
   _, height, width, _ = img.shape
   inputs = np.zeros((batch_size, height, width, opt.channel))
   inputs[0] = img
@@ -41,6 +39,13 @@ def upscaled_img_path(img_path, upscale_factor):
   img_name = os.path.basename(img_path).split('.')[0]
   upscaled_img_name =  "{}_lapsrn_x{}.png".format(img_name, str(upscale_factor))
   return os.path.join(os.path.dirname(img_path), upscaled_img_name)
+
+def transform_reverse(images):
+  images = (images+1.)/2. * 255.0
+  images[images<0] = 0
+  images[images>255.] = 255.
+
+  return images
 
 def generator():
 
@@ -87,9 +92,8 @@ def generator():
 
       print("It takes {}s for processing".format(elapsed_time))
 
-      transformed_img = (upscaled_img+1.)/2.
+      transformed_img = upscaled_img(upscaled_img)
       cv2.imwrite(upscaled_img_path(opt.image, opt.scale), transformed_img[0])
-
 
 if __name__ == '__main__':
   generator()
