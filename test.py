@@ -27,7 +27,7 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 # single image:
 #   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
-#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/set5/GT --output_dir=./dataset/set5/lapsrn --scale=4 --channel=3
+#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set5/GT --output_dir=./dataset/test/set5/lapsrn --scale=4 --channel=3
 
 opt = parser.parse_args()
 batch_size = 2
