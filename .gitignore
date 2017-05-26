@@ -1,4 +1,5 @@
 dataset/train
+dataset/train_bak
 dataset/test
 log
 ckpt
