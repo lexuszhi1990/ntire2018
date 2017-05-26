@@ -38,13 +38,13 @@ function [] = generate_test_dataset(dataset_path)
       scale = scale_list(i);
 
       image_names = strsplit(f_info.name, '.');
-      patch_name = sprintf('%s_l%d.%s',image_names{1}, scale, image_names{2});
+      patch_name = sprintf('%s_l%d.png',image_names{1}, scale);
       lm_path = fullfile(zoom_in_dir, patch_name);
       lr_img = imresize(img_raw,1/scale,'bicubic');
       imwrite(lr_img, lm_path);
       disp(lm_path);
 
-      patch_name = sprintf('%s_bicubic_x%d.%s',image_names{1}, scale, image_names{2});
+      patch_name = sprintf('%s_bicubic_x%d.png',image_names{1}, scale);
       bicubic_hr_path = fullfile(bicubic_dir, patch_name);
       bicubic_upscaled = imresize(lr_img, scale,'bicubic');
       imwrite(bicubic_upscaled, bicubic_hr_path);

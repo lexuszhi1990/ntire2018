@@ -7,6 +7,7 @@ import argparse
 import cv2
 import os
 import numpy as np
+from glob import glob
 
 import tensorflow as tf
 
@@ -27,7 +28,7 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 # single image:
 #   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
-#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set5/GT --output_dir=./dataset/test/set5/lapsrn --scale=4 --channel=3
+#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn --scale=4 --channel=3
 
 opt = parser.parse_args()
 batch_size = 2
@@ -57,16 +58,11 @@ def transform_reverse(images):
 
   return np.clip(images, 0, 255.)
 
-def generator(input_img, output_path):
+def generator(graph, sess_conf, input_img, output_path, reuse=False):
 
   if not tf.gfile.Exists(input_img):
     print('\nCannot find .\n')
     return
-
-  batch_images, img_size = load_img_with_expand_dims(input_img)
-
-  graph = tf.Graph()
-  sess_conf = sess_configure()
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(opt.gpu_id))):
@@ -75,9 +71,11 @@ def generator(input_img, output_path):
       gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
       is_training = tf.placeholder(tf.bool, [])
 
+      batch_images, img_size = load_img_with_expand_dims(input_img)
+
       model = LapSRN(inputs, gt_imgs, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
-      model.extract_features()
-      model.reconstruct()
+      model.extract_features(reuse=reuse)
+      model.reconstruct(reuse=reuse)
 
       saver = tf.train.Saver()
       if os.path.isdir(opt.model):
@@ -105,23 +103,32 @@ def generator(input_img, output_path):
       print("It takes {}s for processing\n".format(elapsed_time))
       print("save image at {}\n".format(output_path))
 
+      sess.close()
+
 if __name__ == '__main__':
+
+  graph = tf.Graph()
+  sess_conf = sess_configure()
 
   if not os.path.exists(opt.output_dir):
     os.mkdir(opt.output_dir)
 
   if os.path.isdir(opt.image):
-    list = os.listdir(opt.image)
-    for image in list:
-      filepath = os.path.join(opt.image, image)
+    image_path = os.path.join(opt.image, '*l{}.png'.format(opt.scale))
+    list = glob(image_path)
+    for filepath in list:
+      print("upscale image: %s"%filepath)
       if os.path.isfile(filepath):
-        print(filepath)
         output_img_path = upscaled_img_path(filepath, opt.scale, opt.output_dir)
-        generator(filepath, output_img_path)
+        # if filepath != list[0]:
+        #   tf.reset_default_graph()
+        # generator(graph, sess_conf, filepath, output_img_path)
+        generator(graph, sess_conf, filepath, output_img_path, filepath != list[0])
 
   elif os.path.isfile(opt.image):
     output_img_path = upscaled_img_path(opt.image, opt.scale, opt.output_dir)
-    generator(opt.image, output_img_path)
+    generator(graph, sess_conf, opt.image, output_img_path)
+
   else:
     print("please set correct input")
 
