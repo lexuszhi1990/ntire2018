@@ -13,8 +13,6 @@ import tensorflow as tf
 
 from src.model import LapSRN
 from src.utils import sess_configure
-from src.evalution import psnr as compute_psnr
-from src.evalution import _SSIMForMultiScale as compute_ssim
 
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
@@ -32,6 +30,7 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 
 opt = parser.parse_args()
 batch_size = 2
+sr_method = 'lapsrn'
 
 def load_img_with_expand_dims(img_path):
   img = cv2.imread(img_path, opt.channel)
@@ -44,7 +43,7 @@ def load_img_with_expand_dims(img_path):
 
 def upscaled_img_path(img_path, upscale_factor,output_dir=None):
   img_name = os.path.basename(img_path).split('.')[0]
-  upscaled_img_name =  "{}_lapsrn_x{}.png".format(img_name, str(upscale_factor))
+  upscaled_img_name =  "{}_{}_x{}.png".format(img_name, sr_method, str(upscale_factor))
   if output_dir != None and os.path.isdir(output_dir):
     dir = output_dir
   else:

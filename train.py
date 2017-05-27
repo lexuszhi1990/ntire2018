@@ -119,5 +119,5 @@ def main(_):
 
 if __name__ == '__main__':
   # usage:
-  #   python train.py --gpu_id=1 --dataset_dir=./dataset/train.h5 --batch_size=20
+  #   python train.py --gpu_id=1 --epoches=2 --dataset_dir=./dataset/train.h5 --batch_size=20
   tf.app.run()
