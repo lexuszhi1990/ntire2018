@@ -3,6 +3,8 @@ log
 ckpt
 tmp
 
+src/evaluation_mat/matlabPyrTools*
+
 *.pyc
 *.h5
 .*.py
