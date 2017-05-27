@@ -44,7 +44,7 @@ function [] = generate_test_dataset(dataset_path)
       imwrite(lr_img, lm_path);
       disp(lm_path);
 
-      patch_name = sprintf('%s_bicubic_x%d.png',image_names{1}, scale);
+      patch_name = sprintf('%s_l%d_bicubic_x%d.png',image_names{1}, scale, scale);
       bicubic_hr_path = fullfile(bicubic_dir, patch_name);
       bicubic_upscaled = imresize(lr_img, scale,'bicubic');
       imwrite(bicubic_upscaled, bicubic_hr_path);
