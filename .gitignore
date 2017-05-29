@@ -4,6 +4,7 @@ ckpt
 tmp
 
 src/evaluation_mat/matlabPyrTools*
+src/evaluation_mat/ifc-*
 
 *.pyc
 *.h5
