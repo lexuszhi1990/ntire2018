@@ -93,6 +93,8 @@ function [data, label] = generate_training_dataset(data_path, dataset)
       curr_dat_sz = store2hdf5(savepath, batchdata, batchlabs, ~created_flag, startloc, chunksz);
       created_flag = true;
       totalct = curr_dat_sz(end);
+
+      disp(batchno);
   end
   % h5disp(savepath);
 

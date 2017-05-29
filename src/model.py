@@ -41,7 +41,7 @@ class LapSRN(object):
           with tf.variable_scope('level_{}_residual_{}'.format(str(l), str(d))):
             x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num, self.filter_num], [self.batch_size, height, width, self.filter_num], stride=1)
             x = batch_normalize(x, self.is_training)
-            x = tf.nn.relu(x)
+            x = prelu(x)
 
         # current upscaled width and height for current stage.
         upscaled_width = self.width*np.exp2(l+1).astype(int)
@@ -50,7 +50,7 @@ class LapSRN(object):
         with tf.variable_scope('level_{}_pixel_shift_upscale'.format(str(l))):
           x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num*4, self.filter_num], [self.batch_size, height, width, self.filter_num*4], stride=1)
           x = pixel_shuffle_layer(x, 2, 64)
-          x = tf.nn.relu(x)
+          x = prelu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(l))):
           net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=1)

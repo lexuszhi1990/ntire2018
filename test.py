@@ -26,7 +26,7 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 # single image:
 #   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
-#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn --scale=4 --channel=3
+#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set5/lr_x2348 --output_dir=./dataset/test/set14/lapsrn --scale=4 --channel=3
 
 opt = parser.parse_args()
 batch_size = 2
@@ -96,8 +96,8 @@ def generator(graph, sess_conf, input_img, output_path, reuse=False):
       upscaled_img = sess.run(model.sr_imgs[-1], feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
 
-      transformed_img = transform_reverse(upscaled_img)
-      cv2.imwrite(output_path, transformed_img[0])
+      transformed_img = transform_reverse(upscaled_img[0])
+      cv2.imwrite(output_path, transformed_img)
 
       print("It takes {}s for processing\n".format(elapsed_time))
       print("save image at {}\n".format(output_path))

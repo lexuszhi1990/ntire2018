@@ -54,7 +54,9 @@ def train(graph, sess_conf, options):
       model.reconstruct()
       loss = model.l1_charbonnier_loss()
 
-      g_output_sum = tf.summary.image("upscaled", transform_reverse(model.sr_imgs[-1]), max_outputs=2)
+      upscaled_x2_img = transform_reverse(model.sr_imgs[0])
+      upscaled_x4_img = transform_reverse(model.sr_imgs[1])
+      g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
       gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
       gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(inputs, size=[data_reader.gt_height, data_reader.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
@@ -119,5 +121,5 @@ def main(_):
 
 if __name__ == '__main__':
   # usage:
-  #   python train.py --gpu_id=1 --epoches=2 --dataset_dir=./dataset/train.h5 --batch_size=20
+  #   python train.py --gpu_id=1 --epoches=2 --dataset_dir=./dataset/train_dataset_coco_selected.h5 --batch_size=16
   tf.app.run()
