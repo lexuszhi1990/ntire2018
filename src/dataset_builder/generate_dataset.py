@@ -105,9 +105,15 @@ def generate_test_dataset(dataset_path):
   bicubic_dir = os.path.join(dataset_path, 'bicubic')
 
   if os.path.exists(zoom_in_dir) == False:
+    os.system('rm -rf ' + zoom_in_dir)
+  else:
+    os.system('rm -rf ' + zoom_in_dir)
     os.mkdir(zoom_in_dir)
 
   if os.path.exists(bicubic_dir) == False:
+    os.system('rm -rf ' + bicubic_dir)
+  else:
+    os.system('rm -rf ' + bicubic_dir)
     os.mkdir(bicubic_dir)
 
   scale_list = [2, 3, 4, 8];

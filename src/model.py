@@ -30,7 +30,7 @@ class LapSRN(object):
 
       with tf.variable_scope('init'):
         x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
-        x = tf.nn.relu(x)
+        x = prelu(x)
 
       for l in xrange(self.level):
         # current width and height for current stage.

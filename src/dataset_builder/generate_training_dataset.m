@@ -1,6 +1,7 @@
 function [data, label] = generate_training_dataset(data_path, dataset)
   % generate_training_dataset('/home/mcc207/datasets', '291')
-  % generate_training_dataset('./', 'coco_selected')
+  % generate_training_dataset('../../dataset', 'coco_291')
+  % generate_training_dataset('../../dataset/test/set5', 'GT')
 
   dataDir = fullfile(data_path, dataset);
   f_lst = [];
@@ -9,18 +10,15 @@ function [data, label] = generate_training_dataset(data_path, dataset)
   f_lst = [f_lst; dir(fullfile(dataDir, '*.png'))];
 
   count = 0;
-  default_width = 240;
-  default_height = 240;
+  default_width = 312;
+  default_height = 312;
   data = zeros(default_width, default_height, 3, 1);
   label = zeros(default_width, default_height,1, 1);
   %% writing to HDF5
-  chunksz = 64;
+  chunksz = 16;
   created_flag = false;
   totalct = 0;
   savepath = ['./train_dataset_' dataset '.h5'];
-
-  folder = fullfile('./dataset', dataset);
-  % mkdir(folder);
 
   for f_iter = 1:numel(f_lst)
     f_info = f_lst(f_iter);
@@ -41,7 +39,7 @@ function [data, label] = generate_training_dataset(data_path, dataset)
 
     % img_raw = img_raw(1:height-mod(height,12),1:width-mod(width,12),:);
     % disp(img_size)
-    if width < default_width & height < default_height
+    if width < default_width | height < default_height
       disp(img_size);
       continue;
     end
