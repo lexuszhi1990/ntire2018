@@ -8,8 +8,8 @@ class LapSRN(object):
     self.scope = scope
     self.inputs = inputs
     self.gt_imgs = gt_imgs
-    self.height = image_size[0]
-    self.width = image_size[1]
+    self.height = np.uint32(image_size[0])
+    self.width = np.uint32(image_size[1])
 
     self.upscale_factor = upscale_factor
     self.level = np.log2(upscale_factor).astype(int)
@@ -32,7 +32,7 @@ class LapSRN(object):
         x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
         x = prelu(x)
 
-      for l in xrange(self.level):
+      for l in range(self.level):
         # current width and height for current stage.
         width = self.width*np.exp2(l).astype(int)
         height = self.height*np.exp2(l).astype(int)
@@ -62,11 +62,11 @@ class LapSRN(object):
         vs.reuse_variables()
 
       base_images = self.inputs
-      for l in xrange(self.level):
+      for l in range(self.level):
         base_images = tf.image.resize_bicubic(base_images, size=[self.height*np.exp2(l+1).astype(int), self.width*np.exp2(l+1).astype(int)], align_corners=False, name='level_{}_biliear'.format(str(l)))
         self.reconstructed_imgs.append(base_images)
 
-      for l in xrange(self.level):
+      for l in range(self.level):
         # self.sr_imgs.append(tf.nn.tanh(self.reconstructed_imgs[l] + self.extracted_features[l]))
         self.sr_imgs.append(self.reconstructed_imgs[l] + self.extracted_features[l])
 
