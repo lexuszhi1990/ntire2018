@@ -24,9 +24,9 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 
 # usage:
 # single image:
-#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
+#   python test.py --gpu_id=2 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
-#   python test.py --gpu_id=1 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set5/lr_x2348 --output_dir=./dataset/test/set14/lapsrn --scale=4 --channel=3
+#   python test.py --gpu_id=2 --channel=3 --model=ckpt/lapsrn --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
 
 opt = parser.parse_args()
 batch_size = 2
@@ -110,6 +110,9 @@ if __name__ == '__main__':
   sess_conf = sess_configure()
 
   if not os.path.exists(opt.output_dir):
+    os.system('rm -rf ' + opt.output_dir)
+    os.mkdir(opt.output_dir)
+  else:
     os.mkdir(opt.output_dir)
 
   if os.path.isdir(opt.image):

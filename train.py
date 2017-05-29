@@ -72,7 +72,7 @@ def train(graph, sess_conf, options):
 
       # restore model
       all_variables = tf.global_variables()
-      saver = tf.train.Saver(all_variables, max_to_keep=3)
+      saver = tf.train.Saver(all_variables, max_to_keep=30)
       ckpt = tf.train.get_checkpoint_state(g_ckpt_dir)
       if ckpt and continued_training:
         saver.restore(sess, ckpt.model_checkpoint_path)
@@ -106,9 +106,10 @@ def train(graph, sess_conf, options):
             apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
-        model_name = "laprcn-{}-{}.ckpt".format(epoch, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
-        saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
-        info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
+          if step % 50 == 0:
+            model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
+            saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
+            info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
