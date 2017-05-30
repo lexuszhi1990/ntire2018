@@ -9,4 +9,4 @@ if size(im2, 3) == 3,
     im2 = im2(:, :, 1);
 end
 
-ssim = ssim_index(im1, img2)
+ssim = ssim_index(im1, im2);

@@ -1,5 +1,8 @@
 function [] = generate_test_dataset(dataset_path)
-  % generate_test_dataset('./test/set14')
+
+  % usage:
+  % addpath('./src/dataset_builder');
+  % generate_test_dataset('./dataset/test/set14')
 
   dataDir = fullfile(dataset_path, 'GT');
   f_lst = [];

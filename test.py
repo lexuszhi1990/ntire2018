@@ -5,6 +5,7 @@ from __future__ import print_function
 import time
 import argparse
 import cv2
+import scipy.misc
 import os
 import numpy as np
 from glob import glob
@@ -12,7 +13,7 @@ from glob import glob
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.utils import sess_configure
+from src.utils import sess_configure, transform_reverse
 
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
@@ -27,13 +28,14 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 #   python test.py --gpu_id=2 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
 #   python test.py --gpu_id=2 --channel=3 --model=ckpt/lapsrn --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
+#   python test.py --gpu_id=2 --channel=3 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
 
 opt = parser.parse_args()
 batch_size = 2
 sr_method = 'lapsrn'
 
 def load_img_with_expand_dims(img_path):
-  img = cv2.imread(img_path, opt.channel)
+  img = scipy.misc.imread(img_path)
   img = np.array(img)/127.5 - 1.
   height, width, _ = img.shape
   inputs = np.zeros((batch_size, height, width, opt.channel))
@@ -50,7 +52,7 @@ def upscaled_img_path(img_path, upscale_factor,output_dir=None):
     dir = os.path.dirname(img_path)
   return os.path.join(dir, upscaled_img_name)
 
-def transform_reverse(images):
+def transform_reverse_bak(images):
   images = (images + 1.) * 127.5
   # images[images<0] = 0
   # images[images>255.] = 255.
@@ -89,15 +91,11 @@ def generator(graph, sess_conf, input_img, output_path, reuse=False):
         print("restore model from %s"%opt.model)
 
       start_time = time.time()
-      upscaled_img = sess.run(model.sr_imgs[-1], feed_dict={inputs: batch_images, is_training: False})
+      upscaled_x4_img = transform_reverse(model.sr_imgs[1])
+      upscaled_img = sess.run(upscaled_x4_img, feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
 
-      start_time = time.time()
-      upscaled_img = sess.run(model.sr_imgs[-1], feed_dict={inputs: batch_images, is_training: False})
-      elapsed_time = time.time() - start_time
-
-      transformed_img = transform_reverse(upscaled_img[0])
-      cv2.imwrite(output_path, transformed_img)
+      scipy.misc.imsave(output_path, upscaled_img[0])
 
       print("It takes {}s for processing\n".format(elapsed_time))
       print("save image at {}\n".format(output_path))
@@ -109,7 +107,7 @@ if __name__ == '__main__':
   graph = tf.Graph()
   sess_conf = sess_configure()
 
-  if not os.path.exists(opt.output_dir):
+  if os.path.exists(opt.output_dir):
     os.system('rm -rf ' + opt.output_dir)
     os.mkdir(opt.output_dir)
   else:

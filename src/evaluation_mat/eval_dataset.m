@@ -1,4 +1,4 @@
-function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, sr_method, sr_factor)
+function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, method_dir, sr_method, sr_factor)
 
 % usage:
 % addpath('./src/evaluation_mat');
@@ -8,7 +8,7 @@ function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, sr_method, sr_factor)
 % eval_dataset('./dataset/test/set5', 'lapsrn', 4)
 
 dataset_gt_path = fullfile(dataset_dir, 'GT');
-dataset_sr_path = fullfile(dataset_dir, sr_method);
+dataset_sr_path = fullfile(dataset_dir, method_dir);
 
 gt_lst = dir(fullfile(dataset_gt_path ,'*.png'));
 PSNR = zeros([1, numel(gt_lst)]);
@@ -40,11 +40,11 @@ for n=1:numel(gt_lst)
   generated_img_y = im2double(generated_img_ycbcr(:,:,1));
   generated_img_y_shaved = shave(uint8(single(generated_img_y) * 255), [sr_factor, sr_factor]);
 
-  PSNR(n) = psnr_index(gt_img_y_shaved, generated_img_y_shaved);
-  SSIM(n) = ssim_index(gt_img_y_shaved, generated_img_y_shaved);
+  PSNR(n) = compute_psnr(gt_img, generated_img);
+  SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
   IFC(n) = ifcvec(double(gt_img_y_shaved), double(generated_img_y_shaved));
 
-  fprintf('for image %s:\n--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', gt_img_name, PSNR(n), SSIM(n), IFC(n));
+  fprintf('for image %s:\n--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', generated_img_path, PSNR(n), SSIM(n), IFC(n));
 end
 
 fprintf('for dataset %s, upscaled by %s, at scale:%d\n--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f;\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
