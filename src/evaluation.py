@@ -4,8 +4,8 @@
 
 Usage:
 
-from src.evalution import psnr as compute_psnr
-from src.evalution import _SSIMForMultiScale as compute_ssim
+from src.evaluation import psnr as compute_psnr
+from src.evaluation import _SSIMForMultiScale as compute_ssim
 """
 
 import math
@@ -14,17 +14,17 @@ from scipy import signal
 from scipy.ndimage.filters import convolve
 import tensorflow as tf
 
-def psnr(pred, gt, shave_border=0):
-  height, width = pred.shape[:2]
-  pred = pred[shave_border:height - shave_border, shave_border:width - shave_border]
-  gt = gt[shave_border:height - shave_border, shave_border:width - shave_border]
+def psnr(pred, gt):
+
+  pred = np.array(pred).astype(np.float64)
+  gt = np.array(gt).astype(np.float64)
 
   imdff = pred - gt
-  rmse = math.sqrt(np.mean(imdff ** 2))
+  rmse = math.sqrt( np.mean(imdff ** 2.) )
   if rmse == 0:
       return 100
-  return 20 * math.log10(255.0 / rmse)
 
+  return 20 * math.log10(255.0 / rmse)
 
 def _FSpecialGauss(size, sigma):
   """Function to mimic the 'fspecial' gaussian MATLAB function."""

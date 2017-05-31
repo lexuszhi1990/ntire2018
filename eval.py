@@ -35,8 +35,8 @@ print("PSNR_bicubic=", psnr_bicubic)
 print("It takes {}s for processing".format(elapsed_time))
 
 start_time = time.time()
-yc_psnr_predicted = compute_psnr(gt_img_yc[:, :, 1], upscaled_img_yc[:, :, 1])
-yc_psnr_bicubic = compute_psnr(gt_img_yc[:, :, 1], bicubic_img_yc[:, :, 1])
+yc_psnr_predicted = compute_psnr(gt_img_yc[:, :, 0], upscaled_img_yc[:, :, 0])
+yc_psnr_bicubic = compute_psnr(gt_img_yc[:, :, 0], bicubic_img_yc[:, :, 0])
 elapsed_time = time.time() - start_time
 print("yc_PSNR_predicted=", yc_psnr_predicted)
 print("yc_PSNR_bicubic=", yc_psnr_bicubic)

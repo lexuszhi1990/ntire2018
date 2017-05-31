@@ -11,6 +11,8 @@ dataset_gt_path = fullfile(dataset_dir, 'GT');
 dataset_sr_path = fullfile(dataset_dir, method_dir);
 
 gt_lst = dir(fullfile(dataset_gt_path ,'*.png'));
+gt_lst = [gt_lst; dir(fullfile(dataset_gt_path, '*.bmp'))];
+
 PSNR = zeros([1, numel(gt_lst)]);
 SSIM = zeros([1, numel(gt_lst)]);
 IFC = zeros([1, numel(gt_lst)]);
@@ -32,13 +34,13 @@ for n=1:numel(gt_lst)
   gt_img = imread(gt_img_path);
   gt_img_ycbcr = rgb2ycbcr(gt_img);
   gt_img_y = im2double(gt_img_ycbcr(:,:,1));
-  gt_img_y_shaved = shave(uint8(single(gt_img_y) * 255), [sr_factor, sr_factor]);
+  gt_img_y_shaved = shave(uint8(single(gt_img_y) * 255), [0, 0]);
 
-  generated_img = imread(generated_img_path);
-  % generated_img = imresize(imresize(gt_img, 1.0/sr_factor, 'bicubic'), sr_factor, 'bicubic');
+  % generated_img = imread(generated_img_path);
+  generated_img = imresize(imresize(gt_img, 1.0/sr_factor), sr_factor, 'bicubic');
   generated_img_ycbcr = rgb2ycbcr(generated_img);
   generated_img_y = im2double(generated_img_ycbcr(:,:,1));
-  generated_img_y_shaved = shave(uint8(single(generated_img_y) * 255), [sr_factor, sr_factor]);
+  generated_img_y_shaved = shave(uint8(single(generated_img_y) * 255), [0, 0]);
 
   PSNR(n) = compute_psnr(gt_img, generated_img);
   SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
