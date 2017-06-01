@@ -2,7 +2,7 @@ import numpy as np
 import h5py
 import cv2
 
-class DatasetFromHdf5(object):
+class Dataset(object):
   def __init__(self, path, batch_size=10, upscale=4):
     self.path = path
     self.batch_size = batch_size
@@ -38,3 +38,30 @@ class DatasetFromHdf5(object):
     batch_input = self.batch_resize(batch_label)
 
     return self.transform(batch_input), self.transform(batch_label)
+
+class DatasetFromHdf5(object):
+    def __init__(self, file_path, batch_size=8, upscale=4):
+        hf = h5py.File(file_path)
+        self.data = hf.get("data")
+        self.label_x2 = hf.get("label_x2")
+        self.label_x4 = hf.get("label_x4")
+
+        self.batch_size = batch_size
+        self.upscale = upscale
+        self.len = self.data.len()
+        self.batch_ids = self.data.len() // self.batch_size
+
+        self.input_image_size = [self.data.shape[2], self.data.shape[3]]
+        _, self.channel, self.gt_height, self.gt_width = np.shape(self.label_x4)
+
+    def batch_transpose(self,images):
+      return np.array([image.T for image in images])
+
+    def next(self, index):
+        batch_data = self.data[index*self.batch_size:(index+1)*self.batch_size]
+        batch_label = self.label_x4[index*self.batch_size:(index+1)*self.batch_size]
+
+        return self.batch_transpose(batch_data), self.batch_transpose(batch_label)
+
+    def __len__(self):
+        return self.data.shape[0]

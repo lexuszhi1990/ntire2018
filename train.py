@@ -30,7 +30,6 @@ def train(graph, sess_conf, options):
   g_ckpt_dir = FLAGS.g_ckpt_dir
   gpu_id = FLAGS.gpu_id
   g_decay_rate = FLAGS.g_decay_rate
-  g_decay_steps = FLAGS.g_decay_steps
   upscale_factor = FLAGS.upscale_factor
   is_training_mode = FLAGS.is_training_mode
   continued_training = FLAGS.continued_training
@@ -40,13 +39,14 @@ def train(graph, sess_conf, options):
 
   lr = FLAGS.lr
 
-  data_reader = DatasetFromHdf5(path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+  data_reader = DatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+  g_decay_steps = batch_ids * epoches
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      inputs = tf.placeholder(tf.float32, [batch_size, None, None, 3])
-      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, 3])
+      inputs = tf.placeholder(tf.float32, [batch_size, None, None, 1])
+      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, 1])
       is_training = tf.placeholder(tf.bool, [])
 
       model = LapSRN(inputs, gt_imgs, image_size=data_reader.input_image_size, is_training=is_training, upscale_factor=data_reader.upscale)
@@ -72,7 +72,7 @@ def train(graph, sess_conf, options):
 
       # restore model
       all_variables = tf.global_variables()
-      saver = tf.train.Saver(all_variables, max_to_keep=30)
+      saver = tf.train.Saver(all_variables, max_to_keep=10)
       ckpt = tf.train.get_checkpoint_state(g_ckpt_dir)
       if ckpt and continued_training:
         saver.restore(sess, ckpt.model_checkpoint_path)
@@ -94,7 +94,7 @@ def train(graph, sess_conf, options):
 
       g_sum_all = tf.summary.merge([g_output_sum, gt_sum, gt_bicubic_sum, batch_input_sum, g_loss_sum, g_lr_sum])
 
-      for epoch in range(epoches):
+      for epoch in range(1, epoches+1):
         for step in range(1, data_reader.batch_ids):
 
           batch_inputs, batch_gt = data_reader.next(step-1)
@@ -106,10 +106,10 @@ def train(graph, sess_conf, options):
             apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
-          if step % 50 == 0:
-            model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
-            saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
-            info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
+        if epoch % 10 == 0:
+          model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
+          saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
+          info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
@@ -123,4 +123,5 @@ def main(_):
 if __name__ == '__main__':
   # usage:
   #   python train.py --gpu_id=3 --epoches=2 --dataset_dir=./dataset/train_dataset_coco_selected.h5 --continued_training=True --batch_size=8
+  #   python train.py --gpu_id=3 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
   tf.app.run()

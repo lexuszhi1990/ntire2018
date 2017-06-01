@@ -27,9 +27,10 @@ def tf_flag_setup(flags):
   flags.DEFINE_string('g_log_dir', './log/lapsrn-g', "folder to log generator train models")
 
   flags.DEFINE_integer('g_decay_steps', 100, "decay learning rate by intervel steps")
-  flags.DEFINE_float('g_decay_rate', 0.95, "decay rate by intervel steps")
-  flags.DEFINE_float('lr', 0.00005, "g learning rate")
+  flags.DEFINE_float('g_decay_rate', 0.1, "decay rate by intervel steps")
+  flags.DEFINE_float('lr', 1e-4, "g learning rate")
 
+  flags.DEFINE_integer('channel', 2, "data input channel")
   flags.DEFINE_integer('upscale_factor', 4, "upscale factor")
 
   flags.DEFINE_bool('is_training_mode', True, "whether continued training from last ckpt")
