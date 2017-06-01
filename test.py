@@ -13,7 +13,7 @@ from glob import glob
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.utils import sess_configure, transform_reverse
+from src.utils import sess_configure, trainsform, transform_reverse
 
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
@@ -25,21 +25,28 @@ parser.add_argument("--channel", default=3, type=int, help="input image channel,
 
 # usage:
 # single image:
-#   python test.py --gpu_id=2 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
+#   python test.py --gpu_id=3 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./tmp/test_imgs/a1.jpg --scale=4 --channel=3
 # for dataset:
-#   python test.py --gpu_id=2 --channel=3 --model=ckpt/lapsrn --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
-#   python test.py --gpu_id=2 --channel=3 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
+#   python test.py --gpu_id=3 --channel=3 --model=ckpt/lapsrn --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
+#   python test.py --gpu_id=3 --channel=3 --model=ckpt/lapsrn/laprcn-model-17-05-25-15-59.ckpt-707 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn_v1 --scale=4
+#   python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --output_dir=./dataset/test/set14/lapsrn/v1
 
 opt = parser.parse_args()
 batch_size = 2
 sr_method = 'lapsrn'
 
+def im2double(im):
+  info = np.iinfo(im.dtype) # Get the data type of the input image
+  return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
+
 def load_img_with_expand_dims(img_path):
-  img = scipy.misc.imread(img_path)
-  img = np.array(img)/127.5 - 1.
+  img = cv2.imread(img_path)
+  img = cv2.cvtColor(img, cv2.COLOR_RGB2YCR_CB)
+  img = im2double(img)
   height, width, _ = img.shape
+
   inputs = np.zeros((batch_size, height, width, opt.channel))
-  inputs[0] = img
+  inputs[0] = img[:,:,0:opt.channel]
 
   return inputs, (height, width)
 
@@ -51,13 +58,6 @@ def upscaled_img_path(img_path, upscale_factor,output_dir=None):
   else:
     dir = os.path.dirname(img_path)
   return os.path.join(dir, upscaled_img_name)
-
-def transform_reverse_bak(images):
-  images = (images + 1.) * 127.5
-  # images[images<0] = 0
-  # images[images>255.] = 255.
-
-  return np.clip(images, 0, 255.)
 
 def generator(graph, sess_conf, input_img, output_path, reuse=False):
 
@@ -77,6 +77,7 @@ def generator(graph, sess_conf, input_img, output_path, reuse=False):
       model = LapSRN(inputs, gt_imgs, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
       model.extract_features(reuse=reuse)
       model.reconstruct(reuse=reuse)
+      upscaled_x4_img = transform_reverse(model.sr_imgs[1])
 
       saver = tf.train.Saver()
       if os.path.isdir(opt.model):
@@ -91,13 +92,11 @@ def generator(graph, sess_conf, input_img, output_path, reuse=False):
         print("restore model from %s"%opt.model)
 
       start_time = time.time()
-      upscaled_x4_img = transform_reverse(model.sr_imgs[1])
       upscaled_img = sess.run(upscaled_x4_img, feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
-
-      scipy.misc.imsave(output_path, upscaled_img[0])
-
       print("It takes {}s for processing\n".format(elapsed_time))
+
+      scipy.misc.imsave(output_path, upscaled_img)
       print("save image at {}\n".format(output_path))
 
       sess.close()
