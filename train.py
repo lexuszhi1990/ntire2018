@@ -5,11 +5,12 @@ from __future__ import print_function
 import os
 import time
 import pprint
+import numpy as np
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.dataset import DatasetFromHdf5
-from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
+from src.dataset import TrainDataset
+from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse, process_train_img
 
 # for log infos
 pp = pprint.PrettyPrinter()
@@ -39,17 +40,18 @@ def train(graph, sess_conf, options):
 
   lr = FLAGS.lr
 
-  data_reader = DatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-  g_decay_steps = batch_ids * epoches
+  dataset = TrainDataset(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+  g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      inputs = tf.placeholder(tf.float32, [batch_size, None, None, 1])
-      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, 1])
+      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN(inputs, gt_imgs, image_size=data_reader.input_image_size, is_training=is_training, upscale_factor=data_reader.upscale)
+      batch_inputs, batch_gt_imgs = process_train_img(gt_imgs, [dataset.gt_height, dataset.gt_width, dataset.channel], dataset.upscale)
+
+      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=dataset.input_image_size, is_training=is_training, upscale_factor=dataset.upscale)
       model.extract_features()
       model.reconstruct()
       loss = model.l1_charbonnier_loss()
@@ -57,9 +59,9 @@ def train(graph, sess_conf, options):
       upscaled_x2_img = transform_reverse(model.sr_imgs[0])
       upscaled_x4_img = transform_reverse(model.sr_imgs[1])
       g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
-      gt_sum = tf.summary.image("gt_output", transform_reverse(gt_imgs), max_outputs=2)
-      batch_input_sum = tf.summary.image("inputs", transform_reverse(inputs), max_outputs=2)
-      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(inputs, size=[data_reader.gt_height, data_reader.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
+      gt_sum = tf.summary.image("gt_output", transform_reverse(batch_gt_imgs), max_outputs=2)
+      batch_input_sum = tf.summary.image("inputs", transform_reverse(batch_inputs), max_outputs=2)
+      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
@@ -95,19 +97,19 @@ def train(graph, sess_conf, options):
       g_sum_all = tf.summary.merge([g_output_sum, gt_sum, gt_bicubic_sum, batch_input_sum, g_loss_sum, g_lr_sum])
 
       for epoch in range(1, epoches+1):
-        for step in range(1, data_reader.batch_ids):
+        for step in range(1, dataset.batch_ids+1):
 
-          batch_inputs, batch_gt = data_reader.next(step-1)
-          if step % 50 == 0:
-            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
+          batch_inputs, batch_gt = dataset.next(step)
+          if step % (dataset.batch_ids//3) == 0:
+            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, is_training: is_training_mode})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
-            summary_writer.add_summary(merged, step + epoch*data_reader.batch_ids)
+            summary_writer.add_summary(merged, step + epoch*dataset.batch_ids)
           else:
-            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, inputs: batch_inputs, is_training: is_training_mode})
+            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, is_training: is_training_mode})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
-        if epoch % 10 == 0:
-          model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%y-%m-%d-%H-%M',time.localtime(time.time())))
+        if epoch % (epoches//10) == 0:
+          model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
           saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
           info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
@@ -122,6 +124,7 @@ def main(_):
 
 if __name__ == '__main__':
   # usage:
-  #   python train.py --gpu_id=3 --epoches=2 --dataset_dir=./dataset/train_dataset_coco_selected.h5 --continued_training=True --batch_size=8
-  #   python train.py --gpu_id=3 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
+  #   python train.py --gpu_id=2 --epoches=2 --dataset_dir=./dataset/train_dataset_coco_selected.h5 --continued_training=True --batch_size=8
+  #   python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
+  #   python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --batch_size=10
   tf.app.run()
