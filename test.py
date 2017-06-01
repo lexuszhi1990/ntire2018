@@ -1,3 +1,12 @@
+#!/usr/bin/python
+'''
+usage:
+single image:
+  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --gt_image=./dataset/test/set14/GT/baboon.png --output_dir=./dataset/test/set14/lapsrn/v1
+for dataset:
+  python test.py --gpu_id=3 --channel=3 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn/v2
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -23,12 +32,6 @@ parser.add_argument("--gt_image", default="", type=str, help="image path or sing
 parser.add_argument("--output_dir", default="./dataset", type=str, help="image path")
 parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
 parser.add_argument("--channel", default=3, type=int, help="input image channel, Default: 4")
-
-# usage:
-# single image:
-#   python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --gt_image=./dataset/test/set14/GT/baboon.png --output_dir=./dataset/test/set14/lapsrn/v1
-
-#   python test.py --gpu_id=3 --channel=3 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn/v2
 
 opt = parser.parse_args()
 batch_size = 16

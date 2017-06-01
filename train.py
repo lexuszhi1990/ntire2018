@@ -1,3 +1,12 @@
+#!/usr/bin/python
+'''
+usage:
+for one channel:
+  python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
+for three channel:
+  python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --batch_size=10
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -123,8 +132,5 @@ def main(_):
   train(graph, sess_conf, FLAGS)
 
 if __name__ == '__main__':
-  # usage:
-  #   python train.py --gpu_id=2 --epoches=2 --dataset_dir=./dataset/train_dataset_coco_selected.h5 --continued_training=True --batch_size=8
-  #   python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
-  #   python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --batch_size=10
+
   tf.app.run()
