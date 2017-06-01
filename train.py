@@ -99,7 +99,7 @@ def train(graph, sess_conf, options):
       for epoch in range(1, epoches+1):
         for step in range(1, dataset.batch_ids+1):
 
-          batch_inputs, batch_gt = dataset.next(step)
+          batch_inputs, batch_gt = dataset.next(step-1)
           if step % (dataset.batch_ids//3) == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, is_training: is_training_mode})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
