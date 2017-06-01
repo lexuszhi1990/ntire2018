@@ -1,14 +1,18 @@
-function [] = generate_test_dataset(dataset_path)
+function [] = generate_test_dataset(origin_dir, dataset_path)
 
   % usage:
   % addpath('./src/dataset_builder');
   % generate_test_dataset('./dataset/test/set14')
 
-  dataDir = fullfile(dataset_path, 'GT');
   f_lst = [];
-  f_lst = [f_lst; dir(fullfile(dataDir, '*.jpg'))];
-  f_lst = [f_lst; dir(fullfile(dataDir, '*.bmp'))];
-  f_lst = [f_lst; dir(fullfile(dataDir, '*.png'))];
+  f_lst = [f_lst; dir(fullfile(origin_dir, '*.jpg'))];
+  f_lst = [f_lst; dir(fullfile(origin_dir, '*.bmp'))];
+  f_lst = [f_lst; dir(fullfile(origin_dir, '*.png'))];
+
+  gt_img_dir = fullfile(dataset_path, 'GT');
+  if ~exist(gt_img_dir)
+    mkdir(gt_img_dir);
+  end
 
   zoom_in_dir = fullfile(dataset_path, 'lr_x2348');
   if ~exist(zoom_in_dir)
@@ -28,14 +32,17 @@ function [] = generate_test_dataset(dataset_path)
         continue;
     end
 
-    f_path = fullfile(dataDir,f_info.name);
+    f_path = fullfile(origin_dir,f_info.name);
     img_raw = imread(f_path);
     img_size = size(img_raw);
     width = img_size(2);
     height = img_size(1);
     img_raw = img_raw(1:height-mod(height,24),1:width-mod(width,24),:);
     % disp([mod(height,24), mod(width,24)]);
-    imwrite(img_raw, f_path);
+
+    patch_name = sprintf('%s.png',image_names{1});
+    gt_img_path = fullfile(gt_img_dir, patch_name);
+    imwrite(img_raw, gt_img_path);
 
     for i = 1:numel(scale_list)
       scale = scale_list(i);

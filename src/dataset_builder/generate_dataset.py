@@ -99,10 +99,16 @@ def generate_train_images(rebuild=False):
   for image_dir in train_image_dirs:
     generate_images(image_dir, train_dir)
 
-def generate_test_dataset(dataset_path):
+def generate_test_dataset(gt_dir, dataset_path):
   gt_img_dir = os.path.join(dataset_path, 'GT')
   zoom_in_dir = os.path.join(dataset_path, 'lr_x2348')
   bicubic_dir = os.path.join(dataset_path, 'bicubic')
+
+  if os.path.exists(gt_img_dir) == False:
+    os.system('rm -rf ' + gt_img_dir)
+  else:
+    os.system('rm -rf ' + gt_img_dir)
+    os.mkdir(gt_img_dir)
 
   if os.path.exists(zoom_in_dir) == False:
     os.system('rm -rf ' + zoom_in_dir)
@@ -118,18 +124,18 @@ def generate_test_dataset(dataset_path):
 
   scale_list = [2, 3, 4, 8];
 
-  gt_img_list = glob(os.path.join(gt_img_dir, '*.*'))
+  gt_img_list = glob(os.path.join(gt_dir, '*.*'))
 
   for image_ab_path in gt_img_list:
     image_basename = os.path.basename(image_ab_path).split('.')[0]
-    dir_name = os.path.dirname(image_ab_path)
 
     image_raw = cv2.imread(image_ab_path)
     image_raw = modcrop(image_raw, 24)
 
     # update defalut image
-    cv2.imwrite(image_ab_path, image_raw)
-    print("update image {}".format(image_basename))
+    image_gt_path = os.path.join(gt_img_dir, "{}.png".format(image_basename))
+    cv2.imwrite(image_gt_path, image_raw)
+    print("update gt image {}".format(image_basename))
 
     for scale in scale_list:
       lr_img = cv2.resize(image_raw, None,fx=1.0/scale,fy=1.0/scale,interpolation=cv2.INTER_CUBIC)
@@ -147,4 +153,4 @@ def generate_test_dataset(dataset_path):
 # usage:
 # for 'generate_test_dataset':
 # from src.dataset_builder.generate_dataset import generate_test_dataset
-# generate_test_dataset('./dataset/test/set14')
+# generate_test_dataset('../../../datasets/set14/', './dataset/test/set14')
