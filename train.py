@@ -4,7 +4,7 @@ usage:
 for one channel:
   python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
 for three channel:
-  python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --batch_size=10
+  python train.py --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --channel=3 --epoches=100 --gpu_id=2 --batch_size=10
 '''
 
 from __future__ import absolute_import
@@ -55,12 +55,13 @@ def train(graph, sess_conf, options):
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
+      batch_gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
+      batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      batch_inputs, batch_gt_imgs = process_train_img(gt_imgs, [dataset.gt_height, dataset.gt_width, dataset.channel], dataset.upscale)
+      # batch_inputs, batch_gt_imgs = process_train_img(gt_imgs, [dataset.gt_height, dataset.gt_width, dataset.channel], dataset.upscale)
 
-      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=dataset.input_image_size, is_training=is_training, upscale_factor=dataset.upscale)
+      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=[dataset.max_height, dataset.max_width], is_training=is_training, upscale_factor=dataset.upscale)
       model.extract_features()
       model.reconstruct()
       loss = model.l1_charbonnier_loss()
@@ -108,13 +109,13 @@ def train(graph, sess_conf, options):
       for epoch in range(1, epoches+1):
         for step in range(1, dataset.batch_ids+1):
 
-          batch_inputs, batch_gt = dataset.next(step-1)
+          batch_in, batch_gt = dataset.next(step-1)
           if step % (dataset.batch_ids//3) == 0:
-            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, is_training: is_training_mode})
+            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_imgs: batch_gt, batch_inputs: batch_in, is_training: False})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
             summary_writer.add_summary(merged, step + epoch*dataset.batch_ids)
           else:
-            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={gt_imgs: batch_gt, is_training: is_training_mode})
+            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={batch_gt_imgs: batch_gt, batch_inputs: batch_in, is_training: False})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
         if epoch % (epoches//10) == 0:

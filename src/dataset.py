@@ -1,31 +1,31 @@
 import numpy as np
 import h5py
-import cv2
+from scipy.misc import imresize
 
 class TrainDataset(object):
   def __init__(self, file_path, train_img_size=[128,128], batch_size=10, upscale=4):
     self.file_path = file_path
     self.batch_size = batch_size
     self.upscale = upscale
+    self.gt_height, self.gt_width = train_img_size
 
     self.hf = h5py.File(self.file_path)
     self.data = self.hf.get('data')
     self.label = self.hf.get('label')
     self.len = self.data.len()
-    _, self.channel, self.max_height, self.max_width = np.shape(self.data)
-    self.gt_height, self.gt_width = train_img_size
-    self.batch_ids = self.data.len() // self.batch_size
 
+    _, self.channel, self.max_height, self.max_width = np.shape(self.data)
+    self.batch_ids = self.data.len() // self.batch_size
     self.input_image_size = [self.gt_height//self.upscale, self.gt_width//self.upscale]
 
   def transform(self, image):
-    return np.array(image)/127.5 - 1.
+    return np.array(image)/255.0
 
   def batch_transpose(self,images):
     return np.array([image.T for image in images])
 
   def batch_resize(self, images):
-    aa = [cv2.resize(image, None, fx=1.0/self.upscale, fy=1.0/self.upscale,interpolation=cv2.INTER_CUBIC) for image in images]
+    aa = [imresize(image, 1.0/self.upscale, interp='bilinear') for image in images]
     if len(np.shape(aa)) == 3:
       aa = [np.expand_dims(x, axis=-1) for x in aa]
     return aa
@@ -34,12 +34,12 @@ class TrainDataset(object):
     return step >= self.data.len()/self.batch_size
 
   def next(self, index):
-    batch_label = self.data[index*self.batch_size:(index+1)*self.batch_size]
+    batch_label = self.label[index*self.batch_size:(index+1)*self.batch_size]
     batch_label = self.batch_transpose(batch_label)
     batch_input = self.batch_resize(batch_label)
 
-    # return self.transform(batch_input), self.transform(batch_label)
-    return batch_input, batch_label
+    # return batch_input, batch_label
+    return self.transform(batch_input), self.transform(batch_label)
 
 class DatasetFromHdf5(object):
     def __init__(self, file_path, batch_size=8, upscale=4):

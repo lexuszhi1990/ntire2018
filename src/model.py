@@ -76,7 +76,16 @@ class LapSRN(object):
 
   def l1_charbonnier_loss(self):
     eps = 1e-6
+
+    # if self.channel == 3:
+    #   gt_imgs_ycc = tf.split(value=self.gt_imgs, num_or_size_splits=3, axis=3)
+    #   sr_imgs_x3_ycc = tf.split(value=self.sr_imgs[1], num_or_size_splits=3, axis=3)
+    #   diff = tf.subtract(gt_imgs_ycc[0], sr_imgs_x3_ycc[0])
+    # else:
+      # diff = tf.subtract(self.gt_imgs, self.sr_imgs[-1])
+
     diff = tf.subtract(self.gt_imgs, self.sr_imgs[-1])
+
     error = tf.sqrt( diff * diff + eps)
     loss  = tf.reduce_mean(error)
 

@@ -10,15 +10,15 @@ def process_train_img(img, size, scale):
     batch_size = tf.Tensor.get_shape(img).as_list()[0]
     height, width, channel = size
 
-    rd = random.uniform(0.5, 1)
+    rd = random.uniform(0.5, 1.2)
     random_height, random_width = int(height*rd), int(height*rd)
-    gt_img = tf.random_crop(img, [batch_size, random_height, random_width, channel])
+    gt_img = tf.random_crop(img, [batch_size, random_height, random_width, channel], seed=random.randint(1, 100))
     gt_img = tf.image.resize_bicubic(gt_img, [height, width], align_corners=False)
 
-    flip_lr_img = tf.split(value=gt_img, num_or_size_splits=batch_size, axis=0)
-    gt_img = tf.concat([tf.expand_dims(tf.image.random_flip_left_right(f_img[0]), axis=0) for f_img in flip_lr_img], axis=0)
-    flip_ud_img = tf.split(value=gt_img, num_or_size_splits=batch_size, axis=0)
-    gt_img = tf.concat([tf.expand_dims(tf.image.random_flip_up_down(f_img[0]), axis=0) for f_img in flip_ud_img], axis=0)
+    # flip_lr_img = tf.split(value=gt_img, num_or_size_splits=batch_size, axis=0)
+    # gt_img = tf.concat([tf.expand_dims(tf.image.random_flip_left_right(f_img[0]), axis=0) for f_img in flip_lr_img], axis=0)
+    # flip_ud_img = tf.split(value=gt_img, num_or_size_splits=batch_size, axis=0)
+    # gt_img = tf.concat([tf.expand_dims(tf.image.random_flip_up_down(f_img[0]), axis=0) for f_img in flip_ud_img], axis=0)
 
     input_img = tf.image.resize_bicubic(gt_img, [height//scale, width//scale], align_corners=False)
 
@@ -64,7 +64,7 @@ def tf_flag_setup(flags):
   flags.DEFINE_bool('debug', False, "whether or not to print debug messages")
 
   # Sets the graph-level random seed.
-  tf.set_random_seed(1234)
+  tf.set_random_seed(random.randint(1, 10000))
 
 def setup_project(FLAGS):
   # init dirs
