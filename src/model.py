@@ -50,9 +50,10 @@ class LapSRN(object):
         # with tf.variable_scope('level_{}_pixel_shift_upscale'.format(str(l))):
         #   x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num*4, self.filter_num], [self.batch_size, height, width, self.filter_num*4], stride=1)
         #   x = pixel_shuffle_layer(x, 2, 64)
-        #   x = tf.nn.relu(x)
+        #   x = lrelu(x)
         with tf.variable_scope('level_{}_transpose_upscale'.format(str(l))):
           x = deconv_layer(x, [4, 4, self.filter_num, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.filter_num], stride=2)
+          x = batch_normalize(x, self.is_training)
           x = lrelu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(l))):
@@ -64,8 +65,7 @@ class LapSRN(object):
       for l in range(self.level):
         upscaled_width = self.width*np.exp2(l+1).astype(int)
         upscaled_height = self.height*np.exp2(l+1).astype(int)
-
-        with tf.variable_scope('level_{}_img_upscale'.format(str(l))):
+        with tf.variable_scope('level_{}_img_upscale_transpose'.format(str(l))):
           base_images = deconv_layer(base_images, [4, 4, self.channel, self.channel], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=2)
 
         self.reconstructed_imgs.append(base_images)
@@ -76,7 +76,8 @@ class LapSRN(object):
         vs.reuse_variables()
 
       for l in range(self.level):
-        self.sr_imgs.append(self.reconstructed_imgs[l] + self.extracted_features[l])
+        sr_img = tf.add(self.reconstructed_imgs[l], self.extracted_features[l])
+        self.sr_imgs.append(sr_img)
 
   @property
   def vars(self):
@@ -84,14 +85,6 @@ class LapSRN(object):
 
   def l1_charbonnier_loss(self):
     eps = 1e-6
-
-    # if self.channel == 3:
-    #   gt_imgs_ycc = tf.split(value=self.gt_imgs, num_or_size_splits=3, axis=3)
-    #   sr_imgs_x3_ycc = tf.split(value=self.sr_imgs[1], num_or_size_splits=3, axis=3)
-    #   diff = tf.subtract(gt_imgs_ycc[0], sr_imgs_x3_ycc[0])
-    # else:
-    # diff = tf.subtract(self.gt_imgs, self.sr_imgs[-1])
-
     diff = tf.subtract(self.gt_imgs, self.sr_imgs[1])
     error = tf.sqrt( diff * diff + eps)
     loss  = tf.reduce_mean(error)

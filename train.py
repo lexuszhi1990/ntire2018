@@ -68,10 +68,10 @@ def train(graph, sess_conf, options):
 
       upscaled_x2_img = transform_reverse(model.sr_imgs[0])
       upscaled_x4_img = transform_reverse(model.sr_imgs[1])
-      g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
-      gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(batch_inputs), max_outputs=2)
       gt_bicubic_sum = tf.summary.image("bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
+      gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_imgs), max_outputs=2)
+      g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
