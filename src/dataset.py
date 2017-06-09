@@ -52,11 +52,12 @@ class DatasetFromHdf5(object):
         self.upscale = upscale
         self.len = self.data.len()
         self.batch_ids = self.data.len() // self.batch_size
+
         self.input_image_size = [self.data.shape[2], self.data.shape[3]]
         _, self.channel, self.gt_height, self.gt_width = np.shape(self.label_x4)
 
     def batch_transpose(self,images):
-      return np.array([image.T for image in images])
+        return np.array([image.T for image in images])
 
     def next(self, index):
         batch_data = self.data[index*self.batch_size:(index+1)*self.batch_size]

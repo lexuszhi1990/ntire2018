@@ -10,8 +10,8 @@ function [data, label] = generate_combined_dataset(data_path, dataset)
   f_lst = [f_lst; dir(fullfile(dataDir, '*.png'))];
 
   count = 0;
-  default_width = 480;
-  default_height = 320;
+  default_width = 240;
+  default_height = 160;
   data = zeros(default_height, default_width, 3, 1);
   label = zeros(default_height, default_width,3, 1);
   %% writing to HDF5

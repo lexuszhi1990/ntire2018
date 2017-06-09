@@ -31,13 +31,14 @@ def trainsform(img):
   return trains_img
 
 def transform_reverse(image):
-  upscale_img = tf.multiply(image, 255.0)
-  upscale_img = tf.clip_by_value(upscale_img, 0, 255)
+  # upscale_img = tf.multiply(image, 255.0)
+  # upscale_img = tf.clip_by_value(upscale_img, 0, 255)
+
   # upscale_img = tf.divide(tf.add(image, 1.0), 2.0)
   # upscale_img = tf.cast(tf.multiply(tf.add(image, 1.0), 127.5), tf.uint8)
   # upscale_img = tf.cast(tf.multiply(tf.add(image, 1.0), 127.5), tf.uint8)
 
-  return upscale_img
+  return image
 
 def mse(target, base):
   return tf.sqrt(tf.reduce_mean(tf.square(tf.subtract(target, base))))

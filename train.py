@@ -2,7 +2,7 @@
 '''
 usage:
 for one channel:
-  python train.py --gpu_id=2 --epoches=100 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
+  python train.py --gpu_id=2 --epoches=100 --lr=0.00001 --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8
 for three channel:
   python train.py --dataset_dir=./dataset/train_dataset_291_origin.h5 --continued_training=False --channel=3 --epoches=100 --gpu_id=2 --batch_size=10
 '''
@@ -18,7 +18,7 @@ import numpy as np
 import tensorflow as tf
 
 from src.model import LapSRN
-from src.dataset import TrainDataset
+from src.dataset import TrainDataset, DatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse, process_train_img
 
 # for log infos
@@ -49,7 +49,7 @@ def train(graph, sess_conf, options):
 
   lr = FLAGS.lr
 
-  dataset = TrainDataset(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+  dataset = DatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
   g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
@@ -61,7 +61,7 @@ def train(graph, sess_conf, options):
 
       # batch_inputs, batch_gt_imgs = process_train_img(gt_imgs, [dataset.gt_height, dataset.gt_width, dataset.channel], dataset.upscale)
 
-      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=[dataset.max_height, dataset.max_width], is_training=is_training, upscale_factor=dataset.upscale)
+      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=dataset.input_image_size, is_training=is_training, upscale_factor=dataset.upscale)
       model.extract_features()
       model.reconstruct()
       loss = model.l1_charbonnier_loss()
@@ -69,15 +69,15 @@ def train(graph, sess_conf, options):
       upscaled_x2_img = transform_reverse(model.sr_imgs[0])
       upscaled_x4_img = transform_reverse(model.sr_imgs[1])
       g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
-      gt_sum = tf.summary.image("gt_output", transform_reverse(batch_gt_imgs), max_outputs=2)
+      gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_imgs), max_outputs=2)
       batch_input_sum = tf.summary.image("inputs", transform_reverse(batch_inputs), max_outputs=2)
-      gt_bicubic_sum = tf.summary.image("gt_bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
+      gt_bicubic_sum = tf.summary.image("bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
-      # opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
-      opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
+      opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
+      # opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
       grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)

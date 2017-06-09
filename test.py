@@ -2,9 +2,9 @@
 '''
 usage:
 single image:
-  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-35-17-06-01-16-22.ckpt-35 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --gt_image=./dataset/test/set14/GT/baboon.png --output_dir=./dataset/test/set14/lapsrn/v1
+  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-40-step-72-2017-06-09-17-09.ckpt-72 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --gt_image=./dataset/test/set14/GT/baboon.png --output_dir=./dataset/test/set14/lapsrn/v1
 for dataset:
-  python test.py --gpu_id=3 --channel=3 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-27-2017-06-02-21-27.ckpt-27 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn/v6
+  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-72-2017-06-09-18-03.ckpt-72 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn/v9
 '''
 
 from __future__ import absolute_import
@@ -42,12 +42,13 @@ def im2double(im):
   return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
 
 def load_img_with_expand_dims(img_path, channel):
-  img = scipy.misc.imread(img_path)
-  # img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-  # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  # img = scipy.misc.imread(img_path, mode='YCbCr')
+
+  img = cv2.imread(img_path)
+  img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
+  height, width, _ = img.shape
 
   img = im2double(img)
-  height, width, _ = img.shape
 
   inputs = np.zeros((batch_size, height, width, channel))
   inputs[0] = img[:,:,0:channel]
@@ -67,16 +68,26 @@ def save_img(image, path):
 
   print("upscaled image size {}".format(np.shape(image)))
 
-  # upscaled_rgb_img = cv2.cvtColor(image, cv2.COLOR_YCR_CB2BGR)
-  # upscaled_int_img = cv2.convertScaleAbs(upscaled_rgb_img, alpha=255)
-  # cv2.imwrite(path, upscaled_int_img)
-
   # upscaled_rgb_img = cv2.cvtColor(image, cv2.COLOR_YCR_CB2RGB)
-  # scipy.misc.imsave(path, upscaled_rgb_img)
+  # scipy.misc.imsave(path, image)
 
-  scipy.misc.imsave(path, image)
+  upscaled_rgb_img = cv2.cvtColor(image, cv2.COLOR_YCR_CB2BGR)
+
+  cv2.imwrite(path, upscaled_rgb_img)
 
   print("save image at {}\n".format(path))
+
+def restore_img(img_path, img_y):
+  img = cv2.imread(img_path)
+  img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
+  upscaled_im = cv2.resize(img, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
+
+  img_y_uint8 = cv2.convertScaleAbs(img_y, alpha=255)
+  print("img_y_uint8 image size {}".format(np.shape(img_y_uint8)))
+
+  upscaled_im[:,:,0] = img_y_uint8
+
+  return upscaled_im
 
 def generator(input_img):
 
@@ -132,8 +143,9 @@ if __name__ == '__main__':
 
       upscaled_img = generator(filepath)
 
+      restored_img = restore_img(filepath, upscaled_img)
       output_img_path = val_img_path(filepath, opt.scale, opt.output_dir)
-      save_img(upscaled_img, output_img_path)
+      save_img(restored_img, output_img_path)
 
   elif os.path.isfile(opt.image):
     output_img_path = val_img_path(opt.image, opt.scale, opt.output_dir)
