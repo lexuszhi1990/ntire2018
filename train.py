@@ -55,29 +55,30 @@ def train(graph, sess_conf, options):
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
 
-      batch_gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
+      batch_gt_x2 = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
+      batch_gt_x4 = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
       # batch_inputs, batch_gt_imgs = process_train_img(gt_imgs, [dataset.gt_height, dataset.gt_width, dataset.channel], dataset.upscale)
 
-      model = LapSRN(batch_inputs, batch_gt_imgs, image_size=dataset.input_image_size, is_training=is_training, upscale_factor=dataset.upscale)
+      model = LapSRN(batch_inputs, batch_gt_x2, batch_gt_x4, image_size=dataset.input_image_size, is_training=is_training, upscale_factor=dataset.upscale)
       model.extract_features()
       model.reconstruct()
-      loss = model.l1_charbonnier_loss()
+      loss = model.l1_loss()
 
       upscaled_x2_img = transform_reverse(model.sr_imgs[0])
       upscaled_x4_img = transform_reverse(model.sr_imgs[1])
       batch_input_sum = tf.summary.image("inputs", transform_reverse(batch_inputs), max_outputs=2)
       gt_bicubic_sum = tf.summary.image("bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
-      gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_imgs), max_outputs=2)
+      gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_x4), max_outputs=2)
       g_output_sum = tf.summary.image("upscaled", upscaled_x4_img, max_outputs=2)
       g_loss_sum = tf.summary.scalar("g_loss", loss)
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
-      opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
-      # opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
+      # opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
+      opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
       grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)
@@ -109,13 +110,13 @@ def train(graph, sess_conf, options):
       for epoch in range(1, epoches+1):
         for step in range(1, dataset.batch_ids+1):
 
-          batch_in, batch_gt = dataset.next(step-1)
+          batch_in, batch_img_x2, batch_img_x4 = dataset.next(step-1)
           if step % (dataset.batch_ids//3) == 0:
-            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_imgs: batch_gt, batch_inputs: batch_in, is_training: False})
+            merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_inputs: batch_in, is_training: True})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
             summary_writer.add_summary(merged, step + epoch*dataset.batch_ids)
           else:
-            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={batch_gt_imgs: batch_gt, batch_inputs: batch_in, is_training: False})
+            apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_inputs: batch_in, is_training: True})
             info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
 
         if epoch % (epoches//10) == 0:

@@ -61,9 +61,10 @@ class DatasetFromHdf5(object):
 
     def next(self, index):
         batch_data = self.data[index*self.batch_size:(index+1)*self.batch_size]
-        batch_label = self.label_x4[index*self.batch_size:(index+1)*self.batch_size]
+        batch_label_x2 = self.label_x2[index*self.batch_size:(index+1)*self.batch_size]
+        batch_label_x4 = self.label_x4[index*self.batch_size:(index+1)*self.batch_size]
 
-        return self.batch_transpose(batch_data), self.batch_transpose(batch_label)
+        return self.batch_transpose(batch_data), self.batch_transpose(batch_label_x2), self.batch_transpose(batch_label_x4)
 
     def __len__(self):
         return self.data.shape[0]

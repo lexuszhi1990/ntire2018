@@ -100,10 +100,11 @@ def generator(input_img):
     with tf.device("/gpu:{}".format(str(opt.gpu_id))):
 
       inputs = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
-      gt_imgs = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
+      gt_img_x2 = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
+      gt_img_x4 = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN(inputs, gt_imgs, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
+      model = LapSRN(inputs, gt_img_x2, gt_img_x4, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
       model.extract_features()
       model.reconstruct()
       upscaled_x4_img = model.sr_imgs[np.log2(opt.scale).astype(int)-1]

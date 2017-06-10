@@ -4,10 +4,10 @@ import tensorflow as tf
 from src.layer import *
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_imgs, image_size, is_training, upscale_factor=4, filter_num=64, scope='lap_srn'):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, image_size, is_training, upscale_factor=4, filter_num=64, scope='lap_srn'):
     self.scope = scope
     self.inputs = inputs
-    self.gt_imgs = gt_imgs
+    self.gt_imgs = [gt_img_x2, gt_img_x4]
     self.height = np.uint32(image_size[0])
     self.width = np.uint32(image_size[1])
 
@@ -23,6 +23,10 @@ class LapSRN(object):
     self.reconstructed_imgs = []
     self.extracted_features = []
 
+  @property
+  def vars(self):
+    return [var for var in tf.trainable_variables() if self.scope in var.name]
+
   def extract_features(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
       if reuse:
@@ -30,6 +34,7 @@ class LapSRN(object):
 
       with tf.variable_scope('init'):
         x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
+        x = batch_normalize(x, self.is_training)
         x = lrelu(x)
 
       for l in range(self.level):
@@ -79,13 +84,16 @@ class LapSRN(object):
         sr_img = tf.add(self.reconstructed_imgs[l], self.extracted_features[l])
         self.sr_imgs.append(sr_img)
 
-  @property
-  def vars(self):
-    return [var for var in tf.trainable_variables() if self.scope in var.name]
+  def l1_loss(self):
+    loss = 0.0
+    for l in range(self.level):
+      loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
 
-  def l1_charbonnier_loss(self):
+    return loss
+
+  def l1_charbonnier_loss(self, X, Y):
     eps = 1e-6
-    diff = tf.subtract(self.gt_imgs, self.sr_imgs[1])
+    diff = tf.subtract(X, Y)
     error = tf.sqrt( diff * diff + eps)
     loss  = tf.reduce_mean(error)
 
@@ -94,6 +102,6 @@ class LapSRN(object):
   def l2_loss(self):
     # diff = (X - Z) .^ 2;
     # Y = 0.5 * sum(diff(:));
-    diff = tf.square(tf.subtract(self.gt_imgs, self.sr_imgs[-1]))
+    diff = tf.square(tf.subtract(self.gt_imgs[-1], self.sr_imgs[-1]))
 
     return 0.5 * tf.reduce_mean(diff)
