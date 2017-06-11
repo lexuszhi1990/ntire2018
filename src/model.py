@@ -34,7 +34,7 @@ class LapSRN(object):
 
       with tf.variable_scope('init'):
         x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
-        x = batch_normalize(x, self.is_training)
+        # x = batch_normalize(x, self.is_training)
         x = lrelu(x)
 
       for l in range(self.level):
@@ -45,7 +45,7 @@ class LapSRN(object):
         for d in range(self.residual_depth):
           with tf.variable_scope('level_{}_residual_{}'.format(str(l), str(d))):
             x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num, self.filter_num], [self.batch_size, height, width, self.filter_num], stride=1)
-            x = batch_normalize(x, self.is_training)
+            # x = batch_normalize(x, self.is_training)
             x = lrelu(x)
 
         # current upscaled width and height for current stage.
@@ -58,7 +58,7 @@ class LapSRN(object):
         #   x = lrelu(x)
         with tf.variable_scope('level_{}_transpose_upscale'.format(str(l))):
           x = deconv_layer(x, [4, 4, self.filter_num, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.filter_num], stride=2)
-          x = batch_normalize(x, self.is_training)
+          # x = batch_normalize(x, self.is_training)
           x = lrelu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(l))):
