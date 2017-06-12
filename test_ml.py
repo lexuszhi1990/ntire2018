@@ -32,9 +32,9 @@ from src.utils import sess_configure, trainsform, transform_reverse
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
 parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
-parser.add_argument("--image", default="./dataset", type=str, help="image path or single image")
+parser.add_argument("--image", default="./null", type=str, help="image path or single image")
 parser.add_argument("--gt_image", default="", type=str, help="image path or single image")
-parser.add_argument("--output_dir", default="./dataset", type=str, help="image path")
+parser.add_argument("--output_dir", default="./null", type=str, help="image path")
 parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
 parser.add_argument("--channel", default=1, type=int, help="input image channel, Default: 4")
 
@@ -98,13 +98,10 @@ def generator(input_img):
   graph = tf.Graph()
   sess_conf = sess_configure()
 
-  # batch_images, img_size = load_img_with_expand_dims(input_img, opt.channel)
-  im_l_y = sio.loadmat(input_img)['im_l_y']
-  img_size = im_l_y.shape
-  height, width = im_l_y.shape
+  img_size = input_img.shape
+  height, width = input_img.shape
   batch_images = np.zeros((batch_size, height, width, opt.channel))
-  im_l_y = im_l_y/255.
-  batch_images[0, :, :, 0] = im_l_y
+  batch_images[0, :, :, 0] = input_img
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(opt.gpu_id))):
@@ -159,17 +156,13 @@ if __name__ == '__main__':
       save_img(restored_img, output_img_path)
 
   elif os.path.isfile(opt.image):
-    im_h_y = generator(opt.image)
 
-    # import pdb
-    # pdb.set_trace()
-
-    im_l_ycbcr = sio.loadmat(opt.image)['im_l_ycbcr']
+    im_l_ycbcr = sio.loadmat(opt.image)['label_x2_ycbcr']
+    im_l_y = sio.loadmat(opt.image)['label_x2_y']
     im_h_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
 
-    im_h_y = im_h_y*255.
-    im_h_y[im_h_y<0] = 0
-    im_h_y[im_h_y>255.] = 255.
+    im_h_y = generator(im_l_y)
+    im_h_y = np.clip(im_h_y*255., 0, 255.)
 
     img = np.zeros((im_h_y.shape[0], im_h_y.shape[1], 3), np.uint8)
     img[:,:,0] = im_h_y[:,:,0]
@@ -178,7 +171,7 @@ if __name__ == '__main__':
     img = Image.fromarray(img, "YCbCr").convert("RGB")
 
     img_name = os.path.basename(opt.image).split('.')[0]
-    save_img(img, img_name+'.png')
+    save_img(img, img_name+'_v2.png')
 
   else:
     print("please set correct input")
