@@ -4,7 +4,7 @@ usage:
 single image:
   python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-24-2017-06-12-15-26.ckpt-24 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-24-2017-06-12-15-26.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/v1
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-24-2017-06-12-15-36.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/v2
 '''
 
 from __future__ import absolute_import
@@ -131,7 +131,7 @@ def SR(input_mat_img):
 
 if __name__ == '__main__':
 
-  if not os.path.exists(opt.output_dir):
+  if not os.path.exists(opt.output_dir) and opt.output_dir != 'null':
     os.system('mkdir -p ' + opt.output_dir)
 
   if os.path.isdir(opt.image):

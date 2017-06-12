@@ -5,7 +5,7 @@ function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, method_dir, sr_method, sr
 % addpath('./src/evaluation_mat/ifc-drrn');
 % addpath('./src/evaluation_mat/matlabPyrTools');
 % eval_dataset('./dataset/test/set14', 'lapsrn', 'lapsrn', 4)
-% eval_dataset('./dataset/test/set5', 'bicubic', 'bicubic', 4)
+% eval_dataset('./dataset/test/set5', 'lapsrn/v1', 'lapsrn', 4)
 
 dataset_gt_path = fullfile(dataset_dir, 'GT');
 dataset_sr_path = fullfile(dataset_dir, method_dir);
