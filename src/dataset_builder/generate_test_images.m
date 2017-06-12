@@ -67,12 +67,12 @@ function [] = generate_test_images(dataset_path)
     label_x2_ycbcr = rgb2ycbcr(label_x2);
     label_x2_y = label_x2_ycbcr(:,:,1);
 
-    data = imresize(img_raw, 1/8,'bicubic');
-    data_ycbcr = rgb2ycbcr(data);
-    data_y = data_ycbcr(:,:,1);
+    label_x1 = imresize(img_raw, 1/8,'bicubic');
+    label_x1_ycbcr = rgb2ycbcr(label_x1);
+    label_x1_y = label_x1_ycbcr(:,:,1);
 
     lm_path = fullfile(mat_dir, image_names{1});
-    save(lm_path, 'img_rgb', 'label_x8_ycbcr', 'label_x8_y', 'label_x4_ycbcr', 'label_x4_y', 'label_x2_ycbcr', 'label_x2_y', 'data_ycbcr', 'data_y');
+    save(lm_path, 'img_rgb', 'label_x8_ycbcr', 'label_x8_y', 'label_x4_ycbcr', 'label_x4_y', 'label_x2_ycbcr', 'label_x2_y', 'label_x1_ycbcr', 'label_x1_y');
     disp(['save image ' lm_path]);
 
     patch_name = sprintf('%s.png',image_names{1});
