@@ -17,6 +17,8 @@ PSNR = zeros([1, numel(gt_lst)]);
 SSIM = zeros([1, numel(gt_lst)]);
 IFC = zeros([1, numel(gt_lst)]);
 
+image_names = [];
+
 for n=1:numel(gt_lst)
   gt_img_name = gt_lst(n).name;
   gt_img_path = fullfile(dataset_gt_path, gt_img_name);
@@ -46,9 +48,12 @@ for n=1:numel(gt_lst)
   SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
   IFC(n) = ifcvec(double(gt_img_y_shaved), double(generated_img_y_shaved));
 
+  image_names = [image_names; {gt_img_name}];
+
   fprintf('for image %s:\n--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', generated_img_path, PSNR(n), SSIM(n), IFC(n));
 end
 
-fprintf('for dataset %s, upscaled by %s, at scale:%d\n--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f;\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
+fprintf('for dataset %s, upscaled by %s, at scale:%d\n--Average PSNR: %.4f;\tAverage SSIM: %.4f;\tAverage IFC: %.4f;\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
 
-end
+filename = fullfile(dataset_sr_path, 'result.txt');
+save_matrix(PSNR, SSIM, IFC, filename, image_names);
