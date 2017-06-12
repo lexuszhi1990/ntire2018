@@ -72,6 +72,7 @@ class LapSRN(object):
         upscaled_height = self.height*np.exp2(l+1).astype(int)
         with tf.variable_scope('level_{}_img_upscale_transpose'.format(str(l))):
           base_images = deconv_layer(base_images, [4, 4, self.channel, self.channel], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=2)
+          # base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(l)))
 
         self.reconstructed_imgs.append(base_images)
 

@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from src.layer import lrelu, prelu
+from src.layer import *
 import tensorflow.contrib.layers as layers
 
 class LapSRN(object):
@@ -47,7 +47,9 @@ class LapSRN(object):
         upscaled_width = self.width*np.exp2(l+1).astype(int)
         upscaled_height = self.height*np.exp2(l+1).astype(int)
 
-        x = tf.image.resize_bilinear(x, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_transpose_upscale'.format(str(l)))
+        # x = tf.image.resize_bilinear(x, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_transpose_upscale'.format(str(l)))
+        x = layers.conv2d_transpose(x, self.filter_num, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}__transpose_upscale'.format(str(l)))
+
 
         net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img'.format(str(l)))
 
@@ -58,8 +60,8 @@ class LapSRN(object):
         upscaled_width = self.width*np.exp2(l+1).astype(int)
         upscaled_height = self.height*np.exp2(l+1).astype(int)
 
-        base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(l)))
-        # base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
+        # base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(l)))
+        base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
 
         self.reconstructed_imgs.append(base_images)
 
