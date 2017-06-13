@@ -2,7 +2,7 @@ function [label] = generate_training_h5(data_path)
   % usage:
   % addpath('./src/evaluation_mat');
   % addpath('./src/dataset_builder');
-  % generate_training_h5('./dataset/train_291')
+  % generate_training_h5('./dataset/train_291');
 
   f_lst = [];
   f_lst = [f_lst; dir(fullfile(data_path, '*.jpg'))];
@@ -86,7 +86,7 @@ function [label] = generate_training_h5(data_path)
       created_flag = true;
       totalct = curr_dat_sz(end);
 
-      disp(['at batch: ', num2str(batchno), '\tbatch size: ', num2str(chunksz)]);
+      disp(['at batch: ', num2str(batchno)]);
   end
 
 end

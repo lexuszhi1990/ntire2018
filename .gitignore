@@ -6,6 +6,7 @@ tmp
 src/evaluation_mat/matlabPyrTools*
 src/evaluation_mat/ifc-*
 
+*.log
 *.pyc
 *.h5
 .*.py
