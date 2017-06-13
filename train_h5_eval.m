@@ -1,3 +1,6 @@
+% update train dataset
+% usage:
+% os.system('matlab -nodesktop -nosplash -r train_h5_eval');
 
 addpath('./src/evaluation_mat');
 addpath('./src/dataset_builder');
