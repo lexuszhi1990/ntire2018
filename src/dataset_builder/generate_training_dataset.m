@@ -1,7 +1,6 @@
 function [data, label] = generate_training_dataset(data_path, dataset)
-  % generate_training_dataset('/home/mcc207/datasets', '291')
-  % generate_training_dataset('../../dataset', 'coco_291')
-  % generate_training_dataset('../../dataset/test/set5', 'GT')
+  % usage:
+  % generate_training_dataset('./dataset/test/set5', 'GT')
 
   dataDir = fullfile(data_path, dataset);
   f_lst = [];

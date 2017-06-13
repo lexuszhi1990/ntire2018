@@ -4,21 +4,11 @@ function save_matrix(psnr, ssim, ifc, filename, images, precision)
 %       save a 2D array into text file
 %
 %   Input:
-%       - psnr         : input matrix (2D array)
-%       - ssim         : input matrix (2D array)
-%       - ifc         : input matrix (2D array)
+%       - psnr      : input matrix (2D array)
+%       - ssim      : input matrix (2D array)
+%       - ifc       : input matrix (2D array)
 %       - filename  : output file name
 %       - precision : float point precision [default = 7]
-%
-%   Citation:
-%       Deep Laplacian Pyramid Networks for Fast and Accurate Super-Resolution
-%       Wei-Sheng Lai, Jia-Bin Huang, Narendra Ahuja, and Ming-Hsuan Yang
-%       IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2017
-%
-%   Contact:
-%       Wei-Sheng Lai
-%       wlai24@ucmerced.edu
-%       University of California, Merced
 % -------------------------------------------------------------------------
 
     if( ~exist('precision', 'var') )
