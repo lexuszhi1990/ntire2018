@@ -4,7 +4,7 @@ usage:
 single image:
   python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-18-33.ckpt-36 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-20-step-24-2017-06-14-20-34.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test1
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-160-step-24-2017-06-14-21-52.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
 '''
 
 from __future__ import absolute_import
@@ -55,15 +55,27 @@ def im2double(im):
 def load_img(img_mat_path):
   image_hash = sio.loadmat(img_mat_path)
 
-  im_l_ycbcr = image_hash['label_x{}_ycbcr'.format(8//opt.scale)]
+  # im_l_ycbcr = image_hash['label_x{}_ycbcr'.format(8//opt.scale)]
   im_l_y = image_hash['label_x{}_y'.format(8//opt.scale)]
-  im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  im_bicubic_ycbcr = image_hash['bicubic_l{}_x{}_ycbcr'.format(opt.scale, opt.scale)]
+  im_bicubic_ycbcr = np.clip(im_bicubic_ycbcr*255., 0, 255.)
   img_gt = image_hash['label_x8_y']
 
   # im_l_y = image_hash['im_l_y']
   # im_l_ycbcr = image_hash['im_l_ycbcr']
   # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
   # img_gt = image_hash['im_gt_y']
+  # im_l_y = im_l_y/255.
+  # img_gt = img_gt/255.
+
+  # img_name = os.path.basename(img_mat_path).split('.')[0]
+  # dir = os.path.dirname(img_mat_path)
+  # im_l_ycbcr = imread(os.path.join(dir, '../lr_x2348', '{}_l{}.png'.format(img_name, opt.scale)), mode='YCbCr')
+  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  # im_l_ycbcr = im_l_ycbcr/255.
+  # im_l_y = im_l_ycbcr[:,:,0]
+  # img_gt = imread(os.path.join(dir, '../PNG', img_name+'.png'), mode='YCbCr')
+  # img_gt = img_gt[:,:,0]/255.
 
   return im_l_y, im_bicubic_ycbcr, img_gt
 
@@ -83,8 +95,16 @@ def save_img(image, path):
   print("upscaled image size {}".format(np.shape(image)))
   print("save image at {}".format(output_img_path))
 
+def save_mat(img, path):
+  image_hash = sio.loadmat(path)
+  image_hash['lapsrn_l{}_x{}_y'.format(opt.scale, opt.scale)] = img
+  sio.savemat(path, image_hash)
+
 def restore_img(im_h_y, im_h_ycbcr):
   im_h_y = np.clip(im_h_y*255., 0, 255.)
+  # im_h_y = im_h_y*255.
+  # im_h_y[im_h_y<0] = 0
+  # im_h_y[im_h_y>255.] = 255.
 
   img = np.zeros((im_h_y.shape[0], im_h_y.shape[1], 3), np.uint8)
   img[:,:,0] = im_h_y[:,:,0]
@@ -145,8 +165,10 @@ def cal_ssim(upscaled_img_y, gt_img_y):
   return ssim
 
 def cal_image_index(gt_img_y, upscaled_img_y):
+
   upscaled_img_y = np.clip(upscaled_img_y*255., 0, 255.)
   gt_img_y = np.clip(gt_img_y*255., 0, 255.)
+
   psnr = compute_psnr(upscaled_img_y, gt_img_y)
   PSNR.append(psnr)
   ssim = cal_ssim(upscaled_img_y, gt_img_y)
@@ -167,6 +189,7 @@ def SR(input_mat_img):
   im_h_y = generator(im_l_y)
   upscaled_img = restore_img(im_h_y, im_h_ycbcr)
   save_img(upscaled_img, input_mat_img)
+  save_mat(im_h_y, input_mat_img)
   cal_image_index(img_gt_y, im_h_y[:,:,0])
 
 if __name__ == '__main__':
@@ -180,8 +203,6 @@ if __name__ == '__main__':
       SR(filepath)
 
     print("for dataset %s:\n--PSNR: %.4f;\tSSIM: %.4f\n"%(opt.image, np.mean(PSNR), np.mean(SSIM)));
-
-    eval_by_saved_img()
 
   elif os.path.isfile(opt.image):
     SR(opt.image)
