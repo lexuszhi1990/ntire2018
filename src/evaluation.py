@@ -16,8 +16,8 @@ import tensorflow as tf
 
 def psnr(pred, gt):
 
-  pred = np.array(pred).astype(np.float64)
-  gt = np.array(gt).astype(np.float64)
+  pred = np.array(pred).astype(np.float32)
+  gt = np.array(gt).astype(np.float32)
 
   imdff = pred - gt
   rmse = math.sqrt( np.mean(imdff ** 2.) )

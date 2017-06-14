@@ -26,7 +26,7 @@ def preprocess(img_path, mode='RGB', shave_bd=0):
 
 
 def eval_dataset(dataset_dir, test_dir, sr_method, scale):
-  gt_img_dir = os.path.join(dataset_dir, 'GT')
+  gt_img_dir = os.path.join(dataset_dir, 'PNG')
   gt_img_list = glob(os.path.join(gt_img_dir, '*.*'))
 
   PSNR = []
@@ -52,9 +52,9 @@ def eval_dataset(dataset_dir, test_dir, sr_method, scale):
     ssim = compute_ssim(gt_img_ep, upscaled_img_ep)[0]
     SSIM.append(ssim)
 
-    print("for image %s:\n--PSNR: %.4f;\tSSIM: %.4f\n"%(upscaled_img_path, psnr, ssim));
+    print("for image %s:\n--PSNR: %.4f;\tSSIM: %.4f"%(upscaled_img_path, psnr, ssim));
 
-  print("for dataset %s:\n--PSNR: %.4f;\tSSIM: %.4f\n"%(test_dir, np.mean(PSNR), np.mean(SSIM)));
+  print("\nfor saved image %s:\n--PSNR: %.4f;\tSSIM: %.4f"%(test_dir, np.mean(PSNR), np.mean(SSIM)));
 
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import h5py
 from scipy.misc import imresize
+import os
 
 class TrainDataset(object):
   def __init__(self, file_path, train_img_size=[128,128], batch_size=10, upscale=4):
@@ -68,3 +69,41 @@ class DatasetFromHdf5(object):
 
     def __len__(self):
         return self.data.shape[0]
+
+class DatasetFromHdf5V1(object):
+    def __init__(self, file_path, batch_size=8, upscale=4):
+        self.batch_size = batch_size
+        self.upscale = upscale
+        self.file_path = file_path
+
+        self.init()
+
+    def init(self):
+        hf = h5py.File(self.file_path)
+        self.label = hf.get("label")
+        self.data_l2 = hf.get("data_l2")
+        self.data_l4 = hf.get("data_l4")
+        self.data_l8 = hf.get("data_l8")
+
+        self.len = self.label.len()
+        self.batch_ids = self.label.len() // self.batch_size
+
+        self.inputs = hf.get("data_l{}".format(self.upscale))
+        self.inputs_size = [self.inputs.shape[2], self.inputs.shape[3]]
+
+        _, self.channel, self.gt_height, self.gt_width = np.shape(self.label)
+
+    def batch_transpose(self,images):
+        return np.array([image.T for image in images])
+
+    def next(self, index):
+        batch_label = self.batch_transpose(self.label[index*self.batch_size:(index+1)*self.batch_size])
+        batch_data_l2 = self.batch_transpose(self.data_l2[index*self.batch_size:(index+1)*self.batch_size])
+        batch_data_l4 = self.batch_transpose(self.data_l4[index*self.batch_size:(index+1)*self.batch_size])
+        batch_data_l8 = self.batch_transpose(self.data_l8[index*self.batch_size:(index+1)*self.batch_size])
+
+        return batch_label, batch_data_l2, batch_data_l4, batch_data_l8
+
+    def rebuild(self):
+        os.system('matlab -nodesktop -nosplash -r train_h5_eval 1>/dev/null');
+        print('rebuild the dataset...')

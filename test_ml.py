@@ -2,9 +2,9 @@
 '''
 usage:
 single image:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-24-2017-06-12-15-26.ckpt-24 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-48-2017-06-14-10-01.ckpt-48 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-24-2017-06-12-15-36.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/v2
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-10-46.ckpt-36 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/v4
 '''
 
 from __future__ import absolute_import
@@ -29,6 +29,10 @@ from src.model import LapSRN
 from src.model_tf import LapSRN as LapSRN_v1
 from src.utils import sess_configure, trainsform, transform_reverse
 
+from src.eval_dataset import eval_dataset
+from src.evaluation import psnr as compute_psnr
+from src.evaluation import _SSIMForMultiScale as compute_ssim
+
 parser = argparse.ArgumentParser(description="LapSRN Test")
 parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
 parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
@@ -40,6 +44,8 @@ parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method"
 parser.add_argument("--batch_size", default=2, type=int, help="batch size")
 
 opt = parser.parse_args()
+PSNR = []
+SSIM = []
 
 def im2double(im):
   info = np.iinfo(im.dtype) # Get the data type of the input image
@@ -49,9 +55,9 @@ def load_img(img_mat_path):
   image_hash = sio.loadmat(img_mat_path)
   im_l_ycbcr = image_hash['label_x{}_ycbcr'.format(8//opt.scale)]
   im_l_y = image_hash['label_x{}_y'.format(8//opt.scale)]
-  im_h_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
 
-  return im_l_y, im_h_ycbcr
+  return im_l_y, im_bicubic_ycbcr, image_hash['label_x8_y']
 
 def val_img_path(img_path):
   img_name = os.path.basename(img_path).split('.')[0]
@@ -123,11 +129,38 @@ def generator(input_img):
 
       return upscaled_img[0]
 
+def cal_ssim(upscaled_img_y, gt_img_y):
+  gt_img_ep = np.expand_dims(np.expand_dims(gt_img_y, axis=0), axis=3)
+  upscaled_img_ep = np.expand_dims(upscaled_img_y, axis=0)
+  upscaled_img_ep = np.expand_dims(np.expand_dims(upscaled_img_y, axis=0), axis=3)
+  ssim = compute_ssim(gt_img_ep, upscaled_img_ep)[0]
+
+  return ssim
+
+def cal_image_index(gt_img_y, upscaled_img_y):
+  upscaled_img_y = np.clip(upscaled_img_y*255., 0, 255.)
+  gt_img_y = np.clip(gt_img_y*255., 0, 255.)
+  psnr = compute_psnr(upscaled_img_y, gt_img_y)
+  PSNR.append(psnr)
+  ssim = cal_ssim(upscaled_img_y, gt_img_y)
+  SSIM.append(ssim)
+
+  print("the current image index:\n--psnr:%0.5f, ssim:%0.5f\n"%(psnr, ssim))
+
+def eval_by_saved_img():
+  dataset_dir_list = opt.image.split('/')[0:-1]
+  dataset_dir = '/'.join(dataset_dir_list)
+  test_dir_list = opt.output_dir.split('/')[len(dataset_dir_list):]
+  test_dir = '/'.join(test_dir_list)
+
+  eval_dataset(dataset_dir, test_dir, opt.sr_method, opt.scale)
+
 def SR(input_mat_img):
-  im_l_y, im_h_ycbcr = load_img(input_mat_img)
+  im_l_y, im_h_ycbcr, img_gt_y = load_img(input_mat_img)
   im_h_y = generator(im_l_y)
   upscaled_img = restore_img(im_h_y, im_h_ycbcr)
   save_img(upscaled_img, input_mat_img)
+  cal_image_index(img_gt_y, im_h_y[:,:,0])
 
 if __name__ == '__main__':
 
@@ -138,6 +171,10 @@ if __name__ == '__main__':
     dataset_image_path = os.path.join(opt.image, '*.mat')
     for filepath in glob(dataset_image_path):
       SR(filepath)
+
+    print("for dataset %s:\n--PSNR: %.4f;\tSSIM: %.4f\n"%(opt.image, np.mean(PSNR), np.mean(SSIM)));
+
+    eval_by_saved_img()
 
   elif os.path.isfile(opt.image):
     SR(opt.image)
