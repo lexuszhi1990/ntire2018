@@ -4,7 +4,7 @@ usage:
 single image:
   python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-18-33.ckpt-36 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-80-step-36-2017-06-14-18-15.ckpt-36 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-20-step-24-2017-06-14-20-34.ckpt-24 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test1
 '''
 
 from __future__ import absolute_import

@@ -17,7 +17,7 @@ class LapSRN(object):
     self.filter_num = filter_num
     self.is_training = is_training
     self.residual_depth = 10
-    self.kernel_size = 5
+    self.kernel_size = 3
     self.batch_size, _, _, self.channel = tf.Tensor.get_shape(inputs).as_list()
 
     self.sr_imgs = []
@@ -53,14 +53,14 @@ class LapSRN(object):
         upscaled_width = self.width*np.exp2(l+1).astype(int)
         upscaled_height = self.height*np.exp2(l+1).astype(int)
 
-        # with tf.variable_scope('level_{}_pixel_shift_upscale'.format(str(l))):
-        #   x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num*4, self.filter_num], [self.batch_size, height, width, self.filter_num*4], stride=1)
-        #   x = pixel_shuffle_layer(x, 2, 64)
-        #   x = lrelu(x)
-        with tf.variable_scope('level_{}_transpose_upscale'.format(str(l))):
-          x = deconv_layer(x, [4, 4, self.filter_num, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.filter_num], stride=2)
-          # x = batch_normalize(x, self.is_training)
+        with tf.variable_scope('level_{}_pixel_shift_upscale'.format(str(l))):
+          x = deconv_layer(x, [self.kernel_size, self.kernel_size, self.filter_num*4, self.filter_num], [self.batch_size, height, width, self.filter_num*4], stride=1)
+          x = pixel_shuffle_layer(x, 2, 64)
           x = lrelu(x)
+        # with tf.variable_scope('level_{}_transpose_upscale'.format(str(l))):
+          # x = deconv_layer(x, [4, 4, self.filter_num, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.filter_num], stride=2)
+          # x = batch_normalize(x, self.is_training)
+          # x = lrelu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(l))):
           net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=1)
@@ -121,7 +121,7 @@ class LapSRN_v1(object):
     self.filter_num = filter_num
     self.is_training = is_training
     self.residual_depth = 10
-    self.kernel_size = 5
+    self.kernel_size = 3
     self.batch_size, _, _, self.channel = tf.Tensor.get_shape(inputs).as_list()
 
     self.sr_imgs = []
@@ -196,6 +196,9 @@ class LapSRN_v1(object):
   def l2_loss(self):
     # diff = (X - Z) .^ 2;
     # Y = 0.5 * sum(diff(:));
-    diff = tf.square(tf.subtract(self.gt_imgs[-1], self.sr_imgs[-1]))
+    loss = 0.0
+    for l in range(self.level):
+      diff = tf.square(tf.subtract(self.sr_imgs[l], self.gt_imgs[l]))
+      loss = loss + 0.5 * tf.reduce_mean(diff)
 
-    return 0.5 * tf.reduce_mean(diff)
+    return loss

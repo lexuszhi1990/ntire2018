@@ -1,8 +1,8 @@
-function [label] = generate_training_h5(data_path)
+function [label] = generate_training_h5(data_path, epoches)
   % usage:
   % addpath('./src/evaluation_mat');
   % addpath('./src/dataset_builder');
-  % generate_training_h5('./dataset/train_291');
+  % generate_training_h5('./dataset/train_291', 5);
 
   f_lst = [];
   f_lst = [f_lst; dir(fullfile(data_path, '*.jpg'))];
@@ -10,6 +10,9 @@ function [label] = generate_training_h5(data_path)
   f_lst = [f_lst; dir(fullfile(data_path, '*.png'))];
 
   count = 0;
+  if( ~exist('epoches', 'var') )
+      epoches = 1;
+  end
   patch_size = 256;
   label = zeros(patch_size, patch_size,1, 1, 'single');
   data_l2 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
@@ -20,55 +23,62 @@ function [label] = generate_training_h5(data_path)
   chunksz = 16;
   created_flag = false;
   totalct = 0;
-  savepath = ['./dataset/train.h5'];
+  savepath = ['./dataset/train_x' num2str(epoches) '.h5'];
 
-  for f_iter = 1:numel(f_lst)
-    f_info = f_lst(f_iter);
-    if f_info.name == '.'
+  for epoch = 1:epoches
+
+    f_lst = f_lst(randperm(length(f_lst)));
+
+    for f_iter = 1:numel(f_lst)
+      f_info = f_lst(f_iter);
+      if f_info.name == '.'
+          continue;
+      end
+
+      f_path = fullfile(data_path,f_info.name);
+      img_raw = imread(f_path);
+
+      % randomly resize between 0.5 ~ 1.0
+      ratio = randi([5, 10]) * 0.1;
+      img_raw = imresize(img_raw, ratio);
+
+      % min width/height should be larger than patch size
+      if( size(img_raw, 1) < patch_size || size(img_raw, 2) < patch_size )
+        img_raw = vllab_imresize(img_raw, patch_size);
+      end
+
+      % random crop with size
+      cropped_img = random_crop(img_raw, patch_size);
+
+      % random rotate and flip
+      image = random_rotate_and_flip(cropped_img);
+
+      if size(img_raw, 3) == 3
+        image = image;
+      else
+        disp(f_info);
+        disp('only one channel for this image');
         continue;
+      end
+
+      image = im2double(image);
+      img_ycbcy = rgb2ycbcr(image);
+
+      img_y = img_ycbcy(:, :, 1);
+      data_l2_y = imresize(img_y, 1/2, 'bicubic');
+      data_l4_y = imresize(img_y, 1/4, 'bicubic');
+      data_l8_y = imresize(img_y, 1/8, 'bicubic');
+
+      count = count+1;
+      label(:, :, :, count) = img_y;
+      data_l2(:, :, :, count) = data_l2_y;
+      data_l4(:, :, :, count) = data_l4_y;
+      data_l8(:, :, :, count) = data_l8_y;
+
+      disp(f_path);
     end
 
-    f_path = fullfile(data_path,f_info.name);
-    img_raw = imread(f_path);
-
-    % randomly resize between 0.5 ~ 1.0
-    ratio = randi([5, 10]) * 0.1;
-    img_raw = imresize(img_raw, ratio);
-
-    % min width/height should be larger than patch size
-    if( size(img_raw, 1) < patch_size || size(img_raw, 2) < patch_size )
-      img_raw = vllab_imresize(img_raw, patch_size);
-    end
-
-    % random crop with size
-    cropped_img = random_crop(img_raw, patch_size);
-
-    % random rotate and flip
-    image = random_rotate_and_flip(cropped_img);
-
-    if size(img_raw, 3) == 3
-      image = image;
-    else
-      disp(f_info);
-      disp('only one channel for this image');
-      continue;
-    end
-
-    image = im2double(image);
-    img_ycbcy = rgb2ycbcr(image);
-
-    img_y = img_ycbcy(:, :, 1);
-    data_l2_y = imresize(img_y, 1/2, 'bicubic');
-    data_l4_y = imresize(img_y, 1/4, 'bicubic');
-    data_l8_y = imresize(img_y, 1/8, 'bicubic');
-
-    count = count+1;
-    label(:, :, :, count) = img_y;
-    data_l2(:, :, :, count) = data_l2_y;
-    data_l4(:, :, :, count) = data_l4_y;
-    data_l8(:, :, :, count) = data_l8_y;
-
-    disp(f_path);
+    disp([num2str(epoch) 'end...']);
   end
 
   order = randperm(count);

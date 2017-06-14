@@ -1,8 +1,8 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0004
-  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0004
+  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0001
+  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --g_decay_rate=0.1 --continued_training=True --batch_size=24 --gpu_id=2 --epoches=100 --lr=0.00005
 '''
 
 from __future__ import absolute_import
