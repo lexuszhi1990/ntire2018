@@ -2,6 +2,7 @@
 '''
 usage:
   python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0008
+  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0008
 '''
 
 from __future__ import absolute_import
@@ -72,8 +73,8 @@ def train(graph, sess_conf, options):
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
-      # opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
-      opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
+      opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
+      # opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
       grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)
@@ -121,10 +122,10 @@ def train(graph, sess_conf, options):
           info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
         # rebuild the dataset on every epoch
-        dataset.rebuild()
-        dataset_v1 = DatasetFromHdf5V1(file_path=dataset.file_path, batch_size=dataset.batch_size, upscale=dataset.upscale)
-        del(dataset)
-        dataset = dataset_v1
+        # dataset.rebuild()
+        # dataset_v1 = DatasetFromHdf5V1(file_path=dataset.file_path, batch_size=dataset.batch_size, upscale=dataset.upscale)
+        # del(dataset)
+        # dataset = dataset_v1
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)

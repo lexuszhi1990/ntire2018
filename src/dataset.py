@@ -80,15 +80,21 @@ class DatasetFromHdf5V1(object):
 
     def init(self):
         hf = h5py.File(self.file_path)
-        self.label = hf.get("label")
-        self.data_l2 = hf.get("data_l2")
-        self.data_l4 = hf.get("data_l4")
-        self.data_l8 = hf.get("data_l8")
+        if hf.get("data_l8") == None:
+            self.label = hf.get("label_x4")
+            self.data_l2 = hf.get("label_x2")
+            self.data_l4 = hf.get("data")
+            self.data_l8 = self.data_l4
+        else:
+            self.label = hf.get("label")
+            self.data_l2 = hf.get("data_l2")
+            self.data_l4 = hf.get("data_l4")
+            self.data_l8 = hf.get("data_l8")
 
         self.len = self.label.len()
         self.batch_ids = self.label.len() // self.batch_size
 
-        self.inputs = hf.get("data_l{}".format(self.upscale))
+        self.inputs = vars(self)["data_l{}".format(self.upscale)]
         self.inputs_size = [self.inputs.shape[2], self.inputs.shape[3]]
 
         _, self.channel, self.gt_height, self.gt_width = np.shape(self.label)
