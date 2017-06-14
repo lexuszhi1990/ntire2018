@@ -60,7 +60,6 @@ def tf_flag_setup(flags):
 
   flags.DEFINE_integer('upscale_factor', 4, "upscale factor")
 
-  flags.DEFINE_bool('is_training_mode', True, "whether continued training from last ckpt")
   flags.DEFINE_bool('continued_training', False, "whether continued training from last ckpt")
   flags.DEFINE_bool('debug', False, "whether or not to print debug messages")
 

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0008
-  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0008
+  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0004
+  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0004
 '''
 
 from __future__ import absolute_import
@@ -29,9 +29,7 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 tf_flag_setup(flags)
 
-def train(graph, sess_conf, options):
-  print('starts to train')
-
+def train(options):
   # define training variables here
   batch_size = FLAGS.batch_size
   dataset_dir = FLAGS.dataset_dir
@@ -39,13 +37,14 @@ def train(graph, sess_conf, options):
   gpu_id = FLAGS.gpu_id
   g_decay_rate = FLAGS.g_decay_rate
   upscale_factor = FLAGS.upscale_factor
-  is_training_mode = FLAGS.is_training_mode
   continued_training = FLAGS.continued_training
   epoches = FLAGS.epoches
   g_log_dir = FLAGS.g_log_dir
   debug = FLAGS.debug
 
   lr = FLAGS.lr
+  sess_conf = sess_configure()
+  graph = tf.Graph()
 
   dataset = DatasetFromHdf5V1(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
   g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
@@ -121,20 +120,12 @@ def train(graph, sess_conf, options):
           saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
           info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
-        # rebuild the dataset on every epoch
-        # dataset.rebuild()
-        # dataset_v1 = DatasetFromHdf5V1(file_path=dataset.file_path, batch_size=dataset.batch_size, upscale=dataset.upscale)
-        # del(dataset)
-        # dataset = dataset_v1
-
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
   setup_project(FLAGS)
 
-  graph = tf.Graph()
-  sess_conf = sess_configure()
-
-  train(graph, sess_conf, FLAGS)
+  print("===> Training")
+  train(FLAGS)
 
 if __name__ == '__main__':
 
