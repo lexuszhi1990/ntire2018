@@ -4,7 +4,8 @@ usage:
 single image:
   python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-50-step-48-2017-06-14-10-01.ckpt-48 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-10-46.ckpt-36 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/v4
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-15-42.ckpt-36
+  --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
 '''
 
 from __future__ import absolute_import
@@ -25,8 +26,7 @@ from scipy.misc import imsave
 
 import tensorflow as tf
 
-from src.model import LapSRN
-from src.model_tf import LapSRN as LapSRN_v1
+from src.model import LapSRN, LapSRN_v1
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
@@ -48,16 +48,25 @@ PSNR = []
 SSIM = []
 
 def im2double(im):
-  info = np.iinfo(im.dtype) # Get the data type of the input image
-  return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
+  # info = np.iinfo(im.dtype) # Get the data type of the input image
+  # return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
+
+  return im/255.
 
 def load_img(img_mat_path):
   image_hash = sio.loadmat(img_mat_path)
+
   im_l_ycbcr = image_hash['label_x{}_ycbcr'.format(8//opt.scale)]
   im_l_y = image_hash['label_x{}_y'.format(8//opt.scale)]
   im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  img_gt = image_hash['label_x8_y']
 
-  return im_l_y, im_bicubic_ycbcr, image_hash['label_x8_y']
+  # im_l_y = image_hash['im_l_y']
+  # im_l_ycbcr = image_hash['im_l_ycbcr']
+  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  # img_gt = image_hash['im_gt_y']
+
+  return im_l_y, im_bicubic_ycbcr, img_gt
 
 def val_img_path(img_path):
   img_name = os.path.basename(img_path).split('.')[0]
@@ -74,7 +83,6 @@ def save_img(image, path):
 
   print("upscaled image size {}".format(np.shape(image)))
   print("save image at {}".format(output_img_path))
-
 
 def restore_img(im_h_y, im_h_ycbcr):
   im_h_y = np.clip(im_h_y*255., 0, 255.)

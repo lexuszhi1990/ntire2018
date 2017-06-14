@@ -105,5 +105,5 @@ class DatasetFromHdf5V1(object):
         return batch_label, batch_data_l2, batch_data_l4, batch_data_l8
 
     def rebuild(self):
-        os.system('matlab -nodesktop -nosplash -r train_h5_eval 1>/dev/null');
         print('rebuild the dataset...')
+        os.system('matlab -nodesktop -nosplash -r train_h5_eval 1>/dev/null');

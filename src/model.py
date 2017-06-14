@@ -121,7 +121,7 @@ class LapSRN_v1(object):
     self.filter_num = filter_num
     self.is_training = is_training
     self.residual_depth = 10
-    self.kernel_size = 3
+    self.kernel_size = 5
     self.batch_size, _, _, self.channel = tf.Tensor.get_shape(inputs).as_list()
 
     self.sr_imgs = []

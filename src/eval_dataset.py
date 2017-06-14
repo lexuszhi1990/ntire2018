@@ -38,8 +38,8 @@ def eval_dataset(dataset_dir, test_dir, sr_method, scale):
     test_img_name = '{}_l{}_{}_x{}.png'.format(image_basename, scale, sr_method, scale)
     upscaled_img_path = os.path.join(dataset_dir, test_dir, test_img_name)
 
-    gt_img = preprocess(image_ab_path, mode='YCbCr', shave_bd=0)
-    upscaled_img = preprocess(upscaled_img_path, mode='YCbCr', shave_bd=0)
+    gt_img = preprocess(image_ab_path, shave_bd=0)
+    upscaled_img = preprocess(upscaled_img_path, shave_bd=0)
 
     gt_img_y = gt_img[:,:,0]
     upscaled_img_y = upscaled_img[:,:,0]
@@ -52,7 +52,7 @@ def eval_dataset(dataset_dir, test_dir, sr_method, scale):
     ssim = compute_ssim(gt_img_ep, upscaled_img_ep)[0]
     SSIM.append(ssim)
 
-    print("for image %s:\n--PSNR: %.4f;\tSSIM: %.4f"%(upscaled_img_path, psnr, ssim));
+    print("for image: %s\n--PSNR: %.4f;\tSSIM: %.4f"%(upscaled_img_path, psnr, ssim));
 
   print("\nfor saved image %s:\n--PSNR: %.4f;\tSSIM: %.4f"%(test_dir, np.mean(PSNR), np.mean(SSIM)));
 

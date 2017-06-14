@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0005
+  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0008
 '''
 
 from __future__ import absolute_import
@@ -121,8 +121,10 @@ def train(graph, sess_conf, options):
           info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
         # rebuild the dataset on every epoch
-        # dataset.rebuild()
-        # dataset = DatasetFromHdf5V1(file_path=dataset.file_path, batch_size=dataset.batch_size, upscale=dataset.upscale)
+        dataset.rebuild()
+        dataset_v1 = DatasetFromHdf5V1(file_path=dataset.file_path, batch_size=dataset.batch_size, upscale=dataset.upscale)
+        del(dataset)
+        dataset = dataset_v1
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
