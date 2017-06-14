@@ -9,6 +9,8 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
 
   % verify that format is right
   dat_dims=size(data_l2);
+  date_l4_dims=size(data_l4);
+  date_l8_dims=size(data_l8);
   lab_dims=size(labels);
   num_samples=dat_dims(end);
 
@@ -29,8 +31,8 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
       delete(filename);
     end
     h5create(filename, '/data_l2', [dat_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [dat_dims(1:end-1) chunksz]); % width, height, channels, number
-    h5create(filename, '/data_l4', [dat_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [dat_dims(1:end-1) chunksz]); % width, height, channels, number
-    h5create(filename, '/data_l8', [dat_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [dat_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/data_l4', [date_l4_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l4_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/data_l8', [date_l8_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l8_dims(1:end-1) chunksz]); % width, height, channels, number
     h5create(filename, '/label', [lab_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [lab_dims(1:end-1) chunksz]); % width, height, channels, number
     if ~exist('startloc','var')
       startloc.dat=[ones(1,length(dat_dims)-1), 1];
