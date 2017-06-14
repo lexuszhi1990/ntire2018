@@ -9,21 +9,18 @@ from glob import glob
 import cv2
 import numpy as np
 
+from PIL import Image
+from scipy.ndimage import imread
+
 from src.evaluation import psnr as compute_psnr
 from src.evaluation import _SSIMForMultiScale as compute_ssim
 
-def preprocess(img_path, mode='RGB', shave_bd=0):
-  img = cv2.imread(img_path)
+def preprocess(img_path, shave_bd=0):
+  img = imread(img_path, mode='YCbCr')
   height, width = img.shape[:2]
   img = img[shave_bd:height - shave_bd, shave_bd:width - shave_bd]
 
-  if mode=='YCbCr':
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-
   return img
-  # if expand_dims:
-  #   img = np.expand_dims(img, axis=0)
-
 
 def eval_dataset(dataset_dir, test_dir, sr_method, scale):
   gt_img_dir = os.path.join(dataset_dir, 'PNG')

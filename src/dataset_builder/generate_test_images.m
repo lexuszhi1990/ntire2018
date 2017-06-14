@@ -2,7 +2,7 @@ function [] = generate_test_images(dataset_path)
 
   % usage:
   % addpath('./src/dataset_builder');
-  % generate_test_images('./dataset/test/set14')
+  % generate_test_images('./dataset/test/set14');
 
   scale_list = [2, 3, 4, 8];
 
@@ -54,21 +54,19 @@ function [] = generate_test_images(dataset_path)
       img_raw = im2double(repmat(img_rgb, [1 1 3]));
     end
 
+    img_ycbcr = rgb2ycbcr(img_raw);
+
     % save mat file for each image
-    label_x8 = img_raw;
-    label_x8_ycbcr = rgb2ycbcr(label_x8);
+    label_x8_ycbcr = img_ycbcr;
     label_x8_y = label_x8_ycbcr(:,:,1);
 
-    label_x4 = imresize(img_raw, 1/2,'bicubic');
-    label_x4_ycbcr = rgb2ycbcr(label_x4);
+    label_x4_ycbcr = imresize(img_ycbcr, 1/2,'bicubic');
     label_x4_y = label_x4_ycbcr(:,:,1);
 
-    label_x2 = imresize(img_raw, 1/4,'bicubic');
-    label_x2_ycbcr = rgb2ycbcr(label_x2);
+    label_x2_ycbcr = imresize(img_ycbcr, 1/4,'bicubic');
     label_x2_y = label_x2_ycbcr(:,:,1);
 
-    label_x1 = imresize(img_raw, 1/8,'bicubic');
-    label_x1_ycbcr = rgb2ycbcr(label_x1);
+    label_x1_ycbcr = imresize(img_ycbcr, 1/8,'bicubic');
     label_x1_y = label_x1_ycbcr(:,:,1);
 
     lm_path = fullfile(mat_dir, image_names{1});
@@ -77,7 +75,7 @@ function [] = generate_test_images(dataset_path)
 
     patch_name = sprintf('%s.png',image_names{1});
     gt_img_path = fullfile(gt_img_dir, patch_name);
-    imwrite(img_rgb, gt_img_path);
+    imwrite(img_raw, gt_img_path);
 
     for i = 1:numel(scale_list)
       scale = scale_list(i);

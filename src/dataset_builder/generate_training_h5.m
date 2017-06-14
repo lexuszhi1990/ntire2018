@@ -47,12 +47,15 @@ function [label] = generate_training_h5(data_path)
     image = random_rotate_and_flip(cropped_img);
 
     if size(img_raw, 3) == 3
-      img_ycbcy = rgb2ycbcr(image);
+      image = image;
     else
       disp(f_info);
       disp('only one channel for this image');
       continue;
     end
+
+    image = im2double(image);
+    img_ycbcy = rgb2ycbcr(image);
 
     img_y = img_ycbcy(:, :, 1);
     data_l2_y = imresize(img_y, 1/2, 'bicubic');
@@ -60,10 +63,10 @@ function [label] = generate_training_h5(data_path)
     data_l8_y = imresize(img_y, 1/8, 'bicubic');
 
     count = count+1;
-    label(:, :, :, count) = im2single(img_y);
-    data_l2(:, :, :, count) = im2single(data_l2_y);
-    data_l4(:, :, :, count) = im2single(data_l4_y);
-    data_l8(:, :, :, count) = im2single(data_l8_y);
+    label(:, :, :, count) = img_y;
+    data_l2(:, :, :, count) = data_l2_y;
+    data_l4(:, :, :, count) = data_l4_y;
+    data_l8(:, :, :, count) = data_l8_y;
 
     disp(f_path);
   end
