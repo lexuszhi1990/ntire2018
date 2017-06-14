@@ -5,7 +5,7 @@ function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, method_dir, sr_method, sr
 % addpath('./src/evaluation_mat/ifc-drrn');
 % addpath('./src/evaluation_mat/matlabPyrTools');
 
-% eval_dataset('./dataset/test/set5', 'lapsrn/v3', 'lapsrn', 4);
+% eval_dataset('./dataset/test/set5', 'lapsrn/mat', 'lapsrn', 4);
 
 dataset_gt_path = fullfile(dataset_dir, 'PNG');
 dataset_sr_path = fullfile(dataset_dir, method_dir);
@@ -39,13 +39,13 @@ for n=1:numel(gt_lst)
 
   gt_img_ycbcr = rgb2ycbcr(gt_img);
   gt_img_y = im2double(gt_img_ycbcr(:,:,1));
-  gt_img_y_shaved = shave(uint8(single(gt_img_y) * 255), [sr_factor, sr_factor]);
+  gt_img_y_shaved = shave(uint8(single(gt_img_y) * 255), sr_factor);
 
   generated_img = imread(generated_img_path);
   % generated_img = imresize(imresize(gt_img, 1.0/sr_factor), sr_factor, 'bicubic');
   generated_img_ycbcr = rgb2ycbcr(generated_img);
   generated_img_y = im2double(generated_img_ycbcr(:,:,1));
-  generated_img_y_shaved = shave(uint8(single(generated_img_y) * 255), [sr_factor, sr_factor]);
+  generated_img_y_shaved = shave(uint8(single(generated_img_y) * 255), sr_factor);
 
   PSNR(n) = compute_psnr(gt_img, generated_img);
   SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
