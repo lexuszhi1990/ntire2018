@@ -1,8 +1,8 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train.h5 --continued_training=False --batch_size=8 --gpu_id=2 --epoches=100 --lr=0.0001
-  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --g_decay_rate=0.1 --continued_training=True --batch_size=24 --gpu_id=2 --epoches=100 --lr=0.00005
+  python train.py --dataset_dir=./dataset/train_x2.h5 --continued_training=False --g_decay_rate=0.5 --gpu_id=2 --epoches=100 --lr=0.0001 --batch_size=8
+  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --g_decay_rate=0.9 --continued_training=True --batch_size=24 --gpu_id=2 --epoches=100 --lr=0.00005
 '''
 
 from __future__ import absolute_import
@@ -47,7 +47,8 @@ def train(options):
   graph = tf.Graph()
 
   dataset = DatasetFromHdf5V1(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-  g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
+  # g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
+  g_decay_steps = np.floor(epoches//3 * dataset.batch_ids)
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
@@ -72,8 +73,8 @@ def train(options):
 
       counter = tf.get_variable(name="counter", shape=[], initializer=tf.constant_initializer(0), trainable=False)
       lr = tf.train.exponential_decay(lr, counter, decay_rate=g_decay_rate, decay_steps=g_decay_steps, staircase=True)
-      opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
-      # opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
+      # opt = tf.train.RMSPropOptimizer(learning_rate=lr, decay=0.95, momentum=0.9, epsilon=1e-8)
+      opt = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.5)
       grads = opt.compute_gradients(loss, var_list=model.vars)
       apply_gradient_opt = opt.apply_gradients(grads, global_step=counter)
       g_lr_sum = tf.summary.scalar("g_lr", lr)
