@@ -2,9 +2,10 @@
 '''
 usage:
 single image:
-  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-40-step-72-2017-06-09-17-09.ckpt-72 --image=./dataset/test/set14/lr_x2348/baboon_l4.png --gt_image=./dataset/test/set14/GT/baboon.png --output_dir=./dataset/test/set14/lapsrn/v1
+  python test_ml.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-36-2017-06-14-18-33.ckpt-36 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-72-2017-06-09-18-03.ckpt-72 --image=./dataset/test/set14/lr_x2348 --output_dir=./dataset/test/set14/lapsrn/v9
+  python test_ml.py --gpu_id=1 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-20-step-180-2017-06-15-14-57.ckpt-180 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
+  python test_ml.py --gpu_id=1 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-180-2017-06-15-18-19.ckpt-180 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
 '''
 
 from __future__ import absolute_import
@@ -13,98 +14,126 @@ from __future__ import print_function
 
 import time
 import argparse
-import cv2
-import scipy.misc
 import os
 import numpy as np
 from glob import glob
+import scipy.io as sio
+
+from PIL import Image
+from scipy.ndimage import imread
+from scipy.misc import imresize
+from scipy.misc import imsave
 
 import tensorflow as tf
 
-from src.model import LapSRN
+from src.model import LapSRN, LapSRN_v1
 from src.utils import sess_configure, trainsform, transform_reverse
 
+from src.eval_dataset import eval_dataset
+from src.evaluation import psnr as compute_psnr
+from src.evaluation import _SSIMForMultiScale as compute_ssim
+
 parser = argparse.ArgumentParser(description="LapSRN Test")
-parser.add_argument("--gpu_id", default=1, type=int, help="GPU id")
+parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
 parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
-parser.add_argument("--image", default="./dataset", type=str, help="image path or single image")
-parser.add_argument("--gt_image", default="", type=str, help="image path or single image")
-parser.add_argument("--output_dir", default="./dataset", type=str, help="image path")
+parser.add_argument("--image", default="null", type=str, help="image path or single image")
+parser.add_argument("--output_dir", default="null", type=str, help="image path")
 parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
-parser.add_argument("--channel", default=3, type=int, help="input image channel, Default: 4")
+parser.add_argument("--channel", default=1, type=int, help="input image channel, Default: 4")
+parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method")
+parser.add_argument("--batch_size", default=2, type=int, help="batch size")
 
 opt = parser.parse_args()
-batch_size = 2
-sr_method = 'lapsrn'
+PSNR = []
+SSIM = []
 
 def im2double(im):
-  info = np.iinfo(im.dtype) # Get the data type of the input image
-  return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
+  # info = np.iinfo(im.dtype) # Get the data type of the input image
+  # return im.astype(np.float32) / info.max # Divide all values by the largest possible value in the datatype
 
-def load_img_with_expand_dims(img_path, channel):
-  # img = scipy.misc.imread(img_path, mode='YCbCr')
+  return im/255.
 
-  img = cv2.imread(img_path)
-  img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-  height, width, _ = img.shape
+def load_img(img_mat_path):
+  image_hash = sio.loadmat(img_mat_path)
 
-  img = im2double(img)
+  # im_l_ycbcr = image_hash['label_x{}_ycbcr'.format(8//opt.scale)]
+  im_l_y = image_hash['label_x{}_y'.format(8//opt.scale)]
+  im_bicubic_ycbcr = image_hash['bicubic_l{}_x{}_ycbcr'.format(opt.scale, opt.scale)]
+  im_bicubic_ycbcr = np.clip(im_bicubic_ycbcr*255., 0, 255.)
+  img_gt = image_hash['label_x8_y']
 
-  inputs = np.zeros((batch_size, height, width, channel))
-  inputs[0] = img[:,:,0:channel]
+  # im_l_y = image_hash['im_l_y']
+  # im_l_ycbcr = image_hash['im_l_ycbcr']
+  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  # img_gt = image_hash['im_gt_y']
+  # im_l_y = im_l_y/255.
+  # img_gt = img_gt/255.
 
-  return inputs, (height, width)
+  # img_name = os.path.basename(img_mat_path).split('.')[0]
+  # dir = os.path.dirname(img_mat_path)
+  # im_l_ycbcr = imread(os.path.join(dir, '../lr_x2348', '{}_l{}.png'.format(img_name, opt.scale)), mode='YCbCr')
+  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
+  # im_l_ycbcr = im_l_ycbcr/255.
+  # im_l_y = im_l_ycbcr[:,:,0]
+  # img_gt = imread(os.path.join(dir, '../PNG', img_name+'.png'), mode='YCbCr')
+  # img_gt = img_gt[:,:,0]/255.
 
-def val_img_path(img_path, upscale_factor,output_dir=None):
+  return im_l_y, im_bicubic_ycbcr, img_gt
+
+def val_img_path(img_path):
   img_name = os.path.basename(img_path).split('.')[0]
-  upscaled_img_name =  "{}_{}_x{}.png".format(img_name, sr_method, str(upscale_factor))
-  if output_dir != None and os.path.isdir(output_dir):
-    dir = output_dir
+  upscaled_img_name =  "{}_l{}_{}_x{}.png".format(img_name, opt.scale, opt.sr_method, str(opt.scale))
+  if opt.output_dir != 'null' and os.path.isdir(opt.output_dir):
+    dir = opt.output_dir
   else:
     dir = os.path.dirname(img_path)
   return os.path.join(dir, upscaled_img_name)
 
 def save_img(image, path):
+  output_img_path = val_img_path(path)
+  imsave(output_img_path, image)
 
   print("upscaled image size {}".format(np.shape(image)))
+  print("save image at {}".format(output_img_path))
 
-  # upscaled_rgb_img = cv2.cvtColor(image, cv2.COLOR_YCR_CB2RGB)
-  # scipy.misc.imsave(path, image)
+def save_mat(img, path):
+  image_hash = sio.loadmat(path)
+  image_hash['lapsrn_l{}_x{}_y'.format(opt.scale, opt.scale)] = img
+  sio.savemat(path, image_hash)
 
-  upscaled_rgb_img = cv2.cvtColor(image, cv2.COLOR_YCR_CB2BGR)
+def restore_img(im_h_y, im_h_ycbcr):
+  im_h_y = np.clip(im_h_y*255., 0, 255.)
+  # im_h_y = im_h_y*255.
+  # im_h_y[im_h_y<0] = 0
+  # im_h_y[im_h_y>255.] = 255.
 
-  cv2.imwrite(path, upscaled_rgb_img)
+  img = np.zeros((im_h_y.shape[0], im_h_y.shape[1], 3), np.uint8)
+  img[:,:,0] = im_h_y[:,:,0]
+  img[:,:,1] = im_h_ycbcr[:,:,1]
+  img[:,:,2] = im_h_ycbcr[:,:,2]
+  img = Image.fromarray(img, "YCbCr").convert("RGB")
 
-  print("save image at {}\n".format(path))
-
-def restore_img(img_path, img_y):
-  img = cv2.imread(img_path)
-  img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-  upscaled_im = cv2.resize(img, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
-
-  img_y_uint8 = cv2.convertScaleAbs(img_y, alpha=255)
-  print("img_y_uint8 image size {}".format(np.shape(img_y_uint8)))
-
-  upscaled_im[:,:,0] = img_y_uint8
-
-  return upscaled_im
+  return img
 
 def generator(input_img):
 
   graph = tf.Graph()
   sess_conf = sess_configure()
 
-  batch_images, img_size = load_img_with_expand_dims(input_img, opt.channel)
+  img_size = input_img.shape
+  height, width = input_img.shape
+  batch_images = np.zeros((opt.batch_size, height, width, opt.channel))
+  batch_images[0, :, :, 0] = input_img
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(opt.gpu_id))):
 
-      inputs = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
-      gt_img_x2 = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
-      gt_img_x4 = tf.placeholder(tf.float32, [batch_size, None, None, opt.channel])
+      inputs = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
+      gt_img_x2 = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
+      gt_img_x4 = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN(inputs, gt_img_x2, gt_img_x4, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
+      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
       model.extract_features()
       model.reconstruct()
       upscaled_x4_img = model.sr_imgs[np.log2(opt.scale).astype(int)-1]
@@ -124,32 +153,60 @@ def generator(input_img):
       start_time = time.time()
       upscaled_img = sess.run(upscaled_x4_img, feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
-      print("It takes {}s for processing\n".format(elapsed_time))
+      print("\nIt takes {}s for processing".format(elapsed_time))
 
       return upscaled_img[0]
 
+def cal_ssim(upscaled_img_y, gt_img_y):
+  gt_img_ep = np.expand_dims(np.expand_dims(gt_img_y, axis=0), axis=3)
+  upscaled_img_ep = np.expand_dims(upscaled_img_y, axis=0)
+  upscaled_img_ep = np.expand_dims(np.expand_dims(upscaled_img_y, axis=0), axis=3)
+  ssim = compute_ssim(gt_img_ep, upscaled_img_ep)[0]
+
+  return ssim
+
+def cal_image_index(gt_img_y, upscaled_img_y):
+
+  upscaled_img_y = np.clip(upscaled_img_y*255., 0, 255.)
+  gt_img_y = np.clip(gt_img_y*255., 0, 255.)
+
+  psnr = compute_psnr(upscaled_img_y, gt_img_y)
+  PSNR.append(psnr)
+  ssim = cal_ssim(upscaled_img_y, gt_img_y)
+  SSIM.append(ssim)
+
+  print("the current image index:\n--psnr:%0.5f, ssim:%0.5f\n"%(psnr, ssim))
+
+def eval_by_saved_img():
+  dataset_dir_list = opt.image.split('/')[0:-1]
+  dataset_dir = '/'.join(dataset_dir_list)
+  test_dir_list = opt.output_dir.split('/')[len(dataset_dir_list):]
+  test_dir = '/'.join(test_dir_list)
+
+  eval_dataset(dataset_dir, test_dir, opt.sr_method, opt.scale)
+
+def SR(input_mat_img):
+  im_l_y, im_h_ycbcr, img_gt_y = load_img(input_mat_img)
+  im_h_y = generator(im_l_y)
+  upscaled_img = restore_img(im_h_y, im_h_ycbcr)
+  save_img(upscaled_img, input_mat_img)
+  save_mat(im_h_y, input_mat_img)
+  cal_image_index(img_gt_y, im_h_y[:,:,0])
+
 if __name__ == '__main__':
 
-  if os.path.exists(opt.output_dir):
-    os.system('rm -rf ' + opt.output_dir)
-    os.mkdir(opt.output_dir)
-  else:
-    os.mkdir(opt.output_dir)
+  if not os.path.exists(opt.output_dir) and opt.output_dir != 'null':
+    os.system('mkdir -p ' + opt.output_dir)
 
   if os.path.isdir(opt.image):
-
-    dataset_image_path = os.path.join(opt.image, '*l{}.png'.format(opt.scale))
+    dataset_image_path = os.path.join(opt.image, '*.mat')
     for filepath in glob(dataset_image_path):
-      print("upscale image: %s"%filepath)
+      SR(filepath)
 
-      upscaled_img = generator(filepath)
-
-      restored_img = restore_img(filepath, upscaled_img)
-      output_img_path = val_img_path(filepath, opt.scale, opt.output_dir)
-      save_img(restored_img, output_img_path)
+    print("for dataset %s:\n--PSNR: %.4f;\tSSIM: %.4f\n"%(opt.image, np.mean(PSNR), np.mean(SSIM)));
 
   elif os.path.isfile(opt.image):
-    output_img_path = val_img_path(opt.image, opt.scale, opt.output_dir)
+    SR(opt.image)
 
   else:
     print("please set correct input")
