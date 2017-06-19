@@ -185,7 +185,7 @@ class LapSRN_v1(object):
     for l in range(self.level):
       loss.append(self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l]))
 
-    return tf.reduce_mean(loss)
+    return tf.reduce_sum(loss)
 
   def l1_charbonnier_loss(self, X, Y):
     eps = 1e-6
@@ -203,4 +203,4 @@ class LapSRN_v1(object):
       diff = tf.square(tf.subtract(self.sr_imgs[l], self.gt_imgs[l]))
       loss.append(0.5 * tf.reduce_mean(diff))
 
-    return tf.reduce_mean(loss)
+    return tf.reduce_sum(loss)
