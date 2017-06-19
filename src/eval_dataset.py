@@ -53,5 +53,7 @@ def eval_dataset(dataset_dir, test_dir, sr_method, scale):
 
   print("\nfor saved image %s:\n--PSNR: %.4f;\tSSIM: %.4f"%(test_dir, np.mean(PSNR), np.mean(SSIM)));
 
+  return PSNR, SSIM
+
 
 

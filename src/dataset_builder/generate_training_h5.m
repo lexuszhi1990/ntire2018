@@ -1,18 +1,22 @@
-function [label] = generate_training_h5(data_path, epoches)
+function [label] = generate_training_h5(data_path, epoches, saved_name)
   % usage:
   % addpath('./src/evaluation_mat');
   % addpath('./src/dataset_builder');
-  % generate_training_h5('./dataset/train_291', 5);
+  % generate_training_h5('./dataset/coco_selected', 5);
 
   f_lst = [];
   f_lst = [f_lst; dir(fullfile(data_path, '*.jpg'))];
   f_lst = [f_lst; dir(fullfile(data_path, '*.bmp'))];
   f_lst = [f_lst; dir(fullfile(data_path, '*.png'))];
 
-  count = 0;
   if( ~exist('epoches', 'var') )
       epoches = 1;
   end
+  if( ~exist('saved_name', 'var') )
+      saved_name = 'train_x';
+  end
+
+  count = 0;
   patch_size = 256;
   label = zeros(patch_size, patch_size,1, 1, 'single');
   data_l2 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
@@ -23,7 +27,8 @@ function [label] = generate_training_h5(data_path, epoches)
   chunksz = 16;
   created_flag = false;
   totalct = 0;
-  savepath = ['./dataset/train_x' num2str(epoches) '.h5'];
+  savepath = ['./dataset/' saved_name  num2str(epoches) '.h5'];
+  disp(savepath);
 
   for epoch = 1:epoches
 

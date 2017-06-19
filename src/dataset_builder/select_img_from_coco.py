@@ -1,14 +1,16 @@
+'''
+usage:
+  from src.dataset_builder.select_img_from_coco import select_img_from_coco
+'''
 import sys
 import os
 import cv2
 
-coco_selected_img_path = './dataset/coco_selected'
 coco_path = '/home/mcc207/datasets/coco/'
-
 sys.path.append(os.path.join(coco_path, 'PythonAPI'))
 from pycocotools.coco import COCO
 
-def select_img_from_coco():
+def select_img_from_coco(coco_selected_img_path = '/home/mcc207/datasets/coco_selected', cat_num=40):
   if os.path.exists(coco_selected_img_path) == False:
     os.mkdir(coco_selected_img_path)
   else:
@@ -38,5 +40,5 @@ def select_img_from_coco():
 
         save_imgs += 1
 
-      if save_imgs > 100:
+      if save_imgs > cat_num:
         break
