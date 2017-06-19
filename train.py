@@ -1,7 +1,8 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train_x2.h5 --continued_training=False --g_decay_rate=0.5 --gpu_id=2 --epoches=100 --lr=0.0001 --batch_size=8
+  python train.py --dataset_dir=./dataset/train_x8.h5 --continued_training=False --g_decay_rate=0.5 --gpu_id=2 --epoches=100 --lr=0.0001 --batch_size=8
+
   python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --g_decay_rate=0.9 --continued_training=True --batch_size=24 --gpu_id=2 --epoches=100 --lr=0.00005
 '''
 
@@ -16,7 +17,7 @@ import numpy as np
 import tensorflow as tf
 
 from src.model import LapSRN, LapSRN_v1
-from src.dataset import TrainDataset, DatasetFromHdf5, DatasetFromHdf5V1
+from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
 
 # for log infos
@@ -46,7 +47,7 @@ def train(options):
   sess_conf = sess_configure()
   graph = tf.Graph()
 
-  dataset = DatasetFromHdf5V1(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+  dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
   # g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
   g_decay_steps = np.floor(epoches//3 * dataset.batch_ids)
 
@@ -58,7 +59,7 @@ def train(options):
       batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, image_size=dataset.inputs_size, is_training=is_training, upscale_factor=dataset.upscale)
+      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale)
       model.extract_features()
       model.reconstruct()
       loss = model.l1_loss()
@@ -106,7 +107,7 @@ def train(options):
       for epoch in range(1, epoches+1):
         for step in range(1, dataset.batch_ids+1):
 
-          batch_img_x4, batch_img_x2, batch_in, _ = dataset.next(step-1)
+          _, batch_img_x4, batch_img_x2, batch_in = dataset.next_batch(step-1)
 
           if step % (dataset.batch_ids//3) == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_inputs: batch_in, is_training: True})
