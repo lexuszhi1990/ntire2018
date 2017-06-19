@@ -66,6 +66,58 @@ class LapSRN_v1(object):
 
         self.reconstructed_imgs.append(base_images)
 
+  def extract_drrn_features(self, reuse=False):
+    with tf.variable_scope(self.scope) as vs:
+      if reuse:
+        vs.reuse_variables()
+
+      x = layers.conv2d(self.inputs, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='init')
+
+      for l in range(self.level):
+        # current width and height for current stage.
+        width = self.width*np.exp2(l).astype(int)
+        height = self.height*np.exp2(l).astype(int)
+
+        init = x
+        for d in range(self.residual_depth):
+          with tf.variable_scope('level_{}_residual_{}_a'.format(str(l), str(d))):
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(l), str(d)))
+
+          with tf.variable_scope('level_{}_residual_{}_b'.format(str(l), str(d))):
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(l), str(d)))
+
+          x = init + x
+
+        # current upscaled width and height for current stage.
+        upscaled_width = self.width*np.exp2(l+1).astype(int)
+        upscaled_height = self.height*np.exp2(l+1).astype(int)
+
+        with tf.variable_scope('level_{}_norm'.format(str(l))):
+          x = batch_normalize(x, self.is_training)
+          x = lrelu(x)
+
+        x = tf.image.resize_bilinear(x, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_transpose_upscale'.format(str(l)))
+        # x = layers.conv2d_transpose(x, self.filter_num, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}__transpose_upscale'.format(str(l)))
+
+
+        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(l)))
+
+        self.extracted_features.append(net)
+
+      base_images = self.inputs
+      for l in range(self.level):
+        upscaled_width = self.width*np.exp2(l+1).astype(int)
+        upscaled_height = self.height*np.exp2(l+1).astype(int)
+
+        base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(l)))
+        # base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
+
+        self.reconstructed_imgs.append(base_images)
+
   def reconstruct(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
       if reuse:

@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python train.py --dataset_dir=./dataset/train_coco_291_x2.h5 --continued_training=False --g_decay_rate=0.9 --upscale_factor=8 --gpu_id=2 --epoches=100 --lr=0.0008 --batch_size=8
+  python train.py --dataset_dir=./dataset/train_coco_291_x2.h5 --continued_training=False --g_log_dir=./log/lapsrn-drrn --reg=0.0001 --g_decay_rate=0.9 --upscale_factor=8 --gpu_id=3 --epoches=60 --lr=0.0006 --batch_size=16
 
 '''
 
@@ -33,7 +33,7 @@ tf_flag_setup(flags)
 def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, debug):
 
   model_list = []
-  sess_conf = sess_configure(dataset_dir, g_ckpt_dir)
+  sess_conf = sess_configure()
   graph = tf.Graph()
 
   dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
@@ -50,7 +50,7 @@ def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_di
       is_training = tf.placeholder(tf.bool, [])
 
       model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg)
-      model.extract_features()
+      model.extract_drrn_features()
       model.reconstruct()
       loss = model.l1_loss()
 
@@ -117,7 +117,7 @@ def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_di
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
-  setup_project(FLAGS)
+  setup_project(FLAGS.dataset_dir, FLAGS.g_ckpt_dir)
 
   print("===> Training")
 
