@@ -30,10 +30,10 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
       fprintf('Warning: replacing existing file %s \n', filename);
       delete(filename);
     end
-    h5create(filename, '/label', [lab_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [lab_dims(1:end-1) chunksz]); % width, height, channels, number
-    h5create(filename, '/data_l2', [dat_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [dat_dims(1:end-1) chunksz]); % width, height, channels, number
-    h5create(filename, '/data_l4', [date_l4_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l4_dims(1:end-1) chunksz]); % width, height, channels, number
-    h5create(filename, '/data_l8', [date_l8_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l8_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/label_x8', [lab_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [lab_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/label_x4', [dat_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [dat_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/label_x2', [date_l4_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l4_dims(1:end-1) chunksz]); % width, height, channels, number
+    h5create(filename, '/data', [date_l8_dims(1:end-1) Inf], 'Datatype', 'single', 'ChunkSize', [date_l8_dims(1:end-1) chunksz]); % width, height, channels, number
     if ~exist('startloc','var')
       startloc.dat=[ones(1,length(dat_dims)-1), 1];
       startloc.lab=[ones(1,length(lab_dims)-1), 1];
@@ -51,10 +51,10 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
   end
 
   if ~isempty(data_l2)
-    h5write(filename, '/label', single(labels), startloc.lab, size(labels));
-    h5write(filename, '/data_l2', single(data_l2), startloc.dat, size(data_l2));
-    h5write(filename, '/data_l4', single(data_l4), startloc.dat, size(data_l4));
-    h5write(filename, '/data_l8', single(data_l8), startloc.dat, size(data_l8));
+    h5write(filename, '/label_x8', single(labels), startloc.lab, size(labels));
+    h5write(filename, '/label_x4', single(data_l2), startloc.dat, size(data_l2));
+    h5write(filename, '/label_x2', single(data_l4), startloc.dat, size(data_l4));
+    h5write(filename, '/data', single(data_l8), startloc.dat, size(data_l8));
   end
 
   if nargout

@@ -81,6 +81,7 @@ def setup_project(FLAGS):
   if tf.gfile.Exists(FLAGS.g_ckpt_dir) == False:
     tf.gfile.MakeDirs(FLAGS.g_ckpt_dir)
 
+
 def sess_configure(log_device_placement=False, memory_per=0.95):
   config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=log_device_placement)
   config.gpu_options.allow_growth = True
