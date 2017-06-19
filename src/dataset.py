@@ -70,45 +70,64 @@ class DatasetFromHdf5(object):
     def __len__(self):
         return self.data.shape[0]
 
-class DatasetFromHdf5V1(object):
+class TrainDatasetFromHdf5(object):
     def __init__(self, file_path, batch_size=8, upscale=4):
         self.batch_size = batch_size
         self.upscale = upscale
         self.file_path = file_path
+        self.current_id = 0
 
         self.init()
 
     def init(self):
         hf = h5py.File(self.file_path)
-        if hf.get("data_l8") == None:
-            self.label = hf.get("label_x4")
-            self.data_l2 = hf.get("label_x2")
-            self.data_l4 = hf.get("data")
-            self.data_l8 = self.data_l4
+        if hf.get("label_x8") == None:
+            self.label_x2 = hf.get("label_x4")
+            self.label_x2 = hf.get("label_x2")
+            self.data = hf.get("data")
         else:
-            self.label = hf.get("label")
-            self.data_l2 = hf.get("data_l2")
-            self.data_l4 = hf.get("data_l4")
-            self.data_l8 = hf.get("data_l8")
+            self.label_x8 = hf.get("label_x8")
+            self.label_x4 = hf.get("label_x4")
+            self.label_x2 = hf.get("label_x2")
+            self.data = hf.get("data")
 
-        self.len = self.label.len()
-        self.batch_ids = self.label.len() // self.batch_size
+        self.input_size = [self.data.shape[2], self.data.shape[3]]
 
-        self.inputs = vars(self)["data_l{}".format(self.upscale)]
-        self.inputs_size = [self.inputs.shape[2], self.inputs.shape[3]]
-
-        _, self.channel, self.gt_height, self.gt_width = np.shape(self.label)
+        self.gt_img = vars(self)["label_x{}".format(self.upscale)]
+        self.total_size, self.channel, self.gt_height, self.gt_width = np.shape(self.gt_img)
+        self.batch_ids = self.total_size // self.batch_size
 
     def batch_transpose(self,images):
         return np.array([image.T for image in images])
 
-    def next(self, index):
-        batch_label = self.batch_transpose(self.label[index*self.batch_size:(index+1)*self.batch_size])
-        batch_data_l2 = self.batch_transpose(self.data_l2[index*self.batch_size:(index+1)*self.batch_size])
-        batch_data_l4 = self.batch_transpose(self.data_l4[index*self.batch_size:(index+1)*self.batch_size])
-        batch_data_l8 = self.batch_transpose(self.data_l8[index*self.batch_size:(index+1)*self.batch_size])
+    def transform(self, image):
+        return np.array(image)/255.0
 
-        return batch_label, batch_data_l2, batch_data_l4, batch_data_l8
+    def next_batch(self, current_index=-1):
+
+        if current_index == -1:
+            if self.is_finished():
+                index = np.random.randint(self.batch_ids-1)
+            else:
+                index = self.current_id
+        else:
+            index = current_index
+
+
+        batch_label_x8 = self.batch_transpose(self.label_x8[index*self.batch_size:(index+1)*self.batch_size])
+        batch_label_x4 = self.batch_transpose(self.label_x4[index*self.batch_size:(index+1)*self.batch_size])
+        batch_label_x2 = self.batch_transpose(self.label_x2[index*self.batch_size:(index+1)*self.batch_size])
+        batch_data = self.batch_transpose(self.data[index*self.batch_size:(index+1)*self.batch_size])
+
+        self.current_id += 1
+
+        return [batch_label_x8, batch_label_x4, batch_label_x2, batch_data]
+
+    def is_finished(self):
+        return self.current_id >= self.batch_ids
+
+    def reset_anchor(self):
+        self.current_id = 0
 
     def rebuild(self):
         print('rebuild the dataset...')

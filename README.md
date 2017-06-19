@@ -24,3 +24,6 @@ for dataset ./dataset/test/set5, upscaled by lapsrn, at scale:4
 --Average PSNR: 30.5380;        Average SSIM: 0.8683;   Average IFC: 2.9960;
 
 python train.py --dataset_dir=./dataset/train_x5.h5 --continued_training=False --g_decay_rate=0.5 --gpu_id=2 --epoches=20 --lr=0.0001 --batch_size=8
+
+for dataset ./dataset/test/set5, upscaled by lapsrn, at scale:4
+--Average PSNR: 30.8876;        Average SSIM: 0.8764;   Average IFC: 3.1621;
