@@ -111,12 +111,12 @@ def generator(input_img, batch_size, scale, channel, model_path, gpu_id):
         latest_ckpt = tf.train.latest_checkpoint(model_path)
         if latest_ckpt:
           saver.restore(sess, latest_ckpt)
-          print("restore model from %s"%latest_ckpt)
+          print("restore model from dir %s"%latest_ckpt)
         else:
           print("cannot restore model from %s, plz checkout"%latest_ckpt)
       else:
         saver.restore(sess, model_path)
-        print("restore model from %s"%model_path)
+        print("restore model from file %s"%model_path)
 
       start_time = time.time()
       upscaled_img = sess.run(upscaled_tf_img, feed_dict={inputs: batch_images, is_training: False})

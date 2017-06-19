@@ -30,22 +30,10 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 tf_flag_setup(flags)
 
-def train(options):
-  # define training variables here
-  batch_size = FLAGS.batch_size
-  dataset_dir = FLAGS.dataset_dir
-  g_ckpt_dir = FLAGS.g_ckpt_dir
-  gpu_id = FLAGS.gpu_id
-  g_decay_rate = FLAGS.g_decay_rate
-  upscale_factor = FLAGS.upscale_factor
-  continued_training = FLAGS.continued_training
-  epoches = FLAGS.epoches
-  reg = FLAGS.reg
-  g_log_dir = FLAGS.g_log_dir
-  debug = FLAGS.debug
+def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, debug):
 
-  lr = FLAGS.lr
-  sess_conf = sess_configure()
+  model_list = []
+  sess_conf = sess_configure(dataset_dir, g_ckpt_dir)
   graph = tf.Graph()
 
   dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
@@ -123,13 +111,17 @@ def train(options):
           model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
           saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
           info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
+          model_list.append(os.path.join(g_ckpt_dir, "{}-{}".format(model_name, step)))
+
+      return model_list
 
 def main(_):
   pp.pprint(flags.FLAGS.__flags)
   setup_project(FLAGS)
 
   print("===> Training")
-  train(FLAGS)
+
+  train(FLAGS.batch_size, FLAGS.upscale_factor, FLAGS.epoches, FLAGS.lr, FLAGS.reg, FLAGS.g_decay_rate, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, FLAGS.continued_training, FLAGS.debug)
 
 if __name__ == '__main__':
 

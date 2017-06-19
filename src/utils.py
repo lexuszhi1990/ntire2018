@@ -66,11 +66,11 @@ def tf_flag_setup(flags):
   # Sets the graph-level random seed.
   tf.set_random_seed(random.randint(1, 10000))
 
-def setup_project(FLAGS):
+def setup_project(dataset_dir, g_ckpt_dir):
   # init dirs
 
-  if tf.gfile.Exists(FLAGS.dataset_dir) == False:
-    tf.gfile.MakeDirs(FLAGS.dataset_dir)
+  if tf.gfile.Exists(dataset_dir) == False:
+    tf.gfile.MakeDirs(dataset_dir)
 
   if tf.gfile.Exists('./log') == False:
     tf.gfile.MakeDirs('./log')
@@ -78,8 +78,8 @@ def setup_project(FLAGS):
   if tf.gfile.Exists('./ckpt') == False:
     tf.gfile.MakeDirs('./ckpt')
 
-  if tf.gfile.Exists(FLAGS.g_ckpt_dir) == False:
-    tf.gfile.MakeDirs(FLAGS.g_ckpt_dir)
+  if tf.gfile.Exists(g_ckpt_dir) == False:
+    tf.gfile.MakeDirs(g_ckpt_dir)
 
 
 def sess_configure(log_device_placement=False, memory_per=0.95):
