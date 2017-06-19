@@ -1,9 +1,9 @@
 #!/usr/bin/python
 '''
 usage:
-  python train.py --dataset_dir=./dataset/train_x8.h5 --continued_training=False --g_decay_rate=0.5 --gpu_id=2 --epoches=100 --lr=0.0001 --batch_size=8
 
-  python train.py --dataset_dir=./dataset/lap_pry_x4_small.h5 --g_decay_rate=0.9 --continued_training=True --batch_size=24 --gpu_id=2 --epoches=100 --lr=0.00005
+  python train.py --dataset_dir=./dataset/train_x8.h5 --continued_training=True --g_decay_rate=0.9 --gpu_id=2 --epoches=100 --lr=0.0004 --batch_size=8
+
 '''
 
 from __future__ import absolute_import
@@ -40,6 +40,7 @@ def train(options):
   upscale_factor = FLAGS.upscale_factor
   continued_training = FLAGS.continued_training
   epoches = FLAGS.epoches
+  reg = FLAGS.reg
   g_log_dir = FLAGS.g_log_dir
   debug = FLAGS.debug
 
@@ -48,8 +49,8 @@ def train(options):
   graph = tf.Graph()
 
   dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-  # g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.1) * (dataset.batch_ids*epoches))
-  g_decay_steps = np.floor(epoches//3 * dataset.batch_ids)
+  g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.05) * (dataset.batch_ids*epoches))
+  # g_decay_steps = np.floor(epoches//3 * dataset.batch_ids)
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
@@ -59,7 +60,7 @@ def train(options):
       batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale)
+      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg)
       model.extract_features()
       model.reconstruct()
       loss = model.l1_loss()

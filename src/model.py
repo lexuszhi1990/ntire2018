@@ -5,7 +5,7 @@ from src.layer import *
 import tensorflow.contrib.layers as layers
 
 class LapSRN(object):
-  def __init__(self, inputs, gt_img_x2, gt_img_x4, image_size, is_training, upscale_factor=4, filter_num=64, scope='lap_srn'):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-5,scope='lap_srn'):
     self.scope = scope
     self.inputs = inputs
     self.gt_imgs = [gt_img_x2, gt_img_x4]
@@ -15,6 +15,7 @@ class LapSRN(object):
     self.upscale_factor = upscale_factor
     self.level = np.log2(upscale_factor).astype(int)
     self.filter_num = filter_num
+    self.reg = reg
     self.is_training = is_training
     self.residual_depth = 10
     self.kernel_size = 3
@@ -109,7 +110,7 @@ class LapSRN(object):
     return 0.5 * tf.reduce_mean(diff)
 
 class LapSRN_v1(object):
-  def __init__(self, inputs, gt_img_x2, gt_img_x4, image_size, is_training, upscale_factor=4, filter_num=64, scope='lap_srn'):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_srn'):
     self.scope = scope
     self.inputs = inputs
     self.gt_imgs = [gt_img_x2, gt_img_x4]
@@ -119,6 +120,7 @@ class LapSRN_v1(object):
     self.upscale_factor = upscale_factor
     self.level = np.log2(upscale_factor).astype(int)
     self.filter_num = filter_num
+    self.reg = reg
     self.is_training = is_training
     self.residual_depth = 10
     self.kernel_size = 3
@@ -137,7 +139,7 @@ class LapSRN_v1(object):
       if reuse:
         vs.reuse_variables()
 
-      x = layers.conv2d(self.inputs, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='init')
+      x = layers.conv2d(self.inputs, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='init')
 
       for l in range(self.level):
         # current width and height for current stage.
@@ -145,7 +147,7 @@ class LapSRN_v1(object):
         height = self.height*np.exp2(l).astype(int)
 
         for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_residual_{}'.format(str(l), str(d)))
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(l), str(d)))
 
         # current upscaled width and height for current stage.
         upscaled_width = self.width*np.exp2(l+1).astype(int)
@@ -155,7 +157,7 @@ class LapSRN_v1(object):
         # x = layers.conv2d_transpose(x, self.filter_num, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}__transpose_upscale'.format(str(l)))
 
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img'.format(str(l)))
+        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(l)))
 
         self.extracted_features.append(net)
 
@@ -179,11 +181,11 @@ class LapSRN_v1(object):
         self.sr_imgs.append(sr_img)
 
   def l1_loss(self):
-    loss = 0.0
+    loss = []
     for l in range(self.level):
-      loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      loss.append(self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l]))
 
-    return loss
+    return tf.reduce_mean(loss)
 
   def l1_charbonnier_loss(self, X, Y):
     eps = 1e-6
@@ -196,9 +198,9 @@ class LapSRN_v1(object):
   def l2_loss(self):
     # diff = (X - Z) .^ 2;
     # Y = 0.5 * sum(diff(:));
-    loss = 0.0
+    loss = []
     for l in range(self.level):
       diff = tf.square(tf.subtract(self.sr_imgs[l], self.gt_imgs[l]))
-      loss = loss + 0.5 * tf.reduce_mean(diff)
+      loss.append(0.5 * tf.reduce_mean(diff))
 
-    return loss
+    return tf.reduce_mean(loss)

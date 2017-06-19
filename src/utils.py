@@ -56,6 +56,7 @@ def tf_flag_setup(flags):
 
   flags.DEFINE_float('g_decay_rate', 0.5, "decay rate by intervel steps")
   flags.DEFINE_float('lr', 1e-4, "g learning rate")
+  flags.DEFINE_float('reg', 1e-4, "g learning rate")
 
   flags.DEFINE_integer('upscale_factor', 4, "upscale factor")
 
