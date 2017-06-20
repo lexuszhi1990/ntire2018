@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python val.py --gpu_id=4 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-20-step-327-2017-06-19-18-13.ckpt-327 --image=./dataset/test/set5/mat --scale=8
+  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-327-2017-06-20-02-37.ckpt-327 --image=./dataset/test/set5/mat --scale=8
 
 '''
 
@@ -71,16 +71,29 @@ def load_img(img_mat_path, scale):
 
   return im_l_y, im_bicubic_ycbcr, img_gt
 
-def restore_img(im_h_y, im_h_ycbcr):
-  im_h_y = np.clip(im_h_y*255., 0, 255.)
+def val_img_path(img_path, scale, sr_method, output_dir):
+  img_name = os.path.basename(img_path).split('.')[0]
+  upscaled_img_name =  "{}_l{}_{}_x{}.png".format(img_name, scale, sr_method, str(scale))
+  if output_dir != 'null' and os.path.isdir(output_dir):
+    dir = output_dir
+  else:
+    dir = os.path.dirname(img_path)
+  return os.path.join(dir, upscaled_img_name)
 
-  img = np.zeros((im_h_y.shape[0], im_h_y.shape[1], 3), np.uint8)
-  img[:,:,0] = im_h_y[:,:,0]
-  img[:,:,1] = im_h_ycbcr[:,:,1]
-  img[:,:,2] = im_h_ycbcr[:,:,2]
-  img = Image.fromarray(img, "YCbCr").convert("RGB")
+def save_img(image, img_path, scale, sr_method, output_dir):
+  output_img_path = val_img_path(img_path)
+  imsave(output_img_path, image)
 
-  return img
+  print("upscaled image size {}".format(np.shape(image)))
+  print("save image at {}".format(output_img_path))
+
+def save_mat(img, path, sr_method, scale):
+  image_hash = sio.loadmat(path)
+  img_key = '{}_l{}_x{}_y'.format(sr_method, scale, scale)
+  image_hash[img_key] = img
+  sio.savemat(path, image_hash)
+
+  print('save mat at {} in {}'.format(path, img_key))
 
 def generator(input_img, batch_size, scale, channel, model_path, gpu_id):
 
@@ -143,7 +156,7 @@ def cal_image_index(gt_img_y, upscaled_img_y):
 
   return psnr, ssim
 
-def SR(dataset_dir, batch_size, init_scale, channel, model_path, gpu_id):
+def SR(dataset_dir, batch_size, init_scale, channel, sr_method, model_path, gpu_id):
 
   dataset_image_path = os.path.join(dataset_dir, '*.mat')
 
@@ -160,8 +173,9 @@ def SR(dataset_dir, batch_size, init_scale, channel, model_path, gpu_id):
 
       im_l_y, im_h_ycbcr, img_gt_y = load_img(filepath, scale)
       im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, model_path, gpu_id)
-      psnr, ssim = cal_image_index(img_gt_y, im_h_y[:,:,0])
+      save_mat(im_h_y, filepath, sr_method, scale)
 
+      psnr, ssim = cal_image_index(img_gt_y, im_h_y[:,:,0])
       psnrs.append(psnr)
       ssims.append(ssim)
       exec_time.append(elapsed_time)
@@ -180,12 +194,11 @@ if __name__ == '__main__':
 
   if os.path.isdir(opt.image):
 
-
-    PSNR, SSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.model, opt.gpu_id)
+    PSNR, SSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.sr_method, opt.model, opt.gpu_id)
 
     for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
       l = np.log2(scale).astype(int) - 1
-      print("for dataset %s, scale: %d, exec time: %.4fs\n--PSNR: %.4f;\tSSIM: %.4f\n"%(opt.image, scale, np.mean(EXEC_TIME[l]), np.mean(PSNR[l]), np.mean(SSIM[l])));
+      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(opt.image, scale, np.mean(EXEC_TIME[l]), np.mean(PSNR[l]), np.mean(SSIM[l])));
 
   else:
     print("please set correct input")

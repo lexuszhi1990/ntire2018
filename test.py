@@ -4,7 +4,7 @@ usage:
 single image:
   python test.py --gpu_id=3 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-36-2017-06-19-11-39.ckpt-36 --image=./dataset/test/set5/mat/baby_GT.mat --output_dir=./
 for dataset:
-  python test.py --gpu_id=4 --channel=1 --scale=4 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-36-2017-06-19-12-29.ckpt-36 --image=./dataset/test/set5/mat --output_dir=./dataset/test/set5/lapsrn/test
+  python test.py --gpu_id=4 --channel=1 --scale=4 --model=./models/lapsrn/lapsrn-epoch-100-step-180-2017-06-15-18-19.ckpt-180 --image=./dataset/test/set14/mat --output_dir=./dataset/test/set5/lapsrn/test
 '''
 
 from __future__ import absolute_import
@@ -25,7 +25,7 @@ from scipy.misc import imsave
 
 import tensorflow as tf
 
-from src.model import LapSRN, LapSRN_v1
+from src.model import LapSRN_v1
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
@@ -130,9 +130,10 @@ def generator(input_img):
       inputs = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
       gt_img_x2 = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
       gt_img_x4 = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
+      gt_img_x8 = tf.placeholder(tf.float32, [opt.batch_size, None, None, opt.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
+      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=opt.scale, is_training=is_training)
       model.extract_features()
       model.reconstruct()
       upscaled_x4_img = model.sr_imgs[np.log2(opt.scale).astype(int)-1]
