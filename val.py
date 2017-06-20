@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-100-step-327-2017-06-20-02-37.ckpt-327 --image=./dataset/test/set5/mat --scale=8
+  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-48-step-654-2017-06-20-09-27.ckpt-654 --image=./dataset/test/set5/mat --scale=8
 
 '''
 
@@ -115,7 +115,8 @@ def generator(input_img, batch_size, scale, channel, model_path, gpu_id):
       is_training = tf.placeholder(tf.bool, [])
 
       model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, is_training=is_training)
-      model.extract_features()
+      # model.extract_features()
+      model.extract_drrn_features()
       model.reconstruct()
       upscaled_tf_img = model.upscaled_img(scale)
 

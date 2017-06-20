@@ -27,3 +27,31 @@ python train.py --dataset_dir=./dataset/train_x5.h5 --continued_training=False -
 
 for dataset ./dataset/test/set5, upscaled by lapsrn, at scale:4
 --Average PSNR: 30.8876;        Average SSIM: 0.8764;   Average IFC: 3.1621;
+
+for dataset ./dataset/test/set14, upscaled by lapsrn, at scale:4
+--Average PSNR: 27.8565;        Average SSIM: 0.7639;   Average IFC: 2.8467;
+
+### 2017-6-19
+
+python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-327-2017-06-19-22-25.ckpt-327 --image=./dataset/test/set5/mat --scale=8
+
+It takes 0.213274002075s for processing
+for dataset ./dataset/test/set5/mat, scale: 2, exec time: 0.2907s
+--PSNR: 36.5536;        SSIM: 0.9554
+
+for dataset ./dataset/test/set5/mat, scale: 4, exec time: 0.1112s
+--PSNR: 30.9073;        SSIM: 0.8799
+
+for dataset ./dataset/test/set5/mat, scale: 8, exec time: 0.1009s
+--PSNR: 25.7404;        SSIM: 0.7324
+
+python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-327-2017-06-19-22-25.ckpt-327 --image=./dataset/test/set14/mat --scale=8
+It takes 0.17630982399s for processing
+for dataset ./dataset/test/set14/mat, scale: 2, exec time: 0.2785s
+--PSNR: 32.2562;        SSIM: 0.9065
+
+for dataset ./dataset/test/set14/mat, scale: 4, exec time: 0.1781s
+--PSNR: 27.5943;        SSIM: 0.7676
+
+for dataset ./dataset/test/set14/mat, scale: 8, exec time: 0.1772s
+--PSNR: 24.0746;        SSIM: 0.6223
