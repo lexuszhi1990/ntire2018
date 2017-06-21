@@ -13,7 +13,8 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
       epoches = 1;
   end
   if( ~exist('saved_name', 'var') )
-      saved_name = 'train_x';
+    disp('please input var name');
+    return
   end
 
   count = 0;
