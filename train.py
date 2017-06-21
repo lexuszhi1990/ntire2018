@@ -1,10 +1,4 @@
 #!/usr/bin/python
-'''
-usage:
-
-  python train.py --dataset_dir=./dataset/train_coco_291_x2.h5 --continued_training=False --g_log_dir=./log/lapsrn-drrn --reg=0.0001 --g_decay_rate=0.9 --upscale_factor=8 --gpu_id=3 --epoches=60 --lr=0.0006 --batch_size=16
-
-'''
 
 from __future__ import absolute_import
 from __future__ import division
@@ -20,25 +14,13 @@ from src.model import LapSRN_v1
 from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
 
-# for log infos
-pp = pprint.PrettyPrinter()
-tf.logging.set_verbosity(tf.logging.INFO)
-info = tf.logging.info
-
-# set flags
-flags = tf.app.flags
-FLAGS = flags.FLAGS
-tf_flag_setup(flags)
-
-def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, debug):
+def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, model_path, debug):
 
   model_list = []
   sess_conf = sess_configure()
   graph = tf.Graph()
 
   dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-  g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(0.05) * (dataset.batch_ids*epoches))
-  # g_decay_steps = np.floor(epoches//3 * dataset.batch_ids)
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
@@ -49,7 +31,7 @@ def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_di
       batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg)
+      model = LapSRN_v1(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg, filter_num=filter_num)
       model.extract_drrn_features()
       model.reconstruct()
       loss = model.l1_loss()
@@ -73,23 +55,14 @@ def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_di
       # restore model
       all_variables = tf.global_variables()
       saver = tf.train.Saver(all_variables, max_to_keep=10)
-      ckpt = tf.train.get_checkpoint_state(g_ckpt_dir)
-      if ckpt and continued_training:
-        saver.restore(sess, ckpt.model_checkpoint_path)
-        info('restore the g from %s', ckpt.model_checkpoint_path)
-        if debug:
-          [print(v.name) for v in all_variables]
-          print("all D variable" , len(all_variables))
-          print("all global_variables" , len(tf.global_variables()))
-          print("all local_variables" , len(tf.local_variables()))
+      if continued_training:
+        saver.restore(sess, model_path)
+        print('restore the g from %s'%model_path)
       else:
-        info('there is no ckpt for g...')
+        print('there is no ckpt for g...')
         sess.run(tf.variables_initializer(set(all_variables)))
 
       # rebuild log dir
-      if tf.gfile.Exists(g_log_dir):
-        tf.gfile.DeleteRecursively(g_log_dir)
-      tf.gfile.MakeDirs(g_log_dir)
       summary_writer = tf.summary.FileWriter(g_log_dir, sess.graph)
 
       g_sum_all = tf.summary.merge([g_output_sum, gt_sum, gt_bicubic_sum, batch_input_sum, g_loss_sum, g_lr_sum])
@@ -101,28 +74,17 @@ def train(batch_size, upscale_factor, epoches, lr, reg, g_decay_rate, dataset_di
 
           if step % (dataset.batch_ids//3) == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_gt_x8: batch_img_x8, batch_inputs: batch_in, is_training: True})
-            info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
+            print("at %d/%d, lr_: %.5f, g_loss: %.5f" % (epoch, step, lr_, loss_))
             summary_writer.add_summary(merged, step + epoch*dataset.batch_ids)
           else:
             apply_gradient_opt_, lr_, loss_ = sess.run([apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_gt_x8: batch_img_x8, batch_inputs: batch_in, is_training: True})
-            info("at %d/%d, lr_: %.5f, g_loss: %.5f", epoch, step, lr_, loss_)
+            print("at %d/%d, lr_: %.5f, g_loss: %.5f" % (epoch, step, lr_, loss_))
 
-        if epoch % (epoches//5) == 0:
+        # if epoch % (epoches//2) == 0:
+        if epoch == epoches:
           model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
           saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
-          info('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
           model_list.append(os.path.join(g_ckpt_dir, "{}-{}".format(model_name, step)))
+          print('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
 
-      return model_list
-
-def main(_):
-  pp.pprint(flags.FLAGS.__flags)
-  setup_project(FLAGS.dataset_dir, FLAGS.g_ckpt_dir)
-
-  print("===> Training")
-
-  train(FLAGS.batch_size, FLAGS.upscale_factor, FLAGS.epoches, FLAGS.lr, FLAGS.reg, FLAGS.g_decay_rate, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, FLAGS.continued_training, FLAGS.debug)
-
-if __name__ == '__main__':
-
-  tf.app.run()
+      return model_list[-1]

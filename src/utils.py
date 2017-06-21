@@ -49,10 +49,11 @@ def tf_flag_setup(flags):
   flags.DEFINE_integer('gpu_id', 0, "max epoch to train")
   flags.DEFINE_integer('epoches', 5, "max epoch to train")
   flags.DEFINE_integer('batch_size', 10, "batch size")
+  flags.DEFINE_integer('filter_num', 64, "batch size")
 
   flags.DEFINE_string('g_ckpt_dir', './ckpt/lapsrn', "folder to save generator train models")
-
   flags.DEFINE_string('g_log_dir', './log/lapsrn-g', "folder to log generator train models")
+  flags.DEFINE_string('model_path', 'null', "path to load train models")
 
   flags.DEFINE_float('g_decay_rate', 0.5, "decay rate by intervel steps")
   flags.DEFINE_float('lr', 1e-4, "g learning rate")
@@ -66,7 +67,7 @@ def tf_flag_setup(flags):
   # Sets the graph-level random seed.
   tf.set_random_seed(random.randint(1, 10000))
 
-def setup_project(dataset_dir, g_ckpt_dir):
+def setup_project(dataset_dir, g_ckpt_dir, g_log_dir):
   # init dirs
 
   if tf.gfile.Exists(dataset_dir) == False:
@@ -81,6 +82,9 @@ def setup_project(dataset_dir, g_ckpt_dir):
   if tf.gfile.Exists(g_ckpt_dir) == False:
     tf.gfile.MakeDirs(g_ckpt_dir)
 
+  if tf.gfile.Exists(g_log_dir):
+    tf.gfile.DeleteRecursively(g_log_dir)
+  tf.gfile.MakeDirs(g_log_dir)
 
 def sess_configure(log_device_placement=False, memory_per=0.95):
   config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=log_device_placement)

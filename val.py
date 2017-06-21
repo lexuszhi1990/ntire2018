@@ -2,7 +2,10 @@
 '''
 usage:
 
-  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-48-step-654-2017-06-20-09-27.ckpt-654 --image=./dataset/test/set5/mat --scale=8
+  # drrn
+  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-654-2017-06-20-12-41.ckpt-654 --image=./dataset/test/set5/mat --sr_method=lapsrn_drrn --scale=8
+
+  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-18-step-654-2017-06-20-19-06.ckpt-654 --image=./dataset/test/set5/mat --scale=8
 
 '''
 
@@ -30,20 +33,6 @@ from src.utils import sess_configure, trainsform, transform_reverse
 from src.eval_dataset import eval_dataset
 from src.evaluation import psnr as compute_psnr
 from src.evaluation import _SSIMForMultiScale as compute_ssim
-
-parser = argparse.ArgumentParser(description="LapSRN Test")
-parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
-parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
-parser.add_argument("--image", default="null", type=str, help="image path or single image")
-parser.add_argument("--output_dir", default="null", type=str, help="image path")
-parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
-parser.add_argument("--channel", default=1, type=int, help="input image channel, Default: 4")
-parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method")
-parser.add_argument("--batch_size", default=2, type=int, help="batch size")
-
-opt = parser.parse_args()
-
-scale_list = [2, 4, 8]
 
 def load_img(img_mat_path, scale):
   image_hash = sio.loadmat(img_mat_path)
@@ -95,10 +84,10 @@ def save_mat(img, path, sr_method, scale):
 
   print('save mat at {} in {}'.format(path, img_key))
 
-def generator(input_img, batch_size, scale, channel, model_path, gpu_id):
+def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu_id):
 
   graph = tf.Graph()
-  sess_conf = sess_configure()
+  sess_conf = sess_configure(memory_per=.5)
 
   img_size = input_img.shape
   height, width = input_img.shape
@@ -114,7 +103,7 @@ def generator(input_img, batch_size, scale, channel, model_path, gpu_id):
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, is_training=is_training)
+      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
       # model.extract_features()
       model.extract_drrn_features()
       model.reconstruct()
@@ -157,13 +146,14 @@ def cal_image_index(gt_img_y, upscaled_img_y):
 
   return psnr, ssim
 
-def SR(dataset_dir, batch_size, init_scale, channel, sr_method, model_path, gpu_id):
+def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, model_path, gpu_id):
 
   dataset_image_path = os.path.join(dataset_dir, '*.mat')
 
   PSNR = []
   SSIM = []
   EXEC_TIME = []
+  scale_list = [2, 4, 8]
 
   for scale in scale_list[0:np.log2(init_scale).astype(int)]:
     ssims = []
@@ -173,7 +163,7 @@ def SR(dataset_dir, batch_size, init_scale, channel, sr_method, model_path, gpu_
     for filepath in glob(dataset_image_path):
 
       im_l_y, im_h_ycbcr, img_gt_y = load_img(filepath, scale)
-      im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, model_path, gpu_id)
+      im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, model_path, gpu_id)
       save_mat(im_h_y, filepath, sr_method, scale)
 
       psnr, ssim = cal_image_index(img_gt_y, im_h_y[:,:,0])
@@ -188,14 +178,32 @@ def SR(dataset_dir, batch_size, init_scale, channel, sr_method, model_path, gpu_
   return PSNR, SSIM, EXEC_TIME
 
 
+def setup_options():
+  parser = argparse.ArgumentParser(description="LapSRN Test")
+  parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
+  parser.add_argument("--model", default="ckpt/lapsrn", type=str, help="model path")
+  parser.add_argument("--image", default="null", type=str, help="image path or single image")
+  parser.add_argument("--output_dir", default="null", type=str, help="image path")
+  parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
+  parser.add_argument("--channel", default=1, type=int, help="input image channel, Default: 4")
+  parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method")
+  parser.add_argument("--batch_size", default=2, type=int, help="batch size")
+  parser.add_argument("--filter_num", default=64, type=int, help="batch size")
+
+  return parser
+
 if __name__ == '__main__':
+
+  scale_list = [2, 4, 8]
+  parser = setup_options()
+  opt = parser.parse_args()
 
   if not os.path.exists(opt.output_dir) and opt.output_dir != 'null':
     os.system('mkdir -p ' + opt.output_dir)
 
   if os.path.isdir(opt.image):
 
-    PSNR, SSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.sr_method, opt.model, opt.gpu_id)
+    PSNR, SSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
 
     for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
       l = np.log2(scale).astype(int) - 1
