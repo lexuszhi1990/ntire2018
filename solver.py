@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/train_291_coco_347_x2.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver --g_ckpt_dir=./ckpt/lapsrn-solver --upscale_factor=4 --gpu_id=0 --lr=0.0006 --filter_num=128 --g_decay_rate=0.9 --reg=0.0001 --epoches=20 --batch_size=8
+  python solver.py --dataset_dir=./dataset/train_x8.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver_v2 --g_ckpt_dir=./ckpt/lapsrn-solver_v2 --g_decay_rate=0.5 --reg=0.0001 --epoches=10 --upscale_factor=4 --gpu_id=3 --filter_num=64 --lr=0.0002 --batch_size=32
 
 '''
 
@@ -32,7 +32,7 @@ def save_results(results, path='./tmp/results.txt'):
 
       scale = np.exp2(l+1).astype(int)
       file_op.write("for model %s, scale: %d, init lr: %f, decay_rate: %f, reg: %f\n"%(result[0], scale, result[4], result[5], result[6]))
-      file_op.write("average exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])))
+      file_op.write("average exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n\n"%(np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])))
       print("scale: %d, init lr: %f\naverage exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(scale, result[4], np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])));
 
   file_op.close()
@@ -47,12 +47,12 @@ def main(_):
   pp = pprint.PrettyPrinter()
   pp.pprint(flags.FLAGS.__flags)
 
-  default_epoch = 6
+  default_epoch = 1
   default_channel = 1
   default_sr_method = 'lapsrn-batch'
   test_dataset_path = './dataset/test/set5/mat'
   results_file = './tmp/results.txt'
-  f = open(results_file, 'w');f.close()
+  f = open(results_file, 'w'); f.close()
 
   lr_list = [0.0006, 0.0004, 0.0002, 0.0001]
   g_decay_rate_list = [0.9, 0.7, 0.5, 0.1]
@@ -76,8 +76,8 @@ def main(_):
           dataset = TrainDatasetFromHdf5(file_path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size, upscale=FLAGS.upscale_factor)
           g_decay_steps = np.floor(np.log(decay_rate)/np.log(0.05) * (dataset.batch_ids*FLAGS.epoches*default_epoch))
 
-          dataset.rebuild()
-          del(dataset)
+          # dataset.rebuild()
+          # del(dataset)
 
           model_path = model_list[-1] if len(model_list) != 0 else "None"
           saved_model = train(FLAGS.batch_size, FLAGS.upscale_factor, default_epoch, lr, reg, FLAGS.filter_num, decay_rate, g_decay_steps, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, epoch!=0, model_path, FLAGS.debug)
