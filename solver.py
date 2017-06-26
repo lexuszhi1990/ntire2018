@@ -49,14 +49,15 @@ def main(_):
 
   default_epoch = 4
   default_channel = 1
-  default_sr_method = 'lapsrn-batch'
+  default_sr_method = 'lapsrn_batch'
   test_dataset_path = './dataset/test/set5/mat'
   results_file = './tmp/results.txt'
   f = open(results_file, 'w'); f.close()
 
-  lr_list = [0.0006, 0.0004, 0.0002, 0.0001]
-  g_decay_rate_list = [0.9, 0.7, 0.5, 0.1]
+  lr_list = [0.0004, 0.0003, 0.0002, 0.0001]
+  g_decay_rate_list = [0.8, 0.7, 0.5, 0.1]
   reg_list = [1e-4, 1e-5]
+  decay_final_rate_list = [0.05, 0.1]
   # lr_list = [FLAGS.lr]
   # g_decay_rate_list = [FLAGS.g_decay_rate]
   # reg_list = [FLAGS.reg]
@@ -65,34 +66,34 @@ def main(_):
   for lr in lr_list:
     for decay_rate in g_decay_rate_list:
       for reg in reg_list:
+        for decay_final_rate in decay_final_rate_list:
+          # training for one epoch
+          model_list = []
+          results = []
 
-        # training for one epoch
-        model_list = []
-        results = []
+          print("===> Start Training for one parameters set")
+          setup_project(FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir)
+          for epoch in range(FLAGS.epoches):
+            dataset = TrainDatasetFromHdf5(file_path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size, upscale=FLAGS.upscale_factor)
+            g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*FLAGS.epoches*default_epoch))
 
-        print("===> Start Training for one parameters set")
-        setup_project(FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir)
-        for epoch in range(FLAGS.epoches):
-          dataset = TrainDatasetFromHdf5(file_path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size, upscale=FLAGS.upscale_factor)
-          g_decay_steps = np.floor(np.log(decay_rate)/np.log(0.05) * (dataset.batch_ids*FLAGS.epoches*default_epoch))
+            dataset.rebuild()
+            del(dataset)
 
-          dataset.rebuild()
-          del(dataset)
+            model_path = model_list[-1] if len(model_list) != 0 else "None"
+            saved_model = train(FLAGS.batch_size, FLAGS.upscale_factor, default_epoch, lr, reg, FLAGS.filter_num, decay_rate, g_decay_steps, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, epoch!=0, model_path, FLAGS.debug)
+            model_list.append(saved_model)
 
-          model_path = model_list[-1] if len(model_list) != 0 else "None"
-          saved_model = train(FLAGS.batch_size, FLAGS.upscale_factor, default_epoch, lr, reg, FLAGS.filter_num, decay_rate, g_decay_steps, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, epoch!=0, model_path, FLAGS.debug)
-          model_list.append(saved_model)
+          print("===> Testing model")
+          print(model_list)
+          # testing for one epoch
+          for model_path in model_list:
+            PSNR, SSIM, EXEC_TIME = SR(test_dataset_path, 2, FLAGS.upscale_factor, default_channel, FLAGS.filter_num, default_sr_method, model_path, FLAGS.gpu_id)
+            results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg])
 
-        print("===> Testing model")
-        print(model_list)
-        # testing for one epoch
-        for model_path in model_list:
-          PSNR, SSIM, EXEC_TIME = SR(test_dataset_path, 2, FLAGS.upscale_factor, default_channel, FLAGS.filter_num, default_sr_method, model_path, FLAGS.gpu_id)
-          results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg])
-
-        print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
-        print("===> Saving results")
-        save_results(results, results_file)
+          print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
+          print("===> Saving results")
+          save_results(results, results_file)
 
 
 if __name__ == '__main__':
