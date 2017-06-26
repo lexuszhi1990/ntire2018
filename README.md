@@ -55,3 +55,16 @@ for dataset ./dataset/test/set14/mat, scale: 4, exec time: 0.1781s
 
 for dataset ./dataset/test/set14/mat, scale: 8, exec time: 0.1772s
 --PSNR: 24.0746;        SSIM: 0.6223
+
+### 2017-6-19 31.0016 drrn
+
+python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=lapsrn_drrn --model=./ckpt/lapsrn-solver_v2/lapsrn-epoch-4-step-181-2017-06-25-04-04.ckpt-181 --image=./dataset/test/set5/mat --scale=4
+
+It takes 1.14187383652s for processing
+save mat at ./dataset/test/set5/mat/baby_GT.mat in lapsrn_l4_x4_y
+for dataset ./dataset/test/set5/mat, scale: 2, average exec time: 0.6681s
+--Aaverage PSNR: 36.3319;       Aaverage SSIM: 0.9529
+
+for dataset ./dataset/test/set5/mat, scale: 4, average exec time: 0.7015s
+--Aaverage PSNR: 30.9160;       Aaverage SSIM: 0.8780
+

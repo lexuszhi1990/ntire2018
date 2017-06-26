@@ -1,11 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-
-  # drrn
-  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-60-step-654-2017-06-20-12-41.ckpt-654 --image=./dataset/test/set5/mat --sr_method=lapsrn_drrn --scale=8
-
-  python val.py --gpu_id=0 --channel=1 --model=./ckpt/lapsrn/lapsrn-epoch-18-step-654-2017-06-20-19-06.ckpt-654 --image=./dataset/test/set5/mat --scale=8
+  python val.py --gpu_id=0 --channel=1 --sr_method=lapsrn_drrn --model=./ckpt/lapsrn/lapsrn-epoch-60-step-654-2017-06-20-12-41.ckpt-654 --image=./dataset/test/set5/mat --filter_num=128  --scale=4
 
 '''
 
@@ -87,7 +83,7 @@ def save_mat(img, path, sr_method, scale):
 def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu_id):
 
   graph = tf.Graph()
-  sess_conf = sess_configure(memory_per=.5)
+  sess_conf = sess_configure(memory_per=.75)
 
   img_size = input_img.shape
   height, width = input_img.shape
