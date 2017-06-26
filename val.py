@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-  python val.py --gpu_id=0 --channel=1 --sr_method=lapsrn_drrn --model=./ckpt/lapsrn/lapsrn-epoch-60-step-654-2017-06-20-12-41.ckpt-654 --image=./dataset/test/set5/mat --filter_num=128  --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn --model=./ckpt/lapsrn/lapsrn-epoch-60-step-327-2017-06-19-22-25.ckpt-327 --image=./dataset/test/set5/mat --scale=4
 
 '''
 
@@ -100,8 +100,8 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       is_training = tf.placeholder(tf.bool, [])
 
       model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
-      # model.extract_features()
-      model.extract_drrn_features()
+      model.extract_features()
+      # model.extract_drrn_features()
       model.reconstruct()
       upscaled_tf_img = model.upscaled_img(scale)
 
