@@ -47,7 +47,7 @@ def main(_):
   pp = pprint.PrettyPrinter()
   pp.pprint(flags.FLAGS.__flags)
 
-  default_epoch = 1
+  default_epoch = 4
   default_channel = 1
   default_sr_method = 'lapsrn-batch'
   test_dataset_path = './dataset/test/set5/mat'
