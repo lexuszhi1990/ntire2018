@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn --model=./ckpt/lapsrn/lapsrn-epoch-60-step-327-2017-06-19-22-25.ckpt-327 --image=./dataset/test/set5/mat --scale=4
+  python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=lapsrn_ml --model=./ckpt/lapsrn-solver_v3/lapsrn-epoch-5-step-724-2017-06-27-14-49.ckpt-724 --image=./dataset/test/set5/mat --scale=4
 
 '''
 
@@ -23,7 +23,7 @@ from scipy.misc import imsave
 
 import tensorflow as tf
 
-from src.model import LapSRN_v1
+from src.model import LapSRN_v1, LapSRN_v2
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
@@ -99,7 +99,7 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v1(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      model = LapSRN_v2(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
       model.extract_features()
       # model.extract_drrn_features()
       model.reconstruct()

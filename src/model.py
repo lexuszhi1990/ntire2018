@@ -262,3 +262,6 @@ class LapSRN_v2(object):
     diff = tf.square(tf.subtract(self.gt_imgs[-1], self.sr_imgs[-1]))
 
     return 0.5 * tf.reduce_mean(diff)
+
+  def upscaled_img(self, index):
+    return self.sr_imgs[index-1]
