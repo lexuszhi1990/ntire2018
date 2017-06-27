@@ -51,7 +51,7 @@ def main(_):
   default_channel = 1
   default_sr_method = 'lapsrn_batch'
   test_dataset_path = './dataset/test/set5/mat'
-  results_file = "./tmp/results-{}-scale-{}-{}.ckpt".format(default_sr_method, FLAGS.upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
+  results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, FLAGS.upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   f = open(results_file, 'w'); f.close()
 
   lr_list = [0.0004, 0.0003, 0.0002, 0.0001]
