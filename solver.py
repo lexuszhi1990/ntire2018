@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/train_x10.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver_v2 --g_ckpt_dir=./ckpt/lapsrn-solver_v2 --g_decay_rate=0.5 --reg=0.0001 --epoches=10 --upscale_factor=4 --gpu_id=3 --filter_num=64 --lr=0.0002 --batch_size=32
+  python solver.py --dataset_dir=./dataset/train_x10.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver_v3 --g_ckpt_dir=./ckpt/lapsrn-solver_v3 --epoches=4 --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=16
 
 '''
 
@@ -47,16 +47,16 @@ def main(_):
   pp = pprint.PrettyPrinter()
   pp.pprint(flags.FLAGS.__flags)
 
-  default_epoch = 4
+  default_epoch = 5
   default_channel = 1
   default_sr_method = 'lapsrn_batch'
   test_dataset_path = './dataset/test/set5/mat'
-  results_file = './tmp/results.txt'
+  results_file = "./tmp/results-{}-scale-{}-{}.ckpt".format(default_sr_method, FLAGS.upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   f = open(results_file, 'w'); f.close()
 
   lr_list = [0.0004, 0.0003, 0.0002, 0.0001]
   g_decay_rate_list = [0.8, 0.7, 0.5, 0.1]
-  reg_list = [1e-4, 1e-5]
+  reg_list = [1e-3, 1e-4]
   decay_final_rate_list = [0.05, 0.1]
   # lr_list = [FLAGS.lr]
   # g_decay_rate_list = [FLAGS.g_decay_rate]
@@ -77,8 +77,8 @@ def main(_):
             dataset = TrainDatasetFromHdf5(file_path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size, upscale=FLAGS.upscale_factor)
             g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*FLAGS.epoches*default_epoch))
 
-            dataset.rebuild()
-            del(dataset)
+            # dataset.rebuild()
+            # del(dataset)
 
             model_path = model_list[-1] if len(model_list) != 0 else "None"
             saved_model = train(FLAGS.batch_size, FLAGS.upscale_factor, default_epoch, lr, reg, FLAGS.filter_num, decay_rate, g_decay_steps, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, epoch!=0, model_path, FLAGS.debug)

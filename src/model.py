@@ -239,7 +239,7 @@ class LapSRN_v2(object):
         self.sr_imgs.append(sr_img)
 
   def l1_loss(self):
-    if len(model.gt_imgs) == 0:
+    if len(self.gt_imgs) == 0:
       self.init_gt_imgs()
 
     loss = 0.0

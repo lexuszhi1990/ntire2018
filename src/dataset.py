@@ -27,7 +27,7 @@ class TrainDatasetFromHdf5(object):
         self.gt_img = vars(self)["label_x{}".format(self.upscale)]
         self.total_size, self.channel, self.gt_height, self.gt_width = np.shape(self.gt_img)
         self.batch_ids = self.total_size // self.batch_size
-        self.input_size = [self.gt_height//self.upscale, self.gt_width//self.upscale]
+        self.input_size = [self.gt_height//4, self.gt_width//4]
 
     def batch_transpose(self,images):
         return np.array([image.T for image in images])
