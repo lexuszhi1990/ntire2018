@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/train_x10.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver_v3 --g_ckpt_dir=./ckpt/lapsrn-solver_v3 --epoches=4 --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=16
+  python solver.py --dataset_dir=./dataset/train_x10.h5 --continued_training=False --g_log_dir=./log/lapsrn-solver_v4 --g_ckpt_dir=./ckpt/lapsrn-solver_v3 --epoches=8 --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=8
 
 '''
 
@@ -77,8 +77,8 @@ def main(_):
             dataset = TrainDatasetFromHdf5(file_path=FLAGS.dataset_dir, batch_size=FLAGS.batch_size, upscale=FLAGS.upscale_factor)
             g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*FLAGS.epoches*default_epoch))
 
-            # dataset.rebuild()
-            # del(dataset)
+            dataset.rebuild()
+            del(dataset)
 
             model_path = model_list[-1] if len(model_list) != 0 else "None"
             saved_model = train(FLAGS.batch_size, FLAGS.upscale_factor, default_epoch, lr, reg, FLAGS.filter_num, decay_rate, g_decay_steps, FLAGS.dataset_dir, FLAGS.g_ckpt_dir, FLAGS.g_log_dir, FLAGS.gpu_id, epoch!=0, model_path, FLAGS.debug)
@@ -86,7 +86,6 @@ def main(_):
 
           print("===> Testing model")
           print(model_list)
-          # testing for one epoch
           for model_path in model_list:
             PSNR, SSIM, EXEC_TIME = SR(test_dataset_path, 2, FLAGS.upscale_factor, default_channel, FLAGS.filter_num, default_sr_method, model_path, FLAGS.gpu_id)
             results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg])
