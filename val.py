@@ -14,12 +14,11 @@ import argparse
 import os
 import numpy as np
 from glob import glob
+
 import scipy.io as sio
 
-from PIL import Image
-from scipy.ndimage import imread
-from scipy.misc import imresize
-from scipy.misc import imsave
+from src.cv2_utils import *
+
 
 import tensorflow as tf
 
@@ -30,29 +29,33 @@ from src.eval_dataset import eval_dataset
 from src.evaluation import psnr as compute_psnr
 from src.evaluation import _SSIMForMultiScale as compute_ssim
 
-def load_img(img_mat_path, scale):
+
+def load_img_from_png(img_mat_path, scale):
+
+  img_name = os.path.basename(img_mat_path).split('.')[0]
+  dir = os.path.dirname(img_mat_path)
+
+  img_path = os.path.join(dir, '../lr_x2348', '{}_l{}.png'.format(img_name, opt.scale))
+  image_bgr = img_read(img_path)
+  image_bgr = normalize(image_bgr)
+  im_l_ycbcr = cvt_ycrcb(image_bgr)
+  im_l_y = im_l_ycbcr[:,:,0]
+
+  im_bicubic_ycbcr = cv2_imresie(im_l_ycbcr, scale, scale, interpolation=cv2.INTER_LINEAR)
+
+  image_bgr_gt = img_read(os.path.join(dir, '../PNG', img_name+'.png'))
+  image_bgr_gt = normalize(image_bgr_gt)
+  img_gt = cvt_ycrcb(image_bgr_gt)
+
+  return im_l_y, im_bicubic_ycbcr, img_gt
+
+def load_img_from_mat(img_mat_path, scale):
   image_hash = sio.loadmat(img_mat_path)
 
   im_l_y = image_hash['label_x{}_y'.format(8//scale)]
   im_bicubic_ycbcr = image_hash['bicubic_l{}_x{}_ycbcr'.format(scale, scale)]
   im_bicubic_ycbcr = np.clip(im_bicubic_ycbcr*255., 0, 255.)
   img_gt = image_hash['label_x8_y']
-
-  # im_l_y = image_hash['im_l_y']
-  # im_l_ycbcr = image_hash['im_l_ycbcr']
-  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
-  # img_gt = image_hash['im_gt_y']
-  # im_l_y = im_l_y/255.
-  # img_gt = img_gt/255.
-
-  # img_name = os.path.basename(img_mat_path).split('.')[0]
-  # dir = os.path.dirname(img_mat_path)
-  # im_l_ycbcr = imread(os.path.join(dir, '../lr_x2348', '{}_l{}.png'.format(img_name, opt.scale)), mode='YCbCr')
-  # im_bicubic_ycbcr = imresize(im_l_ycbcr, 4.0, interp='bicubic')
-  # im_l_ycbcr = im_l_ycbcr/255.
-  # im_l_y = im_l_ycbcr[:,:,0]
-  # img_gt = imread(os.path.join(dir, '../PNG', img_name+'.png'), mode='YCbCr')
-  # img_gt = img_gt[:,:,0]/255.
 
   return im_l_y, im_bicubic_ycbcr, img_gt
 
@@ -158,7 +161,7 @@ def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, mode
 
     for filepath in glob(dataset_image_path):
 
-      im_l_y, im_h_ycbcr, img_gt_y = load_img(filepath, scale)
+      im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
       im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, model_path, gpu_id)
       save_mat(im_h_y, filepath, sr_method, scale)
 
