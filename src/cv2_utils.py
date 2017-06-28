@@ -1,18 +1,12 @@
 import numpy as np
 import cv2
-from scipy.misc import imresize
 
-def img_read(img_path):
+def cv2_img_read(img_path):
     return cv2.imread(img_path)
 
 def cv2_imresie(image, fx, fy, interpolation):
+  # Interpolation to use for re-sizing [cv2.INTER_CUBIC, cv2.INTER_LINEAR, cv2.INTER_NEAREST]
   image = cv2.resize(image, None, fx=fx, fy=fy, interpolation=interpolation)
-
-  return image
-
-def scipy_imresize(image, size, interp='bilinear'):
-  # Interpolation to use for re-sizing ('nearest', 'lanczos', 'bilinear', 'bicubic' or 'cubic').
-  image = imresize(image, size, interp=interp)
 
   return image
 
@@ -76,10 +70,11 @@ def random_resize(image, alpha=0.6):
 
   return image
 
-def extract_y_channel(image):
-  img_y = cv2.cvtColor(image, cv2.COLOR_BGR2YCR_CB)
+def cvt_ycrcb(image):
+  return cv2.cvtColor(image, cv2.COLOR_BGR2YCR_CB)
 
-  return img_y[:,:,0]
+def extract_y_channel(image):
+  return cvt_ycrcb(image)[:,:,0]
 
 def center_crop(x, crop_h, crop_w=None):
   if crop_w is None:
