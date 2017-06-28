@@ -2,9 +2,9 @@
 usage:
   from src.dataset_builder.generate_dataset_plt import generate_train_h5, generate_test_dataset
 
-  generate_train_h5('/Users/david/mnt/data/set14/', epoches=4, saved_name='py_train')
+  generate_train_h5('dataset/t291_g100', epoches=6, saved_name='py_train_t291_g100')
 
-  generate_test_dataset('../../../datasets/set14/', './dataset/test/set14')
+  generate_test_dataset('./dataset/py_test/bsd100/raw', './dataset/py_test/bsd100')
 
 '''
 
@@ -13,7 +13,7 @@ import h5py
 import numpy as np
 from glob import glob
 
-from src.cv2_utils import *
+from src.pil_utils import *
 
 def generate_train_h5(image_dir, epoches=1, saved_name='py_train', default_size=[256, 256], dst_dir='./dataset'):
 
@@ -22,22 +22,24 @@ def generate_train_h5(image_dir, epoches=1, saved_name='py_train', default_size=
     print 'generate_images at {}, saved h5 at {}'.format(image_dir, saved_path)
 
     for epoch in range(epoches):
-        image_list = glob(os.path.join(image_dir, '*.*'))
-        for image_ab_path in image_list:
-            image = augment(image_ab_path, default_size)
+      image_list = glob(os.path.join(image_dir, '*.*'))
+      np.random.shuffle(image_list)
+      for image_ab_path in image_list:
+        image = augment(image_ab_path, default_size)
 
-            resized_img = np.expand_dims(image, axis=0)
-            label_x8_list.append(resized_img)
+        resized_img = np.expand_dims(image, axis=0)
+        label_x8_list.append(resized_img)
 
-            resized_img = img_resize_float(image, 0.5)
-            label_x4_list.append(np.expand_dims(resized_img, axis=0))
+        resized_img = img_resize_float(image, 0.5)
+        label_x4_list.append(np.expand_dims(resized_img, axis=0))
 
-            resized_img = img_resize_float(image, 0.25)
-            label_x2_list.append(np.expand_dims(resized_img, axis=0))
+        resized_img = img_resize_float(image, 0.25)
+        label_x2_list.append(np.expand_dims(resized_img, axis=0))
 
-            resized_img = img_resize_float(image, 0.125)
-            data_list.append(np.expand_dims(resized_img, axis=0))
+        resized_img = img_resize_float(image, 0.125)
+        data_list.append(np.expand_dims(resized_img, axis=0))
 
+        print 'epoch {}, image: {}'.format(epoch, image_ab_path)
 
     f = h5py.File(saved_path, "w")
     f.create_dataset("label_x8", data=label_x8_list, chunks=True)
@@ -45,30 +47,31 @@ def generate_train_h5(image_dir, epoches=1, saved_name='py_train', default_size=
     f.create_dataset("label_x2", data=label_x2_list, chunks=True)
     f.create_dataset("data", data=data_list, chunks=True)
     f.close()
+    print('generate train file at {}'.format(saved_path))
 
-    return label_x8_list, label_x4_list, label_x2_list, data_list
+    # return label_x8_list, label_x4_list, label_x2_list, data_list
 
 def generate_test_dataset(gt_dir, dataset_path):
   gt_img_dir = os.path.join(dataset_path, 'GT')
   zoom_in_dir = os.path.join(dataset_path, 'lr_x2348')
   bicubic_dir = os.path.join(dataset_path, 'bicubic')
 
-  if os.path.exists(gt_img_dir) == False:
-    os.system('rm -rf ' + gt_img_dir)
-  else:
+  if os.path.exists(gt_img_dir):
     os.system('rm -rf ' + gt_img_dir)
     os.mkdir(gt_img_dir)
-
-  if os.path.exists(zoom_in_dir) == False:
-    os.system('rm -rf ' + zoom_in_dir)
   else:
+    os.mkdir(gt_img_dir)
+
+  if os.path.exists(zoom_in_dir):
     os.system('rm -rf ' + zoom_in_dir)
     os.mkdir(zoom_in_dir)
-
-  if os.path.exists(bicubic_dir) == False:
-    os.system('rm -rf ' + bicubic_dir)
   else:
+    os.mkdir(zoom_in_dir)
+
+  if os.path.exists(bicubic_dir):
     os.system('rm -rf ' + bicubic_dir)
+    os.mkdir(bicubic_dir)
+  else:
     os.mkdir(bicubic_dir)
 
   scale_list = [2, 3, 4, 8];
@@ -76,7 +79,7 @@ def generate_test_dataset(gt_dir, dataset_path):
   gt_img_list = glob(os.path.join(gt_dir, '*.*'))
 
   for image_ab_path in gt_img_list:
-    image_basename, ext = os.path.splitext(image_ab_path)
+    image_basename = os.path.basename(image_ab_path).split('.')[0]
 
     image = img_read(image_ab_path)
     image = centered_mod_crop(image, 24)

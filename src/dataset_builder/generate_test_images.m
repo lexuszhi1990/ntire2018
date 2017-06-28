@@ -1,13 +1,16 @@
 function [] = generate_test_images(dataset_path)
 
-  % usage:
-  % addpath('./src/dataset_builder');
-  % generate_test_images('./dataset/test/set14');
+%{
+  usage:
+    addpath('./src/evaluation_mat');
+    addpath('./src/dataset_builder');
+    generate_test_images('./dataset/mat_test/set14');
+%}
 
   scale_list = [2, 3, 4, 8];
 
   f_lst = [];
-  origin_dir = fullfile(dataset_path, 'GT');
+  origin_dir = fullfile(dataset_path, 'raw');
   f_lst = [f_lst; dir(fullfile(origin_dir, '*.jpg'))];
   f_lst = [f_lst; dir(fullfile(origin_dir, '*.bmp'))];
   f_lst = [f_lst; dir(fullfile(origin_dir, '*.png'))];
