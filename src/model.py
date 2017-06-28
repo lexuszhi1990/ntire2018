@@ -222,7 +222,7 @@ class LapSRN_v2(object):
       for scale in range(1, self.upscale_factor+1):
         upscaled_width = self.width*scale
         upscaled_height = self.height*scale
-        base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(scale)))
+        base_images = tf.image.resize_bicubic(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(scale)))
 
         # base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
         # net = deconv_layer(x, [self.kernel_size, self.kernel_size, self.channel, self.filter_num], [self.batch_size, upscaled_height, upscaled_width, self.channel], stride=1)

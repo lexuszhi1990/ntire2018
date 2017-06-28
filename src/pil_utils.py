@@ -5,13 +5,13 @@ usage:
 
 note:
   the size in PLT Image model are (width, height).
+  http://effbot.org/imagingbook/image.htm
 '''
 
 import numpy as np
 from PIL import Image
 
 def img_read(image_path):
-  # http://effbot.org/imagingbook/image.htm
   image = Image.open(image_path)
 
   return image
