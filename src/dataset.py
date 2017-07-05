@@ -14,15 +14,10 @@ class TrainDatasetFromHdf5(object):
 
     def init(self):
         hf = h5py.File(self.file_path)
-        if hf.get("label_x8") == None:
-            self.label_x2 = hf.get("label_x4")
-            self.label_x2 = hf.get("label_x2")
-            self.data = hf.get("data")
-        else:
-            self.label_x8 = hf.get("label_x8")
-            self.label_x4 = hf.get("label_x4")
-            self.label_x2 = hf.get("label_x2")
-            self.data = hf.get("data")
+        self.label_x8 = hf.get("label_x8")
+        self.label_x4 = hf.get("label_x4")
+        self.label_x2 = hf.get("label_x2")
+        self.data = hf.get("data")
 
         self.gt_img = vars(self)["label_x{}".format(self.upscale)]
         self.total_size, self.channel, self.gt_height, self.gt_width = np.shape(self.gt_img)

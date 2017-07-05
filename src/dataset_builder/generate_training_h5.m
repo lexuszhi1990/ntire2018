@@ -1,8 +1,10 @@
 function [label] = generate_training_h5(data_path, epoches, saved_name)
-  % usage:
-  % addpath('./src/evaluation_mat');
-  % addpath('./src/dataset_builder');
-  % generate_training_h5('./dataset/coco_selected', 5);
+%{
+  usage:
+    addpath('./src/evaluation_mat');
+    addpath('./src/dataset_builder');
+    generate_training_h5('./dataset/coco_selected', 5);
+%}
 
   f_lst = [];
   f_lst = [f_lst; dir(fullfile(data_path, '*.jpg'))];

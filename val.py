@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-  python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=lapsrn_ml --model=./ckpt/lapsrn-solver_v3/lapsrn-epoch-5-step-724-2017-06-27-14-49.ckpt-724 --image=./dataset/test/set5/mat --scale=4
+  python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=lapsrn_ml --model=./ckpt/lapsrn-solver_v3/lapsrn-epoch-5-step-724-2017-06-28-12-15.ckpt-724 --image=./dataset/test/set5/mat --scale=4
 
 '''
 
