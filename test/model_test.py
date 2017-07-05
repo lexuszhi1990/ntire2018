@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.python.ops import random_ops
 
-from src.model import LapSRN_v1, LapSRN_v2
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4
 
 batch_size = 2
 gt_shape = [32, 32]
@@ -22,8 +22,8 @@ batch_gt_x4 = tf.placeholder(tf.float32, [batch_size, None, None, 1])
 batch_gt_x8 = tf.placeholder(tf.float32, [batch_size, None, None, 1])
 is_training = tf.placeholder(tf.bool, [])
 
-model = LapSRN_v2(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=in_shape, is_training=is_training, upscale_factor=upscale_factor, reg=reg, filter_num=filter_num)
-model.init_vars()
+model = LapSRN_v4(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=in_shape, is_training=is_training, upscale_factor=upscale_factor, reg=reg, filter_num=filter_num)
+model.init_gt_imgs()
 model.extract_features()
 model.reconstruct()
 loss = model.l1_loss()
