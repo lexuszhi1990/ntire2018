@@ -6,7 +6,7 @@ usage:
   addpath('./src/evaluation_mat/ifc-drrn');
   addpath('./src/evaluation_mat/matlabPyrTools');
 
-  eval_dataset('./dataset/test/set5', 'lapsrn/mat', 'lapsrn', 4);
+  eval_dataset('./dataset/test/set5', 'lapsrn/lapsrn_mat_v2', 'lapsrn_mat_v2', 4);
 %}
 
 dataset_gt_path = fullfile(dataset_dir, 'PNG');
