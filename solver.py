@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/train_x8.h5 --g_log_dir=./log/lapsrn-solver_v5 --g_ckpt_dir=./ckpt/lapsrn-solver_v5 --test_dataset_path=./dataset/test/set5/mat --epoches=8 --inner_epoches=4 --default_channel=1 --default_sr_method='lap_v4' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=4
+  python solver.py --dataset_dir=./dataset/py_train_t291_g100_x10.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapsrn-solver_v6 --test_dataset_path=./dataset/test/set5/mat --epoches=3 --inner_epoches=10 --default_channel=1 --default_sr_method='lap_v5' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=4
 
 '''
 
@@ -81,7 +81,7 @@ def main(_):
 
   lr_list = [0.0004, 0.0003, 0.0002, 0.0001]
   g_decay_rate_list = [0.8, 0.7, 0.5, 0.1]
-  reg_list = [1e-3, 1e-4]
+  reg_list = [5e-4, 1e-4]
   decay_final_rate_list = [0.05, 0.1]
 
   for lr in lr_list:
