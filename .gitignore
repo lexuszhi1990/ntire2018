@@ -2,6 +2,7 @@ dataset
 log
 ckpt
 tmp
+saved_models/lapsrn
 
 src/evaluation_mat/matlabPyrTools*
 src/evaluation_mat/ifc-*
