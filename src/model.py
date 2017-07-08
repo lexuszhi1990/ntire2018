@@ -239,9 +239,6 @@ class LapSRN_v2(object):
         self.sr_imgs.append(sr_img)
 
   def l1_loss(self):
-    if len(self.gt_imgs) == 0:
-      self.init_gt_imgs()
-
     loss = 0.0
     for l in range(self.upscale_factor):
       loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
@@ -346,9 +343,6 @@ class LapSRN_v3(object):
         self.sr_imgs.append(sr_img)
 
   def l1_loss(self):
-    if len(self.gt_imgs) == 0:
-      self.init_gt_imgs()
-
     loss = 0.0
     for l in range(self.step_depth):
       loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
@@ -464,9 +458,6 @@ class LapSRN_v4(object):
         self.sr_imgs.append(sr_img)
 
   def l1_loss(self):
-    if len(self.gt_imgs) == 0:
-      self.init_gt_imgs()
-
     loss = 0.0
     for l in range(self.step_depth):
       loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])

@@ -32,6 +32,7 @@ def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate
       is_training = tf.placeholder(tf.bool, [])
 
       model = LapSRN_v2(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg, filter_num=filter_num)
+      model.init_gt_imgs()
       model.extract_features()
       model.reconstruct()
       loss = model.l1_loss()
