@@ -68,3 +68,8 @@ for dataset ./dataset/test/set5/mat, scale: 2, average exec time: 0.6681s
 for dataset ./dataset/test/set5/mat, scale: 4, average exec time: 0.7015s
 --Aaverage PSNR: 30.9160;       Aaverage SSIM: 0.8780
 
+
+### 2017-07-08
+
+for dataset ./dataset/test/set5, upscaled by lapsrn_mat_v2, at scale:4
+--Average PSNR: 31.1038;        Average SSIM: 0.8818;   Average IFC: 3.2382;
