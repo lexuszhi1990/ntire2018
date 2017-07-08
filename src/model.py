@@ -284,7 +284,7 @@ class BaselapV1(object):
     self.is_training = is_training
 
     # hyper parameters
-    self.step_depth = 8
+    self.step_depth = 6
     self.residual_depth = 10
     self.kernel_size = 3
 
@@ -345,7 +345,7 @@ class BaselapV1(object):
     return 0.5 * tf.reduce_mean(diff)
 
   def upscaled_img(self, index):
-    return self.sr_imgs[index-1]
+    return self.sr_imgs[-1]
 
 class LapSRN_v3(BaselapV1):
 

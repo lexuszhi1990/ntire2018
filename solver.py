@@ -2,7 +2,7 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/py_train_t291_g100_x10.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapsrn-solver_v6 --test_dataset_path=./dataset/test/set5/mat --epoches=3 --inner_epoches=10 --default_channel=1 --default_sr_method='lap_v5' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=4
+  python solver.py --dataset_dir=./dataset/py_train_t291_g100_x10.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapsrn-solver_v6 --test_dataset_path=./dataset/test/set5/mat --epoches=3 --inner_epoches=10 --default_channel=1 --default_sr_method='lap_v6' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=4
 
 '''
 
