@@ -40,6 +40,7 @@ def random_interp():
 def normalize(image):
   image = np.array(image) / 255.0
   image = Image.fromarray(image)
+
   return image
 
 def random_resize(image, alpha=0.6):
@@ -96,6 +97,9 @@ def random_rotate(image):
   image = image.rotate(angle)
 
   return image
+
+def im2array(img):
+  return np.array(img)
 
 def centered_mod_crop(img, modulo):
   width, height = img.size   # Get dimensions
