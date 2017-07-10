@@ -345,7 +345,8 @@ class BaselapV1(object):
     return 0.5 * tf.reduce_mean(diff)
 
   def upscaled_img(self, index):
-    return self.sr_imgs[-1]
+    r = index / self.upscale_factor * self.step_depth - 1
+    return self.sr_imgs[r]
 
 class LapSRN_v3(BaselapV1):
 

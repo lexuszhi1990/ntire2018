@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-  python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=lapsrn_ml --model=./ckpt/lapsrn-solver_v3/lapsrn-epoch-5-step-724-2017-06-28-12-15.ckpt-724 --image=./dataset/test/set5/mat --scale=4
+  python val_pil.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn_v3 --model=./ckpt/lapser-solver_v6/lapsrn-epoch-10-step-1955-2017-07-10-11-11.ckpt-1955 --image=./dataset/py_test/set5/PNG --scale=4
 
 '''
 
@@ -32,30 +32,18 @@ from src.evaluation import _SSIMForMultiScale as compute_ssim
 
 def load_img_from_png(img_mat_path, scale):
 
-  img_name = os.path.basename(img_mat_path).split('.')[0]
-  dir = os.path.dirname(img_mat_path)
-
-  img_path = os.path.join(dir, 'lr_x2348', '{}_l{}.png'.format(img_name, opt.scale))
-  im_l = img_read(img_path)
+  im_l = img_read(img_mat_path)
   im_l_y = extract_y_channel(im_l)
-  im_l_y = im2array(normalize(im_l_y))
+  im_l_y_a = im2array(normalize(im_l_y))
 
-  im_bicubic_ycbcr = im2array(img_resize(im_l, scale))
+  im_bicubic_ycbcr = im2array(img_resize_float(im_l_y, scale))
 
-  image_gt = img_read(os.path.join(dir, 'PNG', img_name+'.png'))
+  img_name = img_mat_path.replace('_l{}'.format(scale), '_gt')
+  image_gt = img_read(img_name)
   image_gt_y = extract_y_channel(image_gt)
   image_gt_y = im2array(normalize(image_gt_y))
 
-  return im_l_y, im_bicubic_ycbcr, image_gt_y
-
-def val_img_path(img_path, scale, sr_method, output_dir):
-  img_name = os.path.basename(img_path).split('.')[0]
-  upscaled_img_name =  "{}_l{}_{}_x{}.png".format(img_name, scale, sr_method, str(scale))
-  if output_dir != 'null' and os.path.isdir(output_dir):
-    dir = output_dir
-  else:
-    dir = os.path.dirname(img_path)
-  return os.path.join(dir, upscaled_img_name)
+  return im_l_y_a, im_bicubic_ycbcr, image_gt_y
 
 def colorize(y, ycbcr):
     img = np.zeros((y.shape[0], y.shape[1], 3), np.uint8)
@@ -65,23 +53,18 @@ def colorize(y, ycbcr):
     img = Image.fromarray(img, "YCbCr").convert("RGB")
     return img
 
-def save_img(image, img_path, scale, sr_method, output_dir):
+def save_img(im_h_y, im_h_ycbcr, dataset_dir, img_path, sr_method, scale):
 
+  upscaled_image_path = os.path.join(dataset_dir, 'laprsrn', sr_method)
+  if not os.path.exists(upscaled_image_path):
+    os.system('mkdir -p ' + upscaled_image_path)
 
+  img_name = os.path.basename(img_path).split('.')[0]
+  upscaled_img_name =  "{}_l{}_{}_x{}.png".format(img_name, scale, sr_method, str(scale))
+  output_img_path = os.path.join(upscaled_image_path, upscaled_img_name)
 
-  if not os.path.exists(opt.output_dir) and opt.output_dir != 'null':
-    os.system('mkdir -p ' + opt.output_dir)
-
-
-      img = np.zeros((y.shape[0], y.shape[1], 3), np.uint8)
-    img[:,:,0] = y
-    img[:,:,1] = ycbcr[:,:,1]
-    img[:,:,2] = ycbcr[:,:,2]
-    img = Image.fromarray(img, "YCbCr").convert("RGB")
-    return img
-
-  output_img_path = val_img_path(img_path)
-  imsave(output_img_path, image)
+  upscaled_img = colorize(im_h_y, im_h_ycbcr)
+  upscaled_img.save(output_img_path)
 
   print("upscaled image size {}".format(np.shape(image)))
   print("save image at {}".format(output_img_path))
@@ -105,9 +88,9 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v2(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      model = LapSRN_v3(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      model.init_gt_imgs()
       model.extract_features()
-      # model.extract_drrn_features()
       model.reconstruct()
       upscaled_tf_img = model.upscaled_img(scale)
 
@@ -148,25 +131,25 @@ def cal_image_index(gt_img_y, upscaled_img_y):
 
   return psnr, ssim
 
-def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, model_path, gpu_id):
-
-  dataset_image_path = os.path.join(dir, 'lr_x2348', '_l{}.png'.format(scale))
+def SR(dataset_dir, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id):
 
   PSNR = []
   SSIM = []
   EXEC_TIME = []
   scale_list = [2, 4, 8]
 
-  for scale in scale_list[0:np.log2(init_scale).astype(int)]:
+  for scale in scale_list[0:np.log2(scale).astype(int)]:
     ssims = []
     psnrs = []
     exec_time = []
 
+    dataset_image_path = os.path.join(dataset_dir, '*_l{}.png'.format(scale))
+
     for filepath in glob(dataset_image_path):
 
-      im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
+      im_l_y, im_h_ycbcr, img_gt_y = load_img_from_png(filepath, scale)
       im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, model_path, gpu_id)
-      # save_mat(im_h_y, im_h_ycbcr, filepath, sr_method, scale)
+      # save_img(im_h_y, im_h_ycbcr, dataset_dir, filepath, sr_method, scale)
 
       psnr, ssim = cal_image_index(img_gt_y, im_h_y[:,:,0])
       psnrs.append(psnr)

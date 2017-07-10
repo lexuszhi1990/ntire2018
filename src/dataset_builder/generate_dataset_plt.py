@@ -4,7 +4,7 @@ usage:
 
   generate_train_h5('dataset/t291_g100', epoches=6, saved_name='py_train_t291_g100')
 
-  generate_test_dataset('./dataset/py_test/bsd100/raw', './dataset/py_test/bsd100')
+  generate_test_dataset('./dataset/py_test/set5/raw', './dataset/py_test/set5')
 
 '''
 
@@ -52,8 +52,7 @@ def generate_train_h5(image_dir, epoches=1, saved_name='py_train', default_size=
     # return label_x8_list, label_x4_list, label_x2_list, data_list
 
 def generate_test_dataset(gt_dir, dataset_path):
-  gt_img_dir = os.path.join(dataset_path, 'GT')
-  zoom_in_dir = os.path.join(dataset_path, 'lr_x2348')
+  gt_img_dir = os.path.join(dataset_path, 'PNG')
   bicubic_dir = os.path.join(dataset_path, 'bicubic')
 
   if os.path.exists(gt_img_dir):
@@ -61,12 +60,6 @@ def generate_test_dataset(gt_dir, dataset_path):
     os.mkdir(gt_img_dir)
   else:
     os.mkdir(gt_img_dir)
-
-  if os.path.exists(zoom_in_dir):
-    os.system('rm -rf ' + zoom_in_dir)
-    os.mkdir(zoom_in_dir)
-  else:
-    os.mkdir(zoom_in_dir)
 
   if os.path.exists(bicubic_dir):
     os.system('rm -rf ' + bicubic_dir)
@@ -85,14 +78,14 @@ def generate_test_dataset(gt_dir, dataset_path):
     image = centered_mod_crop(image, 24)
 
     # update defalut image
-    image_gt_path = os.path.join(gt_img_dir, "{}.png".format(image_basename))
+    image_gt_path = os.path.join(gt_img_dir, "{}_gt.png".format(image_basename))
     image.save(image_gt_path)
     print("update gt image {}".format(image_gt_path))
 
     for scale in scale_list:
       lr_img = img_resize_float(image, 1.0/scale)
       patch_name = '{}_l{}.png'.format(image_basename, scale)
-      zoom_in_img_path = os.path.join(zoom_in_dir, patch_name)
+      zoom_in_img_path = os.path.join(gt_img_dir, patch_name)
       lr_img.save(zoom_in_img_path)
       print("save lr image {} with scale {}".format(zoom_in_img_path, scale))
 
