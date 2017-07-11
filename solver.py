@@ -2,7 +2,12 @@
 '''
 usage:
 
-  python solver.py --dataset_dir=./dataset/py_train_t291_g100_x10.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapser-solver_v6 --test_dataset_path=./dataset/test/set5/mat --epoches=3 --inner_epoches=10 --default_channel=1 --default_sr_method='lap_v6' --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=2
+  for v2:
+  python solver.py --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapser-solver_v6 --test_dataset_path=./dataset/test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --default_sr_method='lap_v6' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=16
+
+  for v3:
+  # dataset 391x200, batch:12 => 15 min per epoch
+  python solver.py --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v8 --g_ckpt_dir=./ckpt/lapser-solver_v8 --default_sr_method='lap_v8' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=12
 
 '''
 

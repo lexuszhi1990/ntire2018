@@ -284,7 +284,7 @@ class BaselapV1(object):
     self.is_training = is_training
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 8
     self.residual_depth = 10
     self.kernel_size = 3
 

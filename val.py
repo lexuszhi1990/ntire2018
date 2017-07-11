@@ -22,7 +22,7 @@ from src.cv2_utils import *
 
 import tensorflow as tf
 
-from src.model import LapSRN_v1, LapSRN_v2
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
