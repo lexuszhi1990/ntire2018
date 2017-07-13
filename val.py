@@ -82,7 +82,7 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v2(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      model = LapSRN_v3(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
       model.extract_features()
       # model.extract_drrn_features()
       model.reconstruct()

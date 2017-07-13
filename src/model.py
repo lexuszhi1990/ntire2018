@@ -284,7 +284,7 @@ class BaselapV1(object):
     self.is_training = is_training
 
     # hyper parameters
-    self.step_depth = 8
+    self.step_depth = 4
     self.residual_depth = 10
     self.kernel_size = 3
 
@@ -345,7 +345,7 @@ class BaselapV1(object):
     return 0.5 * tf.reduce_mean(diff)
 
   def upscaled_img(self, index):
-    r = index / self.upscale_factor * self.step_depth - 1
+    r = int(index / self.upscale_factor * self.step_depth - 1)
     return self.sr_imgs[r]
 
 class LapSRN_v3(BaselapV1):
@@ -362,15 +362,14 @@ class LapSRN_v3(BaselapV1):
 
       for step in range(1, self.step_depth+1):
 
+        for d in range(self.residual_depth):
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(step), str(d)))
+
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
-        for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(step), str(d)))
-
         net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
-
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -379,6 +378,11 @@ class LapSRN_v3(BaselapV1):
         base_images = tf.image.resize_bicubic(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
 
         self.reconstructed_imgs.append(base_images)
+
+  def l1_loss(self):
+    loss = 0.0
+    loss = 0.75*self.l1_charbonnier_loss(self.sr_imgs[-1], self.gt_imgs[-1]) + 0.25*self.l1_charbonnier_loss(self.sr_imgs[-2], self.gt_imgs[-2])
+    return loss
 
 class LapSRN_v4(BaselapV1):
 
