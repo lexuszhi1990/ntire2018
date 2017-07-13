@@ -7,7 +7,7 @@ usage:
 
   for v3:
   # dataset 391x200, batch:12 => 15 min per epoch
-  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v8 --g_ckpt_dir=./ckpt/lapser-solver_v8 --default_sr_method='lap_v8' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=2 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=12
+  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v3 --g_ckpt_dir=./ckpt/lapser-solver_v3 --default_sr_method='lap_v3' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=2 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --gpu_id=3 --filter_num=128 --batch_size=12
 
 '''
 

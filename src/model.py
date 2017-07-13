@@ -298,11 +298,14 @@ class BaselapV1(object):
     return [var for var in tf.trainable_variables() if self.scope in var.name]
 
   def init_gt_imgs(self):
-    for step in range(1, self.step_depth+1):
+    for step in range(1, self.step_depth):
       height = self.height*self.upscale_factor*step//self.step_depth
       width = self.width*self.upscale_factor*step//self.step_depth
       img = tf.image.resize_bicubic(self.labels, size=[height, width], align_corners=False, name='level_{}_gt_img'.format(str(step)))
       self.gt_imgs.append(img)
+
+    self.labels.set_shape([self.batch_size, self.height*self.upscale_factor, self.width*self.upscale_factor, self.channel])
+    self.gt_imgs.append(self.labels)
 
   def current_step_img_size(self, step):
     current_tensor = self.gt_imgs[step]

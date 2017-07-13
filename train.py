@@ -37,8 +37,8 @@ def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate
       model.reconstruct()
       loss = model.l1_loss()
 
-      upscaled_x2_img = transform_reverse(model.upscaled_img[2])
-      upscaled_x4_img = transform_reverse(model.upscaled_img[4])
+      upscaled_x2_img = transform_reverse(model.upscaled_img(2))
+      upscaled_x4_img = transform_reverse(model.upscaled_img(4))
       batch_input_sum = tf.summary.image("inputs", transform_reverse(batch_inputs), max_outputs=2)
       gt_bicubic_sum = tf.summary.image("bicubic_img", transform_reverse(tf.image.resize_images(batch_inputs, size=[dataset.gt_height, dataset.gt_width], method=tf.image.ResizeMethod.BICUBIC, align_corners=False)), max_outputs=2)
       gt_sum = tf.summary.image("gt", transform_reverse(batch_gt_x4), max_outputs=2)
