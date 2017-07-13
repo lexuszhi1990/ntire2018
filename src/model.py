@@ -357,17 +357,17 @@ class LapSRN_v3(BaselapV1):
 
       with tf.variable_scope('init'):
         x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
-        # x = batch_normalize(x, self.is_training)
+        x = batch_normalize(x, self.is_training)
         x = lrelu(x)
 
       for step in range(1, self.step_depth+1):
 
-        for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(step), str(d)))
-
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
+
+        for d in range(self.residual_depth):
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(step), str(d)))
 
         net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
@@ -375,7 +375,7 @@ class LapSRN_v3(BaselapV1):
       base_images = self.inputs
       for step in range(1, self.step_depth+1):
         height, width = self.current_step_img_size(step-1)
-        base_images = tf.image.resize_bicubic(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
+        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
 
         self.reconstructed_imgs.append(base_images)
 
@@ -422,6 +422,6 @@ class LapSRN_v4(BaselapV1):
 
       for step in range(1, self.step_depth+1):
         height, width = self.current_step_img_size(step-1)
-        base_images = tf.image.resize_bicubic(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
+        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
 
         self.reconstructed_imgs.append(base_images)
