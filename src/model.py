@@ -381,7 +381,9 @@ class LapSRN_v3(BaselapV1):
 
   def l1_loss(self):
     loss = 0.0
-    loss = 0.75*self.l1_charbonnier_loss(self.sr_imgs[-1], self.gt_imgs[-1]) + 0.25*self.l1_charbonnier_loss(self.sr_imgs[-2], self.gt_imgs[-2])
+    for l in range(self.step_depth):
+      loss = loss + (1.0/self.step_depth*l) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+
     return loss
 
 class LapSRN_v4(BaselapV1):
