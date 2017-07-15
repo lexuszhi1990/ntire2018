@@ -1,11 +1,15 @@
 #!/usr/bin/python
 '''
 usage:
+
+  v1:
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./saved_models/lapsrn/v1_result-30.9073/lapsrn-epoch-60-step-327-2017-06-19-22-25.ckpt-327 --image=./dataset/mat_test/set5/mat --scale=4
+
   v2:
   python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=lapsrn_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/set5/mat --scale=4
 
   v3:
-  python val.py --gpu_id=2 --channel=1 --filter_num=128 --sr_method=lapsrn_ml --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=lapsrn_ml --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
 
 '''
 
@@ -66,7 +70,7 @@ def save_mat(img, path, sr_method, scale):
 
   print('save mat at {} in {}'.format(path, img_key))
 
-def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu_id):
+def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
 
   graph = tf.Graph()
   sess_conf = sess_configure(memory_per=.75)
@@ -85,7 +89,8 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v2(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      SRNet = globals()[model_name]
+      model = SRNet(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
       model.init_gt_imgs()
       model.extract_features()
       model.reconstruct()
@@ -157,7 +162,7 @@ def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, mode
     for filepath in glob(dataset_image_path):
 
       im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
-      im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, model_path, gpu_id)
+      im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id)
       save_mat(im_h_y, filepath, sr_method, scale)
 
       psnr, ssim, msssim = cal_image_index(img_gt_y, im_h_y[:,:,0], scale)
