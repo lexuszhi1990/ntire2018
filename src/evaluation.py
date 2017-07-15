@@ -4,8 +4,7 @@
 
 Usage:
 
-from src.evaluation import psnr as compute_psnr
-from src.evaluation import _SSIMForMultiScale as compute_ssim
+from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 """
 
 import math
@@ -14,12 +13,15 @@ from scipy import signal
 from scipy.ndimage.filters import convolve
 import tensorflow as tf
 
-def psnr(pred, gt, shave_border=0):
+def shave_bd(img, border=0):
+  height, width = img.shape[:2]
+  shaved_img = img[border:height - border, border:width - border]
 
-  height, width = pred.shape[:2]
-  pred = pred[shave_border:height - shave_border, shave_border:width - shave_border]
-  gt = gt[shave_border:height - shave_border, shave_border:width - shave_border]
+  shaved_img = np.array(shaved_img).astype(np.float32)
 
+  return shaved_img
+
+def compute_psnr(pred, gt):
   pred = np.array(pred).astype(np.float32)
   gt = np.array(gt).astype(np.float32)
 
@@ -29,6 +31,18 @@ def psnr(pred, gt, shave_border=0):
       return 100
 
   return 20 * math.log10(255.0 / rmse)
+
+def compute_ssim(pred, gt):
+  pred = np.array(pred).astype(np.float32)
+  gt = np.array(gt).astype(np.float32)
+
+  return _SSIMForMultiScale(pred, gt)[0]
+
+def compute_msssim(pred, gt):
+  pred = np.array(pred).astype(np.float32)
+  gt = np.array(gt).astype(np.float32)
+
+  return MultiScaleSSIM(pred, gt)
 
 def _FSpecialGauss(size, sigma):
   """Function to mimic the 'fspecial' gaussian MATLAB function."""

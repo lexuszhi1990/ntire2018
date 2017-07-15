@@ -2,7 +2,7 @@
 '''
 usage:
   v2:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=lapsrn_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/set5/mat --scale=4
 
   v3:
   python val.py --gpu_id=2 --channel=1 --filter_num=128 --sr_method=lapsrn_ml --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
@@ -85,7 +85,7 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
       gt_img_x8 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v3(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
+      model = LapSRN_v2(inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size=img_size, upscale_factor=scale, filter_num=filter_num, is_training=is_training)
       model.init_gt_imgs()
       model.extract_features()
       model.reconstruct()
