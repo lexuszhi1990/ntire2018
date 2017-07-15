@@ -370,9 +370,11 @@ class LapSRN_v3(BaselapV1):
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
         for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}'.format(str(step), str(d)))
+          with tf.variable_scope('level_{}_residual_{}'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs

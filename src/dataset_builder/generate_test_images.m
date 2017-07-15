@@ -45,19 +45,16 @@ function [] = generate_test_images(dataset_path)
 
     f_path = fullfile(origin_dir ,f_info.name);
     img = imread(f_path);
-    img_size = size(img);
-    height = img_size(1); % 行数
-    width = img_size(2); % 列数
-    img_rgb = img(1:height-mod(height,24),1:width-mod(width,24),:);
 
     if size(img, 3) == 3
-      img_raw = im2double(img_rgb);
+      img_raw = im2double(img);
     else
       disp(['only one channel for this image ' f_info.name]);
-      img_raw = im2double(repmat(img_rgb, [1 1 3]));
+      img_raw = im2double(repmat(img, [1 1 3]));
     end
 
-    img_ycbcr = rgb2ycbcr(img_raw);
+    img_rgb = modcrop(img_raw, 24);
+    img_ycbcr = rgb2ycbcr(img_rgb);
 
     % save mat file for each image
     label_x8_ycbcr = img_ycbcr;
