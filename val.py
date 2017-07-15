@@ -30,8 +30,7 @@ from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
-from src.evaluation import psnr as compute_psnr
-from src.evaluation import _SSIMForMultiScale as compute_ssim
+from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 
 def load_img_from_mat(img_mat_path, scale):
   image_hash = sio.loadmat(img_mat_path)
@@ -113,21 +112,31 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_path, gpu
 
 def cal_ssim(upscaled_img_y, gt_img_y):
   gt_img_ep = np.expand_dims(np.expand_dims(gt_img_y, axis=0), axis=3)
-  upscaled_img_ep = np.expand_dims(upscaled_img_y, axis=0)
   upscaled_img_ep = np.expand_dims(np.expand_dims(upscaled_img_y, axis=0), axis=3)
-  ssim = compute_ssim(gt_img_ep, upscaled_img_ep)[0]
+  ssim = compute_ssim(gt_img_ep, upscaled_img_ep)
 
   return ssim
 
-def cal_image_index(gt_img_y, upscaled_img_y):
+def cal_msssim(upscaled_img_y, gt_img_y):
+  gt_img_ep = np.expand_dims(np.expand_dims(gt_img_y, axis=0), axis=3)
+  upscaled_img_ep = np.expand_dims(np.expand_dims(upscaled_img_y, axis=0), axis=3)
+  msssim = compute_msssim(gt_img_ep, upscaled_img_ep)
+
+  return msssim
+
+def cal_image_index(gt_img_y, upscaled_img_y, scale):
 
   upscaled_img_y = np.clip(upscaled_img_y*255., 0, 255.)
   gt_img_y = np.clip(gt_img_y*255., 0, 255.)
 
+  upscaled_img_y = shave_bd(upscaled_img_y, scale)
+  gt_img_y = shave_bd(gt_img_y, scale)
+
   psnr = compute_psnr(upscaled_img_y, gt_img_y)
   ssim = cal_ssim(upscaled_img_y, gt_img_y)
+  msssim = cal_msssim(upscaled_img_y, gt_img_y)
 
-  return psnr, ssim
+  return psnr, ssim, msssim
 
 def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, model_path, gpu_id):
 
@@ -135,12 +144,14 @@ def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, mode
 
   PSNR = []
   SSIM = []
+  MSSSIM = []
   EXEC_TIME = []
   scale_list = [2, 4, 8]
 
   for scale in scale_list[0:np.log2(init_scale).astype(int)]:
-    ssims = []
     psnrs = []
+    ssims = []
+    msssims = []
     exec_time = []
 
     for filepath in glob(dataset_image_path):
@@ -149,16 +160,18 @@ def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, mode
       im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, model_path, gpu_id)
       save_mat(im_h_y, filepath, sr_method, scale)
 
-      psnr, ssim = cal_image_index(img_gt_y, im_h_y[:,:,0])
+      psnr, ssim, msssim = cal_image_index(img_gt_y, im_h_y[:,:,0], scale)
       psnrs.append(psnr)
       ssims.append(ssim)
+      msssims.append(msssim)
       exec_time.append(elapsed_time)
 
     PSNR.append(psnrs)
     SSIM.append(ssims)
+    MSSSIM.append(msssims)
     EXEC_TIME.append(exec_time)
 
-  return PSNR, SSIM, EXEC_TIME
+  return PSNR, SSIM, MSSSIM, EXEC_TIME
 
 
 def setup_options():
@@ -186,11 +199,11 @@ if __name__ == '__main__':
 
   if os.path.isdir(opt.image):
 
-    PSNR, SSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
+    PSNR, SSIM, MSSSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
 
     for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
       l = np.log2(scale).astype(int) - 1
-      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(opt.image, scale, np.mean(EXEC_TIME[l]), np.mean(PSNR[l]), np.mean(SSIM[l])));
+      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, scale, np.mean(EXEC_TIME[l]), np.mean(PSNR[l]), np.mean(SSIM[l]), np.mean(MSSSIM[l])));
 
   else:
     print("please set correct input")

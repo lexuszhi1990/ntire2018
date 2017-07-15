@@ -12,8 +12,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import imread
 
-from src.evaluation import psnr as compute_psnr
-from src.evaluation import _SSIMForMultiScale as compute_ssim
+from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 
 def preprocess(img_path, shave_bd=0):
   img = imread(img_path, mode='YCbCr')
