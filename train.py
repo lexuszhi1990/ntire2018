@@ -14,7 +14,7 @@ from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4
 from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
 
-def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, model_path, debug):
+def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, model_name, model_path, debug):
 
   model_list = []
   sess_conf = sess_configure()
@@ -31,7 +31,8 @@ def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate
       batch_inputs = tf.placeholder(tf.float32, [batch_size, None, None, dataset.channel])
       is_training = tf.placeholder(tf.bool, [])
 
-      model = LapSRN_v4(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg, filter_num=filter_num)
+      SRNet = globals()[model_name]
+      model = SRNet(batch_inputs, batch_gt_x2, batch_gt_x4, batch_gt_x8, image_size=dataset.input_size, is_training=is_training, upscale_factor=dataset.upscale, reg=reg, filter_num=filter_num)
       model.init_gt_imgs()
       model.extract_features()
       model.reconstruct()
@@ -83,9 +84,9 @@ def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate
 
         # if epoch % (epoches//2) == 0:
         if epoch == epoches:
-          model_name = "lapsrn-epoch-{}-step-{}-{}.ckpt".format(epoch, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
-          saver.save(sess, os.path.join(g_ckpt_dir, model_name), global_step=step)
-          model_list.append(os.path.join(g_ckpt_dir, "{}-{}".format(model_name, step)))
-          print('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, model_name))
+          ckpt_name = "{}-epoch-{}-step-{}-{}.ckpt".format(model_name, epoch, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
+          saver.save(sess, os.path.join(g_ckpt_dir, ckpt_name), global_step=step)
+          model_list.append(os.path.join(g_ckpt_dir, "{}-{}".format(ckpt_name, step)))
+          print('save model at step: %d, in dir %s, name %s' %(step, g_ckpt_dir, ckpt_name))
 
       return model_list[-1]

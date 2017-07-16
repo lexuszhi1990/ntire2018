@@ -112,7 +112,7 @@ def main(_):
             # del(dataset)
 
             model_path = model_list[-1] if len(model_list) != 0 else "None"
-            saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, model_path, debug)
+            saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
             model_list.append(saved_model)
 
           print("===> Testing model")
