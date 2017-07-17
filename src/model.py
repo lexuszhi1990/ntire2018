@@ -348,7 +348,7 @@ class BaselapV1(object):
     return 0.5 * tf.reduce_mean(diff)
 
   def upscaled_img(self, index):
-    r = int(index / self.upscale_factor * self.step_depth - 1)
+    r = int(index * self.step_depth / self.upscale_factor - 1)
     return self.sr_imgs[r]
 
 class LapSRN_v3(BaselapV1):
@@ -374,7 +374,7 @@ class LapSRN_v3(BaselapV1):
             x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
             x = batch_normalize(x, self.is_training)
 
-        net = layers.conv2d(x, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=5, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -387,7 +387,8 @@ class LapSRN_v3(BaselapV1):
   def l1_loss(self):
     loss = 0.0
     for l in range(self.step_depth):
-      loss = loss + (1.0/self.step_depth*l) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      # loss = loss + (1.0/self.step_depth*l) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
 
     return loss
 
@@ -430,7 +431,8 @@ class LapSRN_v4(BaselapV1):
   def l1_loss(self):
     loss = 0.0
     for l in range(self.step_depth):
-      loss = loss + (1.0/self.step_depth*l) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      # loss = loss + (1.0/self.step_depth*l) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
 
     return loss
 

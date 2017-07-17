@@ -3,13 +3,16 @@
 usage:
 
   v1:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/lapsrn-epoch-2-step-2442-2017-07-16-00-21.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-203-2017-07-16-15-12.ckpt-203 --image=./dataset/mat_test/set5/mat --scale=4
 
   v2:
   python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/set5/mat --scale=4
 
   v3:
-  python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=lapsrn_ml --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=LapSRN_v3 --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
+
+  v4:
+  python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/lapsrn-epoch-2-step-2442-2017-07-16-18-43.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
 
 '''
 
