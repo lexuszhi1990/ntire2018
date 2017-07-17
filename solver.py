@@ -2,17 +2,17 @@
 '''
 usage:
   for v1:
-  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v1 --g_ckpt_dir=./ckpt/lapser-solver_v1 --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1 --default_sr_method='LapSRN_v1' --upscale_factor=4 --gpu_id=0 --filter_num=64 --batch_size=8
+  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v1 --g_ckpt_dir=./ckpt/lapser-solver_v1 --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=4 --default_channel=1 --default_sr_method='LapSRN_v1' --upscale_factor=4 --gpu_id=0 --filter_num=64 --batch_size=64
 
   for v2:
   python solver.py --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapser-solver_v6 --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --default_sr_method='lap_v6' --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=16
 
   for v3:
   # dataset 391x200, batch:12 => 15 min per epoch
-  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v3 --g_ckpt_dir=./ckpt/lapser-solver_v3 --default_sr_method='lap_v3' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=2 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --gpu_id=3 --filter_num=128 --batch_size=4
+  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v3 --g_ckpt_dir=./ckpt/lapser-solver_v3 --default_sr_method='LapSRN_v3' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=4 --default_channel=1  --upscale_factor=4 --gpu_id=3 --filter_num=64 --batch_size=8
 
   for v4:
-  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v4 --g_ckpt_dir=./ckpt/lapser-solver_v4 --default_sr_method='lap_v4' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=12
+  python solver.py --dataset_dir=./dataset/mat_train_391_x50.h5 --g_log_dir=./log/lapsrn-solver_v4 --g_ckpt_dir=./ckpt/lapser-solver_v4 --default_sr_method='LapSRN_v4' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=4 --default_channel=1  --upscale_factor=4 --gpu_id=2 --filter_num=64 --batch_size=8
 
 '''
 
@@ -34,14 +34,13 @@ from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project
 
 
-def save_results(results, path='./tmp/results.txt'):
+def save_results(results, path='./tmp/results.txt', scale=4):
   file_op = open(path,'a')
 
   for result in results:
     num = len(result[1])
     for l in range(num):
 
-      scale = np.exp2(l+1).astype(int)
       file_op.write("for model %s, scale: %d, init lr: %f, decay_rate: %f, reg: %f\n"%(result[0], scale, result[4], result[5], result[6]))
       file_op.write("average exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n\n"%(np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])))
       print("scale: %d, init lr: %f\naverage exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(scale, result[4], np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])));
@@ -90,7 +89,7 @@ def main(_):
   f = open(results_file, 'w'); f.close()
 
   lr_list = [0.0004, 0.0003, 0.0002, 0.0001]
-  g_decay_rate_list = [0.8, 0.7, 0.5, 0.1]
+  g_decay_rate_list = [0.8, 0.6, 0.4, 0.2]
   reg_list = [5e-4, 1e-4]
   decay_final_rate_list = [0.05, 0.1]
 
@@ -118,12 +117,12 @@ def main(_):
           print("===> Testing model")
           print(model_list)
           for model_path in model_list:
-            PSNR, SSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
+            PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
             results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg])
 
           print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
           print("===> Saving results")
-          save_results(results, results_file)
+          save_results(results, results_file, upscale_factor)
 
 
 if __name__ == '__main__':
