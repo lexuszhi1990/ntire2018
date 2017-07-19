@@ -33,7 +33,7 @@ from src.cv2_utils import *
 
 import tensorflow as tf
 
-from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
@@ -146,7 +146,7 @@ def cal_image_index(gt_img_y, upscaled_img_y, scale):
 
   return psnr, ssim, msssim
 
-def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, model_path, gpu_id):
+def SR(dataset_dir, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id):
 
   dataset_image_path = os.path.join(dataset_dir, '*.mat')
 
@@ -154,30 +154,30 @@ def SR(dataset_dir, batch_size, init_scale, channel, filter_num, sr_method, mode
   SSIM = []
   MSSSIM = []
   EXEC_TIME = []
-  scale_list = [2, 4, 8]
 
-  for scale in scale_list[0:np.log2(init_scale).astype(int)]:
-    psnrs = []
-    ssims = []
-    msssims = []
-    exec_time = []
+  # scale_list = [2, 4, 8]
+  # for scale in scale_list[0:np.log2(init_scale).astype(int)]:
+  psnrs = []
+  ssims = []
+  msssims = []
+  exec_time = []
 
-    for filepath in glob(dataset_image_path):
+  for filepath in glob(dataset_image_path):
 
-      im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
-      im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id)
-      save_mat(im_h_y, filepath, sr_method, scale)
+    im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
+    im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id)
+    save_mat(im_h_y, filepath, sr_method, scale)
 
-      psnr, ssim, msssim = cal_image_index(img_gt_y, im_h_y[:,:,0], scale)
-      psnrs.append(psnr)
-      ssims.append(ssim)
-      msssims.append(msssim)
-      exec_time.append(elapsed_time)
+    psnr, ssim, msssim = cal_image_index(img_gt_y, im_h_y[:,:,0], scale)
+    psnrs.append(psnr)
+    ssims.append(ssim)
+    msssims.append(msssim)
+    exec_time.append(elapsed_time)
 
-    PSNR.append(psnrs)
-    SSIM.append(ssims)
-    MSSSIM.append(msssims)
-    EXEC_TIME.append(exec_time)
+  PSNR.append(psnrs)
+  SSIM.append(ssims)
+  MSSSIM.append(msssims)
+  EXEC_TIME.append(exec_time)
 
   return PSNR, SSIM, MSSSIM, EXEC_TIME
 
