@@ -15,6 +15,9 @@ usage:
   v4:
   python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
+  v6:
+  python val.py --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-19-14.ckpt-19548 --image=./dataset/mat_test/bsd100/mat --gpu_id=1 --scale=4
+
 '''
 
 from __future__ import absolute_import
