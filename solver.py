@@ -105,56 +105,39 @@ def main(_):
   results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   f = open(results_file, 'w'); f.close()
 
-  step_2_lr_list = [0.0008, 0.0006]
-  step_4_lr_list = [0.0004, 0.0002]
-  step_8_lr_list = [0.0002, 0.0001]
+  lr_list = [0.0003, 0.0006, 0.0009]
   g_decay_rate_list = [0.8, 0.2]
   reg_list = [1e-4]
   decay_final_rate_list = [0.05, 0.01]
 
-  print("===> setup_project")
-  setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
-
-  for decay_rate in g_decay_rate_list:
-    for reg in reg_list:
+  for reg in reg_list:
+    for decay_rate in g_decay_rate_list:
       for decay_final_rate in decay_final_rate_list:
-        for lr_index in range(len(step_2_lr_list)):
-          print("===> Start Training for one parameters set")
+        for lr in lr_list:
           # training for one epoch
           model_list = []
           results = []
 
-          step_dataset = './dataset/mat_train_391_x50.h5'
-          step_sr_factor = 2
-          step_lr = step_2_lr_list[index]
-          model_path = model_list[-1] if len(model_list) != 0 else "None"
-          dataset = TrainDatasetFromHdf5(file_path=step_dataset, batch_size=batch_size, upscale=step_sr_factor)
-          g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids))
-          saved_model = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, False, default_sr_method, model_path, debug)
-          model_list.append(saved_model)
+          print("===> Start Training for one parameters set")
+          setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
+          for epoch in range(epoches):
+            dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+            g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*epoches*inner_epoches))
 
-          step_dataset = './dataset/mat_train_391_x200.h5'
-          step_sr_factor = 4
-          step_lr = step_4_lr_list[index]
-          model_path = model_list[-1] if len(model_list) != 0 else "None"
-          dataset = TrainDatasetFromHdf5(file_path=step_dataset, batch_size=batch_size, upscale=step_sr_factor)
-          g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids))
-          saved_model = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, True, default_sr_method, model_path, debug)
-          model_list.append(saved_model)
+            # dataset.rebuild()
+            # del(dataset)
 
-          # for lr in lr_list:
-          # dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-          # g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*epoches*inner_epoches))
-
-          # model_path = model_list[-1] if len(model_list) != 0 else "None"
-          # saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
-          # model_list.append(saved_model)
+            model_path = model_list[-1] if len(model_list) != 0 else "None"
+            saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
+            model_list.append(saved_model)
 
           print("===> Testing model")
-          PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
-          results.append([saved_model, PSNR, SSIM, EXEC_TIME, step_lr, decay_rate, reg, decay_final_rate])
+          print(model_list)
+          for model_path in model_list:
+            PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
+            results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
 
-          print("===> a training round ends, lr: %f, decay_rate: %f, decay_final_rate: %f\n"%(step_lr, decay_rate, decay_final_rate))
+          print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
           print("===> Saving results")
           save_results(results, results_file, upscale_factor)
 
