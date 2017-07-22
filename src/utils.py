@@ -79,6 +79,9 @@ def setup_project(dataset_dir, g_ckpt_dir, g_log_dir):
   if tf.gfile.Exists('./ckpt') == False:
     tf.gfile.MakeDirs('./ckpt')
 
+  if tf.gfile.Exists('./tmp') == False:
+    tf.gfile.MakeDirs('./tmp')
+
   if tf.gfile.Exists(g_ckpt_dir) == False:
     tf.gfile.MakeDirs(g_ckpt_dir)
 
