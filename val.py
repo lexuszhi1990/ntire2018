@@ -3,20 +3,19 @@
 usage:
 
   v1:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-203-2017-07-16-15-12.ckpt-203 --image=./dataset/mat_test/set5/mat --scale=4
-  python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-1221-2017-07-19-14-09.ckpt-1221 --image=./dataset/mat_test/bsd100/mat --scale=4
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-203-2017-07-16-15-12.ckpt-203 --image=./dataset/mat_test/set5/mat --scale=4
 
   v2:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/bsd100/mat --scale=4
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v3:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v3 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-07-00.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v3 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-07-00.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
 
   v4:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v6:
-  python val.py --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-19-14.ckpt-19548 --image=./dataset/mat_test/bsd100/mat --gpu_id=1 --scale=4
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/bsd100/mat --scale=4
 
 '''
 
