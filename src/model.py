@@ -326,12 +326,22 @@ class BaselapV1(object):
         sr_img = tf.add(self.reconstructed_imgs[l], self.extracted_features[l])
         self.sr_imgs.append(sr_img)
 
-  def l1_loss(self):
+  def l1_mormal_loss(self):
     loss = 0.0
     for l in range(self.step_depth):
       loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
 
     return loss
+
+  def l1_weighted_loss(self):
+    loss = 0.0
+    for l in range(self.step_depth):
+      loss = loss + (2.0*l/self.step_depth) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+
+    return loss
+
+  def l1_loss(self):
+    self.l1_mormal_loss()
 
   def l1_charbonnier_loss(self, X, Y):
     eps = 1e-6
@@ -349,8 +359,8 @@ class BaselapV1(object):
     return 0.5 * tf.reduce_mean(diff)
 
   def upscaled_img(self, index):
-    r = int(index * self.step_depth / self.upscale_factor - 1)
-    return self.sr_imgs[r]
+    # r = int(index * self.step_depth / self.upscale_factor - 1)
+    return self.sr_imgs[-1]
 
 class LapSRN_v3(BaselapV1):
 
@@ -555,12 +565,7 @@ class LapSRN_v8(LapSRN_v6):
   '''
 
   def l1_loss(self):
-    loss = 0.0
-    for l in range(self.step_depth):
-      # loss = loss + self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
-      loss = loss + (2.0*l/self.step_depth) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
-
-    return loss
+    self.l1_weighted_loss()
 
 
 class LapSRN_v9(BaselapV1):

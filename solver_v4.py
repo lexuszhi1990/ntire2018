@@ -18,7 +18,7 @@ usage:
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v5 --g_ckpt_dir=./ckpt/lapser-solver_v5 --default_sr_method='LapSRN_v5' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
   for v6:
-  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapser-solver_v6 --default_sr_method='LapSRN_v6' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+  CUDA_VISIBLE_DEVICES=2 python solver_v4.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v6_v1 --g_ckpt_dir=./ckpt/lapser-solver_v6_v1 --default_sr_method='LapSRN_v6' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
   for v7:
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v7 --g_ckpt_dir=./ckpt/lapser-solver_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
@@ -126,25 +126,21 @@ def main(_):
 
           step_dataset = './dataset/mat_train_391_x50.h5'
           step_sr_factor = 2
-          step_lr = step_2_lr_list[index]
-          model_path = model_list[-1] if len(model_list) != 0 else "None"
+          step_lr = step_2_lr_list[lr_index]
           dataset = TrainDatasetFromHdf5(file_path=step_dataset, batch_size=batch_size, upscale=step_sr_factor)
           g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids))
-          saved_model = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, False, default_sr_method, model_path, debug)
-          model_list.append(saved_model)
+          model_v2_path = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, False, default_sr_method, None, debug)
 
           step_dataset = './dataset/mat_train_391_x200.h5'
           step_sr_factor = 4
-          step_lr = step_4_lr_list[index]
-          model_path = model_list[-1] if len(model_list) != 0 else "None"
+          step_lr = step_4_lr_list[lr_index]
           dataset = TrainDatasetFromHdf5(file_path=step_dataset, batch_size=batch_size, upscale=step_sr_factor)
           g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids))
-          saved_model = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, True, default_sr_method, model_path, debug)
-          model_list.append(saved_model)
+          model_v4_path = train(batch_size, step_sr_factor, 1, step_lr, reg, filter_num, decay_rate, g_decay_steps, step_dataset, g_ckpt_dir, g_log_dir, gpu_id, True, default_sr_method, model_v2_path, debug)
 
           print("===> Testing model")
-          PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
-          results.append([saved_model, PSNR, SSIM, EXEC_TIME, step_lr, decay_rate, reg, decay_final_rate])
+          PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_v4_path, gpu_id)
+          results.append([model_v4_path, PSNR, SSIM, EXEC_TIME, step_lr, decay_rate, reg, decay_final_rate])
 
           print("===> a training round ends, lr: %f, decay_rate: %f, decay_final_rate: %f\n"%(step_lr, decay_rate, decay_final_rate))
           print("===> Saving results")
