@@ -20,6 +20,7 @@ class LapSRN_v1(object):
     self.is_training = is_training
     self.residual_depth = 10
     self.kernel_size = 3
+    self.image_squeeze_channle = 256
     self.batch_size, _, _, self.channel = tf.Tensor.get_shape(inputs).as_list()
 
     self.sr_imgs = []
@@ -484,109 +485,15 @@ class LapSRN_v6(BaselapV1):
   '''
     drrn image_tune: 512x1
   '''
-  def extract_features(self, reuse=False):
-    with tf.variable_scope(self.scope) as vs:
-      if reuse:
-        vs.reuse_variables()
-
-      with tf.variable_scope('init'):
-        x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
-        # x = batch_normalize(x, self.is_training)
-        x = lrelu(x)
-
-      for step in range(1, self.step_depth+1):
-
-        with tf.variable_scope('level_{}_img'.format(str(step))):
-          height, width = self.current_step_img_size(step-1)
-          x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
-
-        init = x
-        for d in range(self.residual_depth):
-          with tf.variable_scope('level_{}_residual_{}_a'.format(str(step), str(d))):
-            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
-
-          with tf.variable_scope('level_{}_residual_{}_b'.format(str(step), str(d))):
-            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
-
-          x = init + x
-
-        with tf.variable_scope('level_{}_upscaled_img'.format(str(step))):
-          net = layers.conv2d(x, 512, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
-          # net = batch_normalize(net, self.is_training)
-          net = layers.conv2d(net, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=None, scope='level_{}_img'.format(str(step)))
-          self.extracted_features.append(net)
-
-      base_images = self.inputs
-      for step in range(1, self.step_depth+1):
-        height, width = self.current_step_img_size(step-1)
-        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
-        self.reconstructed_imgs.append(base_images)
-
-
-class LapSRN_v7(BaselapV1):
-  '''
-    drrn image_tune: 1024x1 residual_depth = 11
-  '''
-
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
 
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 4
-    self.residual_depth = 12
+    self.step_depth = self.upscale_factor
     self.kernel_size = 3
-
-  def extract_features(self, reuse=False):
-    with tf.variable_scope(self.scope) as vs:
-      if reuse:
-        vs.reuse_variables()
-
-      with tf.variable_scope('init'):
-        x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
-        # x = batch_normalize(x, self.is_training)
-        x = lrelu(x)
-
-      for step in range(1, self.step_depth+1):
-
-        with tf.variable_scope('level_{}_img'.format(str(step))):
-          height, width = self.current_step_img_size(step-1)
-          x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
-
-        init = x
-        for d in range(self.residual_depth):
-          with tf.variable_scope('level_{}_residual_{}_a'.format(str(step), str(d))):
-            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
-
-          with tf.variable_scope('level_{}_residual_{}_b'.format(str(step), str(d))):
-            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
-
-          x = init + x
-
-        with tf.variable_scope('level_{}_upscaled_img'.format(str(step))):
-          net = layers.conv2d(x, 1024, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
-          # net = batch_normalize(net, self.is_training)
-          net = layers.conv2d(net, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=None, scope='level_{}_img'.format(str(step)))
-          self.extracted_features.append(net)
-
-      base_images = self.inputs
-      for step in range(1, self.step_depth+1):
-        height, width = self.current_step_img_size(step-1)
-        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
-        self.reconstructed_imgs.append(base_images)
-
-class LapSRN_v8(BaselapV1):
-  '''
-    drrn image_tune: 1024x1 step_depth:4 residual_depth:10 weighted_loss
-  '''
-  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
-
-    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
-
-    # hyper parameters
-    self.step_depth = 4
     self.residual_depth = 10
-    self.kernel_size = 3
+    self.image_squeeze_channle = 512
 
   def extract_features(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
@@ -610,12 +517,12 @@ class LapSRN_v8(BaselapV1):
             x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
 
           with tf.variable_scope('level_{}_residual_{}_b'.format(str(step), str(d))):
-            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
 
           x = init + x
 
         with tf.variable_scope('level_{}_upscaled_img'.format(str(step))):
-          net = layers.conv2d(x, 1024, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
+          net = layers.conv2d(x, self.image_squeeze_channle, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
           # net = batch_normalize(net, self.is_training)
           net = layers.conv2d(net, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=None, scope='level_{}_img'.format(str(step)))
           self.extracted_features.append(net)
@@ -625,6 +532,27 @@ class LapSRN_v8(BaselapV1):
         height, width = self.current_step_img_size(step-1)
         base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
         self.reconstructed_imgs.append(base_images)
+
+
+class LapSRN_v7(LapSRN_v6):
+  '''
+    drrn image_tune: 1024x1 residual_depth = 12
+  '''
+
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = self.upscale_factor
+    self.kernel_size = 3
+    self.residual_depth = 12
+    self.image_squeeze_channle = 1024
+
+class LapSRN_v8(LapSRN_v6):
+  '''
+    drrn image_tune: 512x1 step_depth:4 residual_depth:10 weighted_loss
+  '''
 
   def l1_loss(self):
     loss = 0.0
