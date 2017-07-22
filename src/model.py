@@ -341,7 +341,7 @@ class BaselapV1(object):
     return loss
 
   def l1_loss(self):
-    self.l1_mormal_loss()
+    return self.l1_mormal_loss()
 
   def l1_charbonnier_loss(self, X, Y):
     eps = 1e-6
@@ -565,7 +565,7 @@ class LapSRN_v8(LapSRN_v6):
   '''
 
   def l1_loss(self):
-    self.l1_weighted_loss()
+    return self.l1_weighted_loss()
 
 
 class LapSRN_v9(BaselapV1):
