@@ -57,7 +57,7 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
 
   end
 
-  fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR: %.4f;\tAverage SSIM: %.4f;\tAverage IFC: %.4f;\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
+  fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR/SSIM/IFC: \t %.4f/%.4f/%.4f\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
 
   filename = fullfile(dataset_sr_path, ['results-' sr_method '-' num2str(sr_factor) '.txt']);
   save_matrix(PSNR, SSIM, IFC, filename, image_names);

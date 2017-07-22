@@ -4,15 +4,16 @@ usage:
 
   v1:
   python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-203-2017-07-16-15-12.ckpt-203 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-1221-2017-07-19-14-09.ckpt-1221 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v2:
-  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=lapsrn_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v2 --model=./saved_models/lapsrn/v2-31.10/lapsrn-epoch-5-step-724-2017-07-05-20-29.ckpt-724 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v3:
-  python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=LapSRN_v3 --model=./ckpt/lapser-solver_v8/lapsrn-epoch-2-step-1628-2017-07-13-13-43.ckpt-1628 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v3 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-07-00.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
 
   v4:
-  python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/lapsrn-epoch-2-step-2442-2017-07-16-18-43.ckpt-2442 --image=./dataset/mat_test/set5/mat --scale=4
+  python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
 '''
 
@@ -33,7 +34,7 @@ from src.cv2_utils import *
 
 import tensorflow as tf
 
-from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
@@ -209,9 +210,9 @@ if __name__ == '__main__':
 
     PSNR, SSIM, MSSSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
 
-    for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
-      l = np.log2(scale).astype(int) - 1
-      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, scale, np.mean(EXEC_TIME[l]), np.mean(PSNR[l]), np.mean(SSIM[l]), np.mean(MSSSIM[l])));
+    # for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
+    # l = np.log2(opt.scale).astype(int) - 1
+    print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
 
   else:
     print("please set correct input")
