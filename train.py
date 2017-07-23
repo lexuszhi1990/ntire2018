@@ -74,7 +74,8 @@ def train(batch_size, upscale_factor, epoches, lr, reg, filter_num, g_decay_rate
 
           batch_img_x8, batch_img_x4, batch_img_x2, batch_in = dataset.next_batch(step-1)
 
-          if step % (dataset.batch_ids//3) == 0:
+          # if step % (dataset.batch_ids//3) == 0:
+          if step % (dataset.batch_ids//100) == 0:
             merged, apply_gradient_opt_, lr_, loss_ = sess.run([g_sum_all, apply_gradient_opt, lr, loss], feed_dict={batch_gt_x2: batch_img_x2, batch_gt_x4: batch_img_x4, batch_gt_x8: batch_img_x8, batch_inputs: batch_in, is_training: True})
             print("at %d/%d, lr_: %.5f, g_loss: %.5f" % (epoch, step, lr_, loss_))
             summary_writer.add_summary(merged, step + epoch*dataset.batch_ids)

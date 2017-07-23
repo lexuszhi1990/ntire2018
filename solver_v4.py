@@ -113,7 +113,6 @@ def main(_):
   decay_final_rate_list = [0.05, 0.01]
 
   print("===> setup_project")
-  setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
 
   for reg in reg_list:
     for decay_rate in g_decay_rate_list:
@@ -123,6 +122,8 @@ def main(_):
           # training for one epoch
           model_list = []
           results = []
+
+          setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
 
           step_dataset = './dataset/mat_train_391_x50.h5'
           step_sr_factor = 2
