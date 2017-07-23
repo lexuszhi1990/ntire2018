@@ -168,6 +168,8 @@ def SR(dataset_dir, batch_size, scale, channel, filter_num, sr_method, model_pat
 
   for filepath in glob(dataset_image_path):
 
+    tf.reset_default_graph()
+
     im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
     im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id)
     save_mat(im_h_y, filepath, sr_method, scale)
