@@ -17,6 +17,8 @@ usage:
   v6:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/bsd100/mat --scale=4
 
+  v7:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4
 '''
 
 from __future__ import absolute_import
@@ -117,7 +119,6 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_name, mod
       start_time = time.time()
       upscaled_img = sess.run(upscaled_tf_img, feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
-      print("\nIt takes {}s for processing".format(elapsed_time))
 
       return upscaled_img[0], elapsed_time
 
@@ -176,6 +177,8 @@ def SR(dataset_dir, batch_size, scale, channel, filter_num, sr_method, model_pat
     ssims.append(ssim)
     msssims.append(msssim)
     exec_time.append(elapsed_time)
+
+    print("for image %s, scale: %d, average exec time: %.4fs\n-- PSNR/SSIM/MSSSIM: %.4f/%.4f/%.4f\n"%(filepath, scale, elapsed_time, psnr, ssim, msssim))
 
   PSNR.append(psnrs)
   SSIM.append(ssims)
