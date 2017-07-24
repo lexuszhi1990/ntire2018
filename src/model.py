@@ -584,10 +584,10 @@ class LapSRN_v9(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = self.upscale_factor
+    self.step_depth = 4
     self.kernel_size = 3
     self.residual_depth = 10
-    self.image_squeeze_channle = 1024
+    self.image_squeeze_channle = 512
 
   def l1_loss(self):
     return self.l1_weighted_loss()
