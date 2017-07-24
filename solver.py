@@ -105,10 +105,10 @@ def main(_):
   results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   f = open(results_file, 'w'); f.close()
 
-  lr_list = [0.0003, 0.0002]
-  g_decay_rate_list = [0.9, 0.1]
+  lr_list = [0.0002, 0.00025]
+  g_decay_rate_list = [0.95, 0.15]
   reg_list = [1e-4]
-  decay_final_rate_list = [0.01]
+  decay_final_rate_list = [0.01, 0.01]
 
   for reg in reg_list:
     for decay_final_rate in decay_final_rate_list:
