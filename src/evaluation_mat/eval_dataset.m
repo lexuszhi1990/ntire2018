@@ -57,7 +57,18 @@ for n=1:numel(gt_lst)
   fprintf('--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', PSNR(n), SSIM(n), IFC(n));
 end
 
-fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR: %.4f;\tAverage SSIM: %.4f;\tAverage IFC: %.4f;\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
+lapsrn_results=[[31.54 0.885 3.559]; [28.19 0.728 3.147];[27.32 0.728 2.677]];
+dataset_index=1;
+pos = strfind(dataset_dir, 'set14');
+if (~isempty(pos))
+  dataset_index=2;
+end
+pos = strfind(dataset_dir, 'bsd100');
+if (~isempty(pos))
+  dataset_index=3;
+end
+
+fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR/SSIM/IFC: \t %.4f/%.4f/%.4f\n Average improvements PSNR/SSIM/IFC: %.4f/%.4f/%.4f\n ', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC), mean(PSNR)-lapsrn_results(dataset_index, 1), mean(SSIM)-lapsrn_results(dataset_index, 2), mean(IFC)-lapsrn_results(dataset_index, 3));
 
 filename = fullfile(dataset_sr_path, 'result.txt');
 save_matrix(PSNR, SSIM, IFC, filename, image_names);
