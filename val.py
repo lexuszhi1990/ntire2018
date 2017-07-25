@@ -20,10 +20,8 @@ usage:
   v7:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4
 '''
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+import matlab
+import matlab.engine
 
 import time
 import argparse
@@ -31,7 +29,7 @@ import os
 import numpy as np
 from glob import glob
 import scipy.io as sio
-import matlab.engine
+
 import tensorflow as tf
 
 from src.cv2_utils import *
