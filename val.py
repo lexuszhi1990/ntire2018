@@ -15,7 +15,7 @@ usage:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v6:
-  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/bsd100/mat --scale=4
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4
 
   v7:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4
@@ -30,14 +30,11 @@ import argparse
 import os
 import numpy as np
 from glob import glob
-
 import scipy.io as sio
-
-from src.cv2_utils import *
-
-
+import matlab.engine
 import tensorflow as tf
 
+from src.cv2_utils import *
 from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10
 from src.utils import sess_configure, trainsform, transform_reverse
 
@@ -77,6 +74,22 @@ def save_mat(img, path, sr_method, scale):
   sio.savemat(path, image_hash)
 
   print('save mat at {} in {}'.format(path, img_key))
+
+def matlab_validation(dataset_dir, sr_method, scale):
+  dataset_dir_list = dataset_dir.split('/')[0:-1]
+  base_dataset_dir = '/'.join(dataset_dir_list)
+
+  eng = matlab.engine.start_matlab()
+
+  eng.addpath(r'./src/evaluation_mat', nargout=0)
+  eng.addpath(r'./src/evaluation_mat/ifc-drrn')
+  eng.addpath(r'./src/evaluation_mat/matlabPyrTools')
+
+  eng.eval_dataset_mat(base_dataset_dir, 'lapsrn/mat', sr_method, scale)
+  eng.eval_dataset(base_dataset_dir, 'lapsrn/mat', sr_method, scale)
+
+  eng.quit()
+
 
 def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
 
@@ -220,6 +233,8 @@ if __name__ == '__main__':
     # for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
     # l = np.log2(opt.scale).astype(int) - 1
     print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
+
+    matlab_validation(opt.image, opt.sr_method, opt.scale)
 
   else:
     print("please set correct input")
