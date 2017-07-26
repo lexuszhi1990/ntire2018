@@ -18,11 +18,11 @@ usage:
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4
 
   v7:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4
-'''
-import matlab
-import matlab.engine
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
 
+  v8:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
+'''
 import time
 import argparse
 import os
@@ -212,6 +212,7 @@ def setup_options():
   parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method")
   parser.add_argument("--batch_size", default=2, type=int, help="batch size")
   parser.add_argument("--filter_num", default=64, type=int, help="batch size")
+  parser.add_argument("--matlab_val", action="store_true", help="use matlab code validation in the end...")
 
   return parser
 
@@ -232,7 +233,11 @@ if __name__ == '__main__':
     # l = np.log2(opt.scale).astype(int) - 1
     print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
 
-    matlab_validation(opt.image, opt.sr_method, opt.scale)
+    if opt.matlab_val:
+      import matlab
+      import matlab.engine
+
+      matlab_validation(opt.image, opt.sr_method, opt.scale)
 
   else:
     print("please set correct input")

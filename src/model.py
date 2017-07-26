@@ -336,7 +336,7 @@ class BaselapV1(object):
   def l1_weighted_loss(self):
     loss = 0.0
     for l in range(self.step_depth):
-      loss = loss + (2.0*l/self.step_depth) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      loss = loss + ((l+1)/self.step_depth) * self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
 
     return loss
 
@@ -561,7 +561,7 @@ class LapSRN_v7(LapSRN_v6):
 
 class LapSRN_v8(LapSRN_v6):
   '''
-    drrn image_tune: 1024x1 residual_depth = 16
+    drrn image_tune: 1024x1 residual_depth = 10 image_squeeze_channle=256
   '''
 
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
@@ -571,8 +571,8 @@ class LapSRN_v8(LapSRN_v6):
     # hyper parameters
     self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 16
-    self.image_squeeze_channle = 1024
+    self.residual_depth = 10
+    self.image_squeeze_channle = 256
 
 
 class LapSRN_v9(LapSRN_v6):
