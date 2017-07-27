@@ -30,7 +30,11 @@ usage:
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v9 --g_ckpt_dir=./ckpt/lapser-solver_v9 --default_sr_method='LapSRN_v9' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=6
 
   for v10:
-  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v10 --g_ckpt_dir=./ckpt/lapser-solver_v10 --default_sr_method='LapSRN_v10' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v10 --g_ckpt_dir=./ckpt/lapser-solver_v10 --default_sr_method='LapSRN_v10' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
+
+For SR X8:
+  for LapSRN_X8_v1:
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_x8_v1 --g_ckpt_dir=./ckpt/lapser-solver_x8_v1 --default_sr_method='LapSRN_X8_v1' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=6
 '''
 
 from __future__ import absolute_import
@@ -106,9 +110,9 @@ def main(_):
   f = open(results_file, 'w'); f.close()
 
   lr_list = [0.0003, 0.0004]
-  g_decay_rate_list = [0.9, 0.1]
+  g_decay_rate_list = [0.05]
   reg_list = [5e-3]
-  decay_final_rate_list = [0.01]
+  decay_final_rate_list = [0.1, 0.01]
 
   for reg in reg_list:
     for decay_final_rate in decay_final_rate_list:
