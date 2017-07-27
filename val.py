@@ -22,6 +22,11 @@ usage:
 
   v8:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
+
+
+For SR X8:
+  for LapSRN_X8_v1:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_X8_v1 --model=./ckpt/lapser-solver_x8_v10/LapSRN_X8_v1-epoch-1-step-19548-2017-07-27-09-07.ckpt-19548 --image=./dataset/mat_test/set14/mat --scale=8
 '''
 import time
 import argparse
