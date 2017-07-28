@@ -15,13 +15,13 @@ usage:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v6:
-  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-21-02-55.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-27-16-30.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
 
   v7:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
 
   v8:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-2-step-9774-2017-07-25-02-46.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
 
 
 For SR X8:
@@ -38,7 +38,8 @@ import scipy.io as sio
 import tensorflow as tf
 
 from src.cv2_utils import *
-from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14
+from src.model import LapSRN_v2_v1, LapSRN_v2_v2
 from src.model import LapSRN_X8_v1
 from src.utils import sess_configure, trainsform, transform_reverse
 
