@@ -21,7 +21,7 @@ usage:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v6 --g_ckpt_dir=./ckpt/lapser-solver_v6 --default_sr_method='LapSRN_v6' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
 
   for v7:
-  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v7 --g_ckpt_dir=./ckpt/lapser-solver_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=2 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v7 --g_ckpt_dir=./ckpt/lapser-solver_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
   for v8:
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v8 --g_ckpt_dir=./ckpt/lapser-solver_v8 --default_sr_method='LapSRN_v8' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
@@ -31,6 +31,13 @@ usage:
 
   for v10:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v10 --g_ckpt_dir=./ckpt/lapser-solver_v10 --default_sr_method='LapSRN_v10' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
+
+  for LapSRN_v14:
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v14 --g_ckpt_dir=./ckpt/lapser-solver_v14 --default_sr_method='LapSRN_v14' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
+
+
+  for LapSRN_v2_v2:
+  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v2_v2 --g_ckpt_dir=./ckpt/lapser-solver_v2_v2 --default_sr_method='LapSRN_v2_v2' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
 For SR X8:
   for LapSRN_X8_v1:
@@ -46,6 +53,7 @@ import time
 import pprint
 import argparse
 import numpy as np
+import cPickle as pickle
 import tensorflow as tf
 
 from train import train
@@ -63,7 +71,7 @@ def save_results(results, path='./tmp/results.txt', scale=4):
     for l in range(num):
 
       file_op.write("for model %s, scale: %d, init lr: %f, decay_rate: %f, reg: %f, decay_final_rate: %f\n"%(result[0], scale, result[4], result[5], result[6], result[7]))
-      file_op.write("average exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n\n"%(np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])))
+      file_op.write("average exec time: %.4fs;\tAaverage PSNR/SSIM: %.4f/%.4f\n\n"%(np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])))
       print("scale: %d, init lr: %f\naverage exec time: %.4fs;\tAaverage PSNR: %.4f;\tAaverage SSIM: %.4f\n"%(scale, result[4], np.mean(result[3][l]), np.mean(result[1][l]), np.mean(result[2][l])));
 
   file_op.close()
@@ -107,40 +115,48 @@ def main(_):
   filter_num = opt.filter_num
 
   results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
+  results_pkl_file = "./tmp/results-{}-scale-{}-{}.pkl".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   f = open(results_file, 'w'); f.close()
 
-  lr_list = [0.0003, 0.0004]
-  g_decay_rate_list = [0.05]
-  reg_list = [5e-3]
-  decay_final_rate_list = [0.1, 0.01]
+  pkl_results = []
 
-  for reg in reg_list:
-    for decay_final_rate in decay_final_rate_list:
-      for decay_rate in g_decay_rate_list:
-        for lr in lr_list:
-          # training for one epoch
-          model_list = []
-          results = []
+  hyper_params = [[0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.1, 0.01, 5e-4], [0.0003, 0.8, 0.05, 1e-4], [0.0003, 0.4, 0.005, 1e-4], [0.0004, 0.9, 0.005, 1e-4], [0.0004, 0.6, 0.001, 1e-4]]
+  # lr_list = [0.0002, 0.0004]
+  # g_decay_rate_list = [0.1, 0.4]
+  # reg_list = [1e-4]
+  # decay_final_rate_list = [0.05, 0.01]
+  # for reg in reg_list:
+  #   for decay_final_rate in decay_final_rate_list:
+  #     for decay_rate in g_decay_rate_list:
+  #       for lr in lr_list:
+  for lr, decay_rate, decay_final_rate, reg in hyper_params:
+    # training for one epoch
+    model_list = []
+    results = []
 
-          print("===> Start Training for one parameters set")
-          setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
-          for epoch in range(epoches):
-            dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
-            g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*epoches*inner_epoches))
+    print("===> Start Training for one parameters set")
+    setup_project(dataset_dir, g_ckpt_dir, g_log_dir)
+    for epoch in range(epoches):
+      dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
+      g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*epoches*inner_epoches))
 
-            model_path = model_list[-1] if len(model_list) != 0 else "None"
-            saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
-            model_list.append(saved_model)
+      model_path = model_list[-1] if len(model_list) != 0 else "None"
+      saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
+      model_list.append(saved_model)
 
-          print("===> Testing model")
-          print(model_list)
-          for model_path in model_list:
-            PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
-            results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
+    print("===> Testing model")
+    print(model_list)
+    for model_path in model_list:
+      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
+      results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
+      pkl_results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
 
-          print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
-          print("===> Saving results")
-          save_results(results, results_file, upscale_factor)
+    print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
+    print("===> Saving results")
+    save_results(results, results_file, upscale_factor)
+
+  print("===> Saving results to pkl at {}".format(results_pkl_file))
+  pickle.dump(pkl_results, open(results_pkl_file, "w"))
 
 
 if __name__ == '__main__':
