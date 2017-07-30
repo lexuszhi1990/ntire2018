@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 def lrelu(x, trainbable=None):
     alpha = 0.2

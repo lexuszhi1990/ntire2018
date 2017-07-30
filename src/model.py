@@ -215,7 +215,12 @@ class LapSRN_v1(object):
 
       base_images = self.inputs
       for l in range(self.level):
-        base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, weights_initializer=bilinear_weights_init, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
+        upscaled_width = self.width*np.exp2(l+1).astype(int)
+        upscaled_height = self.height*np.exp2(l+1).astype(int)
+        # base_images = tf.image.resize_bilinear(base_images, size=[upscaled_height, upscaled_width], align_corners=False, name='level_{}_biliear'.format(str(l)))
+
+        bilinear_weights_init1 = tf.constant_initializer(value=bilinear_upsample_weights(2, 1), dtype=tf.float32)
+        base_images = layers.conv2d_transpose(base_images, 1, 4, stride=2, padding='SAME', activation_fn=lrelu, weights_initializer=bilinear_weights_init1, biases_initializer=None, scope='level_{}_img_upscale_transpose'.format(str(l)))
 
         self.reconstructed_imgs.append(base_images)
 
