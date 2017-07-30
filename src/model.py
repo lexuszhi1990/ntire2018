@@ -885,9 +885,8 @@ class LapSRN_X8_v1(LapSRN_v6):
     # hyper parameters
     self.step_depth = 6
     self.kernel_size = 3
-    self.residual_depth = 10
+    self.residual_depth = 6
     self.image_squeeze_channle = 512
 
   def l1_loss(self):
-    # return self.l1_weighted_loss()
     return self.l1_normal_loss()
