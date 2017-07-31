@@ -21,7 +21,16 @@ usage:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
 
   v8:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-2-step-9774-2017-07-25-02-46.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-1-step-9774-2017-07-29-16-11.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
+
+  v9:
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
+
+  v15:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v15 --model=./ckpt/lapser-solver_v15/LapSRN_v15-epoch-1-step-4886-2017-07-31-00-14.ckpt-4886 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  v16:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-9772-2017-07-31-01-25.ckpt-9772 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+
 
 
 For SR X8:

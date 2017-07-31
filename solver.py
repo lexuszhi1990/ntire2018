@@ -35,12 +35,18 @@ usage:
   for v11:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v11 --g_ckpt_dir=./ckpt/lapser-solver_v11 --default_sr_method='LapSRN_v11' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
 
+
+  for LapSRN_v13:
+  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v13 --g_ckpt_dir=./ckpt/lapser-solver_v13 --default_sr_method='LapSRN_v13' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+
+
+  for LapSRN_v14:
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v14 --g_ckpt_dir=./ckpt/lapser-solver_v14 --default_sr_method='LapSRN_v14' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+
   for v15, 16:
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x100.h5 --g_log_dir=./log/lapsrn-solver_v15 --g_ckpt_dir=./ckpt/lapser-solver_v15 --default_sr_method='LapSRN_v15' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x100.h5 --g_log_dir=./log/lapsrn-solver_v16 --g_ckpt_dir=./ckpt/lapser-solver_v16 --default_sr_method='LapSRN_v16' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
-  for LapSRN_v14:
-  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v14 --g_ckpt_dir=./ckpt/lapser-solver_v14 --default_sr_method='LapSRN_v14' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=16
 
 
   for LapSRN_v2_v2:
@@ -127,7 +133,7 @@ def main(_):
 
   pkl_results = []
 
-  hyper_params = [[0.0003, 0.8, 0.05, 1e-4], [0.00035, 0.85, 0.05, 1e-4], [0.0004, 0.90, 0.01, 1e-4], [0.00045, 0.95, 0.01, 1e-4]]
+  hyper_params = [[0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-4], [0.00035, 0.80, 0.01, 1e-4], [0.00045, 0.95, 0.01, 1e-4]]
   for lr, decay_rate, decay_final_rate, reg in hyper_params:
   # lr_list = [0.0003, 0.0004]
   # g_decay_rate_list = [0.2, 0.8]
