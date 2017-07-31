@@ -688,7 +688,7 @@ class LapSRN_v9(LapSRN_v6):
     self.step_depth = 4
     self.kernel_size = 3
     self.residual_depth = 10
-    self.image_squeeze_channle = 256
+    self.image_squeeze_channle = 512
 
   def l1_loss(self):
     return self.l1_weighted_loss(3)
@@ -755,11 +755,8 @@ class LapSRN_v13(LapSRN_v6):
     # hyper parameters
     self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 16
-    self.image_squeeze_channle = 1024
-
-  def l1_loss(self):
-    return self.l1_weighted_loss(3)
+    self.residual_depth = 10
+    self.image_squeeze_channle = 64
 
 class LapSRN_v14(LapSRN_v6):
   '''
@@ -773,8 +770,8 @@ class LapSRN_v14(LapSRN_v6):
     # hyper parameters
     self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 12
-    self.image_squeeze_channle = 1024
+    self.residual_depth = 10
+    self.image_squeeze_channle = 128
 
 class LapSRN_v15(LapSRN_v6):
   '''
@@ -804,6 +801,51 @@ class LapSRN_v16(LapSRN_v6):
     self.step_depth = 2
     self.kernel_size = 3
     self.residual_depth = 10
+    self.image_squeeze_channle = 512
+
+class LapSRN_v17(LapSRN_v6):
+  '''
+    drrn image_tune: 512 step_depth:2 residual_depth:8 normal_loss
+  '''
+
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 8
+    self.image_squeeze_channle = 512
+
+class LapSRN_v18(LapSRN_v6):
+  '''
+    drrn image_tune: 512 step_depth:2 residual_depth:8 normal_loss
+  '''
+
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 12
+    self.image_squeeze_channle = 512
+
+class LapSRN_v19(LapSRN_v6):
+  '''
+    drrn image_tune: 512 step_depth:2 residual_depth:8 normal_loss
+  '''
+
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 4
     self.image_squeeze_channle = 512
 
 
@@ -903,9 +945,136 @@ class LapSRN_v2_v2(BaselapV1):
         base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
         self.reconstructed_imgs.append(base_images)
 
+# upscale 2
+class LapSRN_v30(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:2 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 512
+
+class LapSRN_v31(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:4 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 512
+
+
+class LapSRN_v32(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:6 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 512
+
+class LapSRN_v33(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:8 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 512
+
+class LapSRN_v34(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:10 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 10
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 512
 
 # upscale 8
-class LapSRN_X8_v1(LapSRN_v6):
+class LapSRN_v40(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:4 residual_depth:4 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 4
+    self.image_squeeze_channle = 1024
+
+class LapSRN_v41(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:4 residual_depth:6 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 6
+    self.image_squeeze_channle = 1024
+
+class LapSRN_v42(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:4 residual_depth:8 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 8
+    self.image_squeeze_channle = 1024
+
+class LapSRN_v43(LapSRN_v6):
+  '''
+  drrn image_tune: 512x1 step_depth:4 residual_depth:10 normal_loss
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
+
+    BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    # hyper parameters
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 10
+    self.image_squeeze_channle = 1024
+
+class LapSRN_v44(LapSRN_v6):
   '''
   drrn image_tune: 512x1 step_depth:4 residual_depth:12 normal_loss
   '''
@@ -916,8 +1085,5 @@ class LapSRN_X8_v1(LapSRN_v6):
     # hyper parameters
     self.step_depth = 6
     self.kernel_size = 3
-    self.residual_depth = 6
-    self.image_squeeze_channle = 512
-
-  def l1_loss(self):
-    return self.l1_normal_loss()
+    self.residual_depth = 12
+    self.image_squeeze_channle = 1024
