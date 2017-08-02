@@ -26,10 +26,23 @@ usage:
   v9:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
 
+  v10:
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v10 --model=./ckpt/lapser-solver_v10/LapSRN_v10-epoch-1-step-13032-2017-07-29-14-15.ckpt-13032 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+
+  v13:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v13 --model=./ckpt/lapser-solver_v13/LapSRN_v13-epoch-1-step-9774-2017-07-31-21-47.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  v14:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v14 --model=./ckpt/lapser-solver_v14/LapSRN_v14-epoch-1-step-9774-2017-07-31-21-52.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+
   v15:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v15 --model=./ckpt/lapser-solver_v15/LapSRN_v15-epoch-1-step-4886-2017-07-31-00-14.ckpt-4886 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
   v16:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-9772-2017-07-31-01-25.ckpt-9772 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+
+  v30:
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-2-step-2443-2017-08-02-01-36.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v31 --model=./ckpt/lapser-solver_v31/LapSRN_v31-epoch-2-step-2443-2017-08-02-00-12.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v32 --model=./ckpt/lapser-solver_v32/LapSRN_v32-epoch-2-step-4887-2017-08-02-01-27.ckpt-4887 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
 
 
 
@@ -47,9 +60,10 @@ import scipy.io as sio
 import tensorflow as tf
 
 from src.cv2_utils import *
-from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14, LapSRN_v15, LapSRN_v16
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14, LapSRN_v15, LapSRN_v16, LapSRN_v17, LapSRN_v18, LapSRN_v19
 from src.model import LapSRN_v2_v1, LapSRN_v2_v2
-from src.model import LapSRN_X8_v1
+from src.model import LapSRN_v30, LapSRN_v31, LapSRN_v32, LapSRN_v33, LapSRN_v34
+from src.model import LapSRN_v40, LapSRN_v41, LapSRN_v42, LapSRN_v44, LapSRN_v44
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
