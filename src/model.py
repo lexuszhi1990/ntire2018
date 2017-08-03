@@ -957,7 +957,7 @@ class LapSRN_v30(LapSRN_v6):
     # hyper parameters
     self.step_depth = 2
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
 
 class LapSRN_v31(LapSRN_v6):
@@ -971,7 +971,7 @@ class LapSRN_v31(LapSRN_v6):
     # hyper parameters
     self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
 
 
@@ -986,7 +986,7 @@ class LapSRN_v32(LapSRN_v6):
     # hyper parameters
     self.step_depth = 6
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
 
 class LapSRN_v33(LapSRN_v6):
@@ -1000,7 +1000,7 @@ class LapSRN_v33(LapSRN_v6):
     # hyper parameters
     self.step_depth = 8
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
 
 class LapSRN_v34(LapSRN_v6):
@@ -1014,7 +1014,7 @@ class LapSRN_v34(LapSRN_v6):
     # hyper parameters
     self.step_depth = 10
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
 
 # upscale 8
