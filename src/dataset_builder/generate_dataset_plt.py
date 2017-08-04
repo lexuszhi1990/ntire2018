@@ -94,3 +94,26 @@ def generate_test_dataset(gt_dir, dataset_path):
       bicubic_sr_img_path = os.path.join(bicubic_dir, patch_name)
       bicubic_sr_img.save(bicubic_sr_img_path)
       print("save lr image {} with scale {}".format(bicubic_sr_img_path, scale))
+
+def gene_x2_dataset():
+  mat_file = h5py.File('./dataset/mat_train_391_x200.h5', "r")
+  data = mat_file['data']
+  label_x2 = mat_file['label_x2']
+  label_x4 = mat_file['label_x4']
+  label_x8 = mat_file['label_x8']
+  f = h5py.File('./dataset/mat_train_391_x2_x200.h5', "w")
+  f.create_dataset("label_x8", data=label_x8, chunks=True)
+  f.create_dataset("label_x4", data=label_x4, chunks=True)
+  f.create_dataset("label_x2", data=label_x8, chunks=True)
+  f.create_dataset("data", data=label_x4, chunks=True)
+  f.close()
+
+  f = h5py.File('./dataset/mat_train_391_x4_x200.h5', "w")
+  f.create_dataset("label_x8", data=label_x8[:10], chunks=True)
+  f.create_dataset("label_x4", data=label_x8, chunks=True)
+  f.create_dataset("label_x2", data=label_x2, chunks=True)
+  f.create_dataset("data", data=label_x2, chunks=True)
+  f.close()
+
+
+
