@@ -109,9 +109,9 @@ def gene_x2_dataset():
   f.close()
 
   f = h5py.File('./dataset/mat_train_391_x4_x200.h5', "w")
-  f.create_dataset("label_x8", data=label_x8[:10], chunks=True)
+  f.create_dataset("label_x8", data=label_x2, chunks=True)
   f.create_dataset("label_x4", data=label_x8, chunks=True)
-  f.create_dataset("label_x2", data=label_x2, chunks=True)
+  f.create_dataset("label_x2", data=label_x4, chunks=True)
   f.create_dataset("data", data=label_x2, chunks=True)
   f.close()
 
