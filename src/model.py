@@ -783,9 +783,9 @@ class LapSRN_v15(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 7
+    self.residual_depth = 5
     self.image_squeeze_channle = 512
 
 class LapSRN_v16(LapSRN_v6):
@@ -798,9 +798,9 @@ class LapSRN_v16(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 8
+    self.step_depth = 5
     self.kernel_size = 3
-    self.residual_depth = 5
+    self.residual_depth = 4
     self.image_squeeze_channle = 512
 
 class LapSRN_v17(LapSRN_v6):
@@ -815,7 +815,7 @@ class LapSRN_v17(LapSRN_v6):
     # hyper parameters
     self.step_depth = 10
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 2
     self.image_squeeze_channle = 512
 
 class LapSRN_v18(LapSRN_v6):
@@ -828,10 +828,10 @@ class LapSRN_v18(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 14
+    self.step_depth = 2
     self.kernel_size = 3
-    self.residual_depth = 3
-    self.image_squeeze_channle = 512
+    self.residual_depth = 10
+    self.image_squeeze_channle = 1024
 
 class LapSRN_v19(LapSRN_v6):
   '''
@@ -969,7 +969,7 @@ class LapSRN_v31(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 4
+    self.step_depth = 3
     self.kernel_size = 3
     self.residual_depth = 10
     self.image_squeeze_channle = 512
@@ -984,7 +984,7 @@ class LapSRN_v32(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 4
     self.kernel_size = 3
     self.residual_depth = 10
     self.image_squeeze_channle = 512
@@ -998,7 +998,7 @@ class LapSRN_v33(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 8
+    self.step_depth = 5
     self.kernel_size = 3
     self.residual_depth = 10
     self.image_squeeze_channle = 512
@@ -1012,7 +1012,7 @@ class LapSRN_v34(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 10
+    self.step_depth = 6
     self.kernel_size = 3
     self.residual_depth = 10
     self.image_squeeze_channle = 512
@@ -1041,9 +1041,9 @@ class LapSRN_v41(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 2
     self.kernel_size = 3
-    self.residual_depth = 6
+    self.residual_depth = 30
     self.image_squeeze_channle = 1024
 
 class LapSRN_v42(LapSRN_v6):
@@ -1055,9 +1055,9 @@ class LapSRN_v42(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 4
     self.kernel_size = 3
-    self.residual_depth = 8
+    self.residual_depth = 15
     self.image_squeeze_channle = 1024
 
 class LapSRN_v43(LapSRN_v6):
@@ -1083,7 +1083,7 @@ class LapSRN_v44(LapSRN_v6):
     BaselapV1.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
     # hyper parameters
-    self.step_depth = 6
+    self.step_depth = 10
     self.kernel_size = 3
-    self.residual_depth = 12
+    self.residual_depth = 6
     self.image_squeeze_channle = 1024
