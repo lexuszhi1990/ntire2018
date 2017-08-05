@@ -1029,7 +1029,7 @@ class LapSRN_v40(LapSRN_v6):
     # hyper parameters
     self.step_depth = 6
     self.kernel_size = 3
-    self.residual_depth = 4
+    self.residual_depth = 6
     self.image_squeeze_channle = 1024
 
 class LapSRN_v41(LapSRN_v6):
