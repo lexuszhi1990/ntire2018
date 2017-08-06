@@ -712,7 +712,7 @@ class LapSRN_v10(LapSRN_v6):
 
 class LapSRN_v11(LapSRN_v6):
   '''
-    drrn image_tune: 1024 step_depth:4 residual_depth:10 weighted_loss
+    drrn image_tune: 1024 step_depth:4 residual_depth:14
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='lap_ml_srn'):
 

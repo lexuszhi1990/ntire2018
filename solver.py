@@ -44,8 +44,8 @@ usage:
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v14 --g_ckpt_dir=./ckpt/lapser-solver_v14 --default_sr_method='LapSRN_v14' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
 
   for v15, 16:
-  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-solver_v15 --g_ckpt_dir=./ckpt/lapser-solver_v15 --default_sr_method='LapSRN_v15' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=2
-  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x100.h5 --g_log_dir=./log/lapsrn-solver_v16 --g_ckpt_dir=./ckpt/lapser-solver_v16 --default_sr_method='LapSRN_v16' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=2
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/lapsrn-solver_v15 --g_ckpt_dir=./ckpt/lapser-solver_v15 --default_sr_method='LapSRN_v15' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=2
+  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/lapsrn-solver_v16 --g_ckpt_dir=./ckpt/lapser-solver_v16 --default_sr_method='LapSRN_v16' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=2
 
 
 
@@ -145,7 +145,7 @@ def main(_):
   # for batch_size:16
   # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.0001, 0.2, 0.01, 1e-4], [0.00015, 0.50, 0.01, 1e-3], [0.0002, 0.70, 0.01, 1e-3], [0.00025, 0.80, 0.01, 1e-3], [0.00035, 0.95, 0.01, 1e-3]]
   # for batch_size:8
-  hyper_params = [[0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3], [0.00045, 0.95, 0.01, 1e-3]]
+  hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
   for lr, decay_rate, decay_final_rate, reg in hyper_params:
   # lr_list = [0.0003, 0.0004]
   # g_decay_rate_list = [0.2, 0.8]
