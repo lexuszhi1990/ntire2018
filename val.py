@@ -18,13 +18,13 @@ usage:
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-27-16-30.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
 
   v7:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4
 
   v8:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-1-step-9774-2017-07-29-16-11.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
 
   v9:
-  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --batch_size=1 --matlab_val
 
   v10:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v10 --model=./ckpt/lapser-solver_v10/LapSRN_v10-epoch-1-step-13032-2017-07-29-14-15.ckpt-13032 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
@@ -40,15 +40,18 @@ usage:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-9772-2017-07-31-01-25.ckpt-9772 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
 
   v30:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-2-step-2443-2017-08-02-01-36.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-04-15-32.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-06-17-39.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v31 --model=./ckpt/lapser-solver_v31/LapSRN_v31-epoch-2-step-2443-2017-08-02-00-12.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v32 --model=./ckpt/lapser-solver_v32/LapSRN_v32-epoch-2-step-4887-2017-08-02-01-27.ckpt-4887 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
 
 
 
 For SR X8:
   for LapSRN_X8_v1:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_X8_v1 --model=./ckpt/lapser-solver_x8_v10/LapSRN_X8_v1-epoch-1-step-19548-2017-07-27-09-07.ckpt-19548 --image=./dataset/mat_test/set14/mat --scale=8
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v42 --model=LapSRN_v42-epoch-1-step-39096-2017-08-07-01-50.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val
 '''
 import time
 import argparse
@@ -114,9 +117,10 @@ def matlab_validation(dataset_dir, sr_method, scale):
   eng.addpath(r'./src/evaluation_mat/matlabPyrTools')
 
   eng.eval_dataset_mat(base_dataset_dir, 'lapsrn/mat', sr_method, scale)
-  eng.eval_dataset(base_dataset_dir, 'lapsrn/mat', sr_method, scale)
+  eng.eval_dataset(base_dataset_dir, sr_method, scale)
 
   eng.quit()
+
 
 
 def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
@@ -240,9 +244,10 @@ def setup_options():
   parser.add_argument("--scale", default=4, type=int, help="scale factor, Default: 4")
   parser.add_argument("--channel", default=1, type=int, help="input image channel, Default: 4")
   parser.add_argument("--sr_method", default="lapsrn", type=str, help="srn method")
-  parser.add_argument("--batch_size", default=2, type=int, help="batch size")
+  parser.add_argument("--batch_size", default=1, type=int, help="batch size")
   parser.add_argument("--filter_num", default=64, type=int, help="batch size")
   parser.add_argument("--matlab_val", action="store_true", help="use matlab code validation in the end...")
+  parser.add_argument("--all_datasets", action="store_true", help="use matlab code validation in the end...")
 
   return parser
 
@@ -252,23 +257,36 @@ if __name__ == '__main__':
   parser = setup_options()
   opt = parser.parse_args()
 
-  if not os.path.exists(opt.output_dir) and opt.output_dir != 'null':
-    os.system('mkdir -p ' + opt.output_dir)
+  if opt.all_datasets:
 
-  if os.path.isdir(opt.image):
+    dataset_dir_list = ['./dataset/mat_test/set5/mat', './dataset/mat_test/set14/mat', './dataset/mat_test/bsd100/mat', './dataset/mat_test/urban100/mat', './dataset/mat_test/manga109/mat']
+    for test_dir in dataset_dir_list:
+      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dir, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
 
-    PSNR, SSIM, MSSSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
+      # for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
+      # l = np.log2(opt.scale).astype(int) - 1
+      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(test_dir, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
 
-    # for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
-    # l = np.log2(opt.scale).astype(int) - 1
-    print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
+      if opt.matlab_val:
+        import matlab
+        import matlab.engine
 
-    if opt.matlab_val:
-      import matlab
-      import matlab.engine
-
-      matlab_validation(opt.image, opt.sr_method, opt.scale)
-
+        matlab_validation(opt.image, opt.sr_method, opt.scale)
   else:
-    print("please set correct input")
+
+    if os.path.isdir(opt.image):
+      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(opt.image, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
+
+      # for scale in scale_list[0:np.log2(opt.scale).astype(int)]:
+      # l = np.log2(opt.scale).astype(int) - 1
+      print("for dataset %s, scale: %d, average exec time: %.4fs\n--Aaverage PSNR: %.4f;\tAaverage SSIM: %.4f;\tAaverage MSSSIM: %.4f\n"%(opt.image, opt.scale, np.mean(EXEC_TIME[0]), np.mean(PSNR[0]), np.mean(SSIM[0]), np.mean(MSSSIM[0])));
+
+      if opt.matlab_val:
+        import matlab
+        import matlab.engine
+
+        matlab_validation(opt.image, opt.sr_method, opt.scale)
+
+    else:
+      print("please set correct input")
 
