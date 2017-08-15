@@ -101,6 +101,7 @@ def gene_x2_dataset():
   label_x2 = mat_file['label_x2']
   label_x4 = mat_file['label_x4']
   label_x8 = mat_file['label_x8']
+
   f = h5py.File('./dataset/mat_train_391_x2_x200.h5', "w")
   f.create_dataset("label_x8", data=data, chunks=True)
   f.create_dataset("label_x4", data=data, chunks=True)
