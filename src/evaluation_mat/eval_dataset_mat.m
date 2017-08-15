@@ -10,7 +10,7 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
   %}
 
   dataset_gt_path = fullfile(dataset_dir, 'mat');
-  dataset_sr_path = fullfile(dataset_dir, method_dir);
+  dataset_sr_path = fullfile(dataset_dir, 'lapsrn', sr_method);
   if ~exist(dataset_sr_path)
     mkdir(dataset_sr_path);
   end
@@ -59,7 +59,7 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
 
   fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR/SSIM/IFC: \t %.4f/%.4f/%.4f\n', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC));
 
-  filename = fullfile(dataset_sr_path, ['results-' sr_method '-' num2str(sr_factor) '.txt']);
+  filename = fullfile(dataset_sr_path, ['results-mat-' sr_method '-' num2str(sr_factor) '.txt']);
   save_matrix(PSNR, SSIM, IFC, filename, image_names);
   fprintf('save result at %s\n', filename);
 

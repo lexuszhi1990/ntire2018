@@ -1,4 +1,4 @@
-function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, method_dir, sr_method, sr_factor)
+function [PSNR, SSIM, IFC] = eval_dataset(dataset_dir, sr_method, sr_factor)
 
 %{
 usage:
@@ -6,11 +6,11 @@ usage:
   addpath('./src/evaluation_mat/ifc-drrn');
   addpath('./src/evaluation_mat/matlabPyrTools');
 
-  eval_dataset('./dataset/mat_test/set5', 'lapsrn/mat', 'LapSRN_v1', 4);
+  eval_dataset('./dataset/mat_test/set5', 'LapSRN_v30', 2);
 %}
 
 dataset_gt_path = fullfile(dataset_dir, 'PNG');
-dataset_sr_path = fullfile(dataset_dir, method_dir);
+dataset_sr_path = fullfile(dataset_dir, 'lapsrn', sr_method);
 
 gt_lst = dir(fullfile(dataset_gt_path ,'*.png'));
 gt_lst = [gt_lst; dir(fullfile(dataset_gt_path, '*.bmp'))];
@@ -40,18 +40,18 @@ for n=1:numel(gt_lst)
   gt_img_y = gt_img_ycbcr(:,:,1);
   gt_img_y = modcrop(gt_img_y, 24);
   gt_img_y_double = double(gt_img_y * 255);
-  gt_img_y_shaved = shave(uint8(gt_img_y_double), sr_factor);
+  gt_img_y_shaved = shave(gt_img_y_double, sr_factor);
 
   generated_img = imread(generated_img_path);
   % generated_img = imresize(imresize(gt_img, 1.0/sr_factor), sr_factor, 'bicubic');
   generated_img_ycbcr = rgb2ycbcr(im2double(generated_img));
   generated_img_y = generated_img_ycbcr(:,:,1);
   generated_img_y_double = double(generated_img_y * 255);
-  generated_img_y_shaved = shave(uint8(generated_img_y_double), sr_factor);
+  generated_img_y_shaved = shave(generated_img_y_double, sr_factor);
 
   PSNR(n) = compute_psnr(gt_img_y_shaved, generated_img_y_shaved);
   SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
-  IFC(n) = ifcvec(gt_img_y_double, generated_img_y_double);
+  IFC(n) = ifcvec(gt_img_y_shaved, generated_img_y_shaved);
   image_names = [image_names; {gt_img_name}];
 
   fprintf('--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', PSNR(n), SSIM(n), IFC(n));
@@ -70,6 +70,6 @@ end
 
 fprintf('\nfor dataset %s, upscaled by %s, at scale:%d\n--Average PSNR/SSIM/IFC: \t %.4f/%.4f/%.4f\n Average improvements PSNR/SSIM/IFC: %.4f/%.4f/%.4f\n ', dataset_dir, sr_method, sr_factor, mean(PSNR), mean(SSIM), mean(IFC), mean(PSNR)-lapsrn_results(dataset_index, 1), mean(SSIM)-lapsrn_results(dataset_index, 2), mean(IFC)-lapsrn_results(dataset_index, 3));
 
-filename = fullfile(dataset_sr_path, 'result.txt');
+filename = fullfile(dataset_sr_path, ['results-finally-' sr_method '-' num2str(sr_factor) '.txt']);
 save_matrix(PSNR, SSIM, IFC, filename, image_names);
 fprintf('save result at %s\n', filename);
