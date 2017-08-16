@@ -40,7 +40,7 @@ usage:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-9772-2017-07-31-01-25.ckpt-9772 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
 
   v30:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-04-15-32.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-04-15-32.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-06-17-39.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
 
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v31 --model=./ckpt/lapser-solver_v31/LapSRN_v31-epoch-2-step-2443-2017-08-02-00-12.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
@@ -247,7 +247,7 @@ def setup_options():
   parser.add_argument("--batch_size", default=1, type=int, help="batch size")
   parser.add_argument("--filter_num", default=64, type=int, help="batch size")
   parser.add_argument("--matlab_val", action="store_true", help="use matlab code validation in the end...")
-  parser.add_argument("--all_datasets", action="store_true", help="use matlab code validation in the end...")
+  parser.add_argument("--validate_all", action="store_true", help="use matlab code validation in the end...")
 
   return parser
 
@@ -257,9 +257,10 @@ if __name__ == '__main__':
   parser = setup_options()
   opt = parser.parse_args()
 
-  if opt.all_datasets:
+  if opt.validate_all:
 
-    dataset_dir_list = ['./dataset/mat_test/set5/mat', './dataset/mat_test/set14/mat', './dataset/mat_test/bsd100/mat', './dataset/mat_test/urban100/mat', './dataset/mat_test/manga109/mat']
+    # dataset_dir_list = ['./dataset/mat_test/set5/mat', './dataset/mat_test/set14/mat', './dataset/mat_test/bsd100/mat', './dataset/mat_test/urban100/mat', './dataset/mat_test/manga109/mat']
+    dataset_dir_list = ['./dataset/mat_test/set5/mat', './dataset/mat_test/set14/mat', './dataset/mat_test/bsd100/mat']
     for test_dir in dataset_dir_list:
       PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dir, opt.batch_size, opt.scale, opt.channel, opt.filter_num, opt.sr_method, opt.model, opt.gpu_id)
 
@@ -271,7 +272,7 @@ if __name__ == '__main__':
         import matlab
         import matlab.engine
 
-        matlab_validation(opt.image, opt.sr_method, opt.scale)
+        matlab_validation(test_dir, opt.sr_method, opt.scale)
   else:
 
     if os.path.isdir(opt.image):
