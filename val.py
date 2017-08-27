@@ -15,43 +15,55 @@ usage:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v4 --model=./ckpt/lapser-solver_v4/LapSRN_v4-epoch-4-step-2442-2017-07-19-13-43.ckpt-2442 --image=./dataset/mat_test/bsd100/mat --scale=4
 
   v6:
-  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-27-16-30.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v6 --model=./ckpt/lapser-solver_v6/LapSRN_v6-epoch-1-step-19548-2017-07-27-16-30.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
 
   v7:
-  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./saved_models/x4/v7_set14_28.2487/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/lapser-solver_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val --validate_all
 
   v8:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-1-step-9774-2017-07-29-16-11.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v8 --model=./ckpt/lapser-solver_v8/LapSRN_v8-epoch-1-step-9774-2017-07-29-16-11.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val --validate_all
 
   v9:
-  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v9 --model=./ckpt/lapser-solver_v9/LapSRN_v9-epoch-1-step-9774-2017-07-29-02-38.ckpt-9774 --image=./dataset/mat_test/set14/mat --scale=4 --batch_size=1 --matlab_val --validate_all
 
   v10:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v10 --model=./ckpt/lapser-solver_v10/LapSRN_v10-epoch-1-step-13032-2017-07-29-14-15.ckpt-13032 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
 
   v13:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v13 --model=./ckpt/lapser-solver_v13/LapSRN_v13-epoch-1-step-9774-2017-07-31-21-47.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v13 --model=./ckpt/lapser-solver_v13/LapSRN_v13-epoch-1-step-9774-2017-07-31-21-47.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
   v14:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v14 --model=./ckpt/lapser-solver_v14/LapSRN_v14-epoch-1-step-9774-2017-07-31-21-52.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v14 --model=./ckpt/lapser-solver_v14/LapSRN_v14-epoch-1-step-39096-2017-08-25-14-34.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
 
   v15:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v15 --model=./ckpt/lapser-solver_v15/LapSRN_v15-epoch-1-step-4886-2017-07-31-00-14.ckpt-4886 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v15 --model=./ckpt/lapser-solver_v15/LapSRN_v15-epoch-1-step-39096-2017-08-08-04-43.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val   --validate_all
   v16:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-9772-2017-07-31-01-25.ckpt-9772 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-39096-2017-08-25-07-49.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
+  v17:
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v17 --model=./ckpt/lapser-solver_v17/LapSRN_v17-epoch-1-step-78192-2017-08-26-07-46.ckpt-78192 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
+
+  v19:
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v19 --model=./ckpt/lapser-solver_v19/LapSRN_v19-epoch-1-step-39096-2017-08-25-17-06.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
 
   v30:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-04-15-32.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v30 --model=./ckpt/lapser-solver_v30/LapSRN_v30-epoch-1-step-39096-2017-08-06-17-39.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
 
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v31 --model=./ckpt/lapser-solver_v31/LapSRN_v31-epoch-2-step-2443-2017-08-02-00-12.ckpt-2443 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v31 --model=./ckpt/lapser-solver_v31/LapSRN_v31-epoch-2-step-4887-2017-08-03-03-34.ckpt-4887 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
 
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v32 --model=./ckpt/lapser-solver_v32/LapSRN_v32-epoch-2-step-4887-2017-08-02-01-27.ckpt-4887 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val
-
-
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v32 --model=./ckpt/lapser-solver_v32/LapSRN_v32-epoch-2-step-4887-2017-08-02-18-29.ckpt-4887 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
 
 For SR X8:
-  for LapSRN_v42:
-  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=LapSRN_v42 --model=saved_models/x8/LapSRN_v42_set14_24.5809/LapSRN_v42-epoch-1-step-39096-2017-08-07-01-50.ckpt-39096 --image=./dataset/mat_test/set14/mat --scale=8 --matlab_val
+  for LapSRN_41:
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v41 --model=LapSRN_v41-epoch-1-step-39096-2017-08-08-15-05.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+
+  for LapSRN_42:
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v42 --model=saved_models/x8/LapSRN_v42_set14_24.5809/LapSRN_v42-epoch-1-step-39096-2017-08-07-01-50.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+
+  for LapSRN_43:
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v43 --model=./LapSRN_v43-epoch-1-step-39096-2017-08-07-01-57.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+
+  for LapSRN_44:
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v44 --model=LapSRN_v44-epoch-1-step-78192-2017-08-19-16-28.ckpt-78192 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+
 '''
 import time
 import argparse
@@ -59,6 +71,7 @@ import os
 import numpy as np
 from glob import glob
 import scipy.io as sio
+import shutil
 
 import tensorflow as tf
 
@@ -126,14 +139,12 @@ def matlab_validation(dataset_dir, sr_method, scale):
 def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
 
   graph = tf.Graph()
-  sess_conf = sess_configure(memory_per=.75)
+  sess_conf = sess_configure(memory_per=.95)
 
   img_size = input_img.shape
   height, width = input_img.shape
   batch_images = np.zeros((batch_size, height, width, channel))
   batch_images[0, :, :, 0] = input_img
-
-  upscaled_img, elapsed_time = None, None
 
   with graph.as_default(), tf.Session(config=sess_conf) as sess:
     with tf.device("/gpu:{}".format(str(gpu_id))):
@@ -164,13 +175,10 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_name, mod
         print("restore model from file %s"%model_path)
 
       start_time = time.time()
-      upscaled_imgs = sess.run(upscaled_tf_img, feed_dict={inputs: batch_images, is_training: False})
+      upscaled_img = sess.run(upscaled_tf_img, feed_dict={inputs: batch_images, is_training: False})
       elapsed_time = time.time() - start_time
-      upscaled_img = upscaled_imgs[0]
 
-    sess.close()
-
-  return upscaled_img, elapsed_time
+      return upscaled_img[0], elapsed_time
 
 def cal_ssim(upscaled_img_y, gt_img_y):
   gt_img_ep = np.expand_dims(np.expand_dims(gt_img_y, axis=0), axis=3)
@@ -278,6 +286,18 @@ if __name__ == '__main__':
         import matlab.engine
 
         matlab_validation(test_dir, opt.sr_method, opt.scale)
+
+        # copy results to saved_models
+        dataset_dir_list = test_dir.split('/')[0:-1]
+        test_dataset=dataset_dir_list[-1]
+        base_dataset_dir = '/'.join(dataset_dir_list)
+        dst_path = 'saved_models/x{}/{}'.format(opt.scale, opt.sr_method)
+        if not os.path.exists(dst_path):
+          os.mkdir(dst_path)
+
+        shutil.copytree('{}/lapsrn/{}'.format(base_dataset_dir, opt.sr_method), '{}/{}'.format(dst_path, test_dataset))
+        os.system('cp {} {}'.format(opt.model+'*', dst_path))
+        print('copied results to saved_models: {}'.format('{}/lapsrn/{}'.format(base_dataset_dir, opt.sr_method)))
   else:
 
     if os.path.isdir(opt.image):

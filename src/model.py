@@ -688,7 +688,7 @@ class LapSRN_v9(LapSRN_v6):
     self.step_depth = 4
     self.kernel_size = 3
     self.residual_depth = 10
-    self.image_squeeze_channle = 512
+    self.image_squeeze_channle = 256
 
   def l1_loss(self):
     return self.l1_weighted_loss(3)
