@@ -61,7 +61,7 @@ class BaseModel(object):
       if reuse:
         vs.reuse_variables()
 
-      for l in range(self.level):
+      for l in range(self.step_depth):
         sr_img = tf.add(self.reconstructed_imgs[l], self.extracted_features[l])
         self.sr_imgs.append(sr_img)
 
@@ -77,8 +77,8 @@ class BaseModel(object):
 
       for step in range(1, self.step_depth+1):
         for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(l), str(d)))
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(l), str(d)))
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
 
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)
@@ -103,13 +103,15 @@ class BaseModel(object):
 
       for step in range(1, self.step_depth+1):
         for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
-          x = batch_normalize(x, self.is_training)
-          x = lrelu(x)
+          with tf.variable_scope('level_{}_residual_{}_convA'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
 
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
-          x = batch_normalize(x, self.is_training)
-          x = lrelu(x)
+          with tf.variable_scope('level_{}_residual_{}_convB'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
 
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)
@@ -135,8 +137,8 @@ class BaseModel(object):
       for step in range(1, self.step_depth+1):
         init = x
         for d in range(self.residual_depth):
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(l), str(d)))
-          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(l), str(d)))
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
+          x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
           x = init + x
 
         with tf.variable_scope('level_{}_img'.format(str(step))):
@@ -191,7 +193,7 @@ class BaseModel(object):
 
   def l1_loss(self):
     loss = []
-    for l in range(self.level):
+    for l in range(self.step_depth):
       loss.append(self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l]))
 
     loss = tf.reduce_sum(loss)
@@ -209,7 +211,7 @@ class BaseModel(object):
     # diff = (X - Z) .^ 2;
     # Y = 0.5 * sum(diff(:));
     loss = []
-    for l in range(self.level):
+    for l in range(self.step_depth):
       diff = tf.square(tf.subtract(self.sr_imgs[l], self.gt_imgs[l]))
       loss.append(0.5 * tf.reduce_mean(diff))
 
