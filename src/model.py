@@ -1087,3 +1087,6 @@ class LapSRN_v44(LapSRN_v6):
     self.kernel_size = 3
     self.residual_depth = 6
     self.image_squeeze_channle = 1024
+
+# update new visions for SR models
+

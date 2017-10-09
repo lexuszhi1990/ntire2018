@@ -90,7 +90,6 @@ from val import SR
 from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project
 
-
 def save_results(results, path='./tmp/results.txt', scale=4):
   file_op = open(path,'a')
 
@@ -144,7 +143,11 @@ def main(_):
 
   results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   results_pkl_file = "./tmp/results-{}-scale-{}-{}.pkl".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
-  f = open(results_file, 'w'); f.close()
+  f = open(results_file, 'w');
+  import pdb
+  pdb.set_trace()
+  file_op.write(opt)
+  f.close()
 
   pkl_results = []
 

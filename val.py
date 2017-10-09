@@ -82,6 +82,9 @@ from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, Lap
 from src.model import LapSRN_v2_v1, LapSRN_v2_v2
 from src.model import LapSRN_v30, LapSRN_v31, LapSRN_v32, LapSRN_v33, LapSRN_v34
 from src.model import LapSRN_v40, LapSRN_v41, LapSRN_v42, LapSRN_v43, LapSRN_v44
+from src.model_new import EDSR_v101, EDSR_v102, EDSR_v103, EDSR_v104, EDSR_v105
+from src.model_new import EDSR_v301
+
 from src.utils import sess_configure, trainsform, transform_reverse
 
 from src.eval_dataset import eval_dataset
