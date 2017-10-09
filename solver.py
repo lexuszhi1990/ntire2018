@@ -68,10 +68,7 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v41 --g_ckpt_dir=./ckpt/lapser-LapSRN_v41 --default_sr_method='LapSRN_v41' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v42 --g_ckpt_dir=./ckpt/lapser-LapSRN_v42 --default_sr_method='LapSRN_v42' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v43 --g_ckpt_dir=./ckpt/lapser-LapSRN_v43 --default_sr_method='LapSRN_v43' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
-<<<<<<< HEAD
-  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v44 --g_ckpt_dir=./ckpt/lapser-LapSRN_v44 --default_sr_method='LapSRN_v44' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
-  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v45 --g_ckpt_dir=./ckpt/lapser-LapSRN_v45 --default_sr_method='LapSRN_v45' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
-=======
+
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v44 --g_ckpt_dir=./ckpt/lapser-LapSRN_v44 --default_sr_method='LapSRN_v44' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=2
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v45 --g_ckpt_dir=./ckpt/lapser-LapSRN_v45 --default_sr_method='LapSRN_v45' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=2
 
@@ -86,8 +83,6 @@ For SR X8:
 
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-solver_v103 --g_ckpt_dir=./ckpt/edsr-solver_v103 --default_sr_method='EDSR_v103' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
 
-
->>>>>>> 351a448cf4688f72b05e5c333ea2fea78749a560
 '''
 
 from __future__ import absolute_import
@@ -172,12 +167,6 @@ def main(_):
   # for batch_size:16
   # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.0001, 0.2, 0.01, 1e-4], [0.00015, 0.50, 0.01, 1e-3], [0.0002, 0.70, 0.01, 1e-3], [0.00025, 0.80, 0.01, 1e-3], [0.00035, 0.95, 0.01, 1e-3]]
   # for batch_size:8
-  hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
-
-  # step-num and residual-depth trade-off params
-  # hyper_params = [[0.00015, 0.1, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
-
-  for lr, decay_rate, decay_final_rate, reg in hyper_params:
   # lr_list = [0.0003, 0.0004]
   # g_decay_rate_list = [0.2, 0.8]
   # reg_list = [1e-4]
@@ -186,7 +175,13 @@ def main(_):
   #   for decay_final_rate in decay_final_rate_list:
   #     for decay_rate in g_decay_rate_list:
   #       for lr in lr_list:
-          # training for one epoch
+
+  hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
+
+  # step-num and residual-depth trade-off params
+  # hyper_params = [[0.00015, 0.1, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
+
+  for lr, decay_rate, decay_final_rate, reg in hyper_params:
     model_list = []
     results = []
 
