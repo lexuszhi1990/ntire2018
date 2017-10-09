@@ -266,12 +266,581 @@ class EDSR_v105(BaseModel):
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
 
+
+# for testing EDSRStepResidualTradeoff
+class EDSRStepResidualTradeoff(BaseModel):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_without_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
+
+class EDSR_v201(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v202(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v203(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 3
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v204(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 4, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v205(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 5, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 5
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v206(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 6, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v207(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 7, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 7
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v208(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 8, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v209(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 9, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 9
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v210(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 10, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 10
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v211(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v212(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v213(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 3
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v214(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v215(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 5, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 5
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v216(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 6, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v217(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 7, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 7
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v218(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 8, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v219(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 9, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 9
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v220(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 10, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 10
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v221(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v222(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v223(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 3
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v224(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 4, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v225(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 5, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 5
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v226(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 6, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 6
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v227(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 7, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 7
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v228(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v229(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 9, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 9
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v230(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 10, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 10
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+
+class EDSR_v241(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 2, residual_depth: 2x1
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 1
+
+
+class EDSR_v242(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 2, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v243(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 2, residual_depth: 2x3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 3
+
+class EDSR_v244(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 2, residual_depth: 2x4
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 4
+
+class EDSR_v245(EDSRStepResidualTradeoff):
+  '''
+    upscale: 2, step_depth: 2, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+class EDSR_v246(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x1
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 1
+
+class EDSR_v247(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v248(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 3
+
+class EDSR_v249(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x4
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 4
+
+class EDSR_v250(EDSRStepResidualTradeoff):
+  '''
+    upscale: 4, step_depth: 4, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+class EDSR_v251(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x1
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 1
+
+class EDSR_v252(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+class EDSR_v253(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 3
+
+class EDSR_v254(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x4
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 4
+
+class EDSR_v255(EDSRStepResidualTradeoff):
+  '''
+    upscale: 8, step_depth: 8, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+# for test expand-squeeze block
 class EDSR_v301(BaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2
     contrast for expand-squeeze block
   '''
-  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='edsr'):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
 
     BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
