@@ -80,3 +80,34 @@ for dataset ./dataset/test/set5/mat, scale: 4, average exec time: 0.7015s
 
 for dataset ./dataset/test/set5, upscaled by lapsrn_mat_v2, at scale:4
 --Average PSNR: 31.1038;        Average SSIM: 0.8818;   Average IFC: 3.2382;
+
+
+### speed table
+
+set5:
+  SRCNN: 0.5343s
+  VDSR(pytorch): 0.1068s
+  DRCN(tensorflow):  0.65747s
+  SubPixel(tf): 0.1191s
+  LapSRN(tf): 0.1084s
+  ESCN(v7): 0.8104s
+
+set14:
+  DRCN(tensorflow):  0.65382s
+
+
+### set5 resolution
+$ identify baby_GT_l4.png
+baby_GT_l4.png PNG 128x128 128x128+0+0 8-bit sRGB 31.1KB 0.000u 0:00.000
+
+$ identify bird_GT_l4.png
+bird_GT_l4.png PNG 72x72 72x72+0+0 8-bit sRGB 11.3KB 0.000u 0:00.000
+
+$ identify butterfly_GT_l4.png
+butterfly_GT_l4.png PNG 64x64 64x64+0+0 8-bit sRGB 10.4KB 0.000u 0:00.000
+
+$ identify head_GT_l4.png
+head_GT_l4.png PNG 70x70 70x70+0+0 8-bit sRGB 9.05KB 0.000u 0:00.000
+
+$ identify woman_GT_l4.png
+woman_GT_l4.png PNG 57x86 57x86+0+0 8-bit sRGB 10.8KB 0.000u 0:00.000
