@@ -23,6 +23,7 @@ class BaseModel(object):
     self.residual_depth = 4
     self.kernel_size = 3
     self.image_squeeze_channle = 256
+    self.image_g_kernel_size = 3
 
     # results container
     self.gt_imgs = []
@@ -77,8 +78,10 @@ class BaseModel(object):
 
       for step in range(1, self.step_depth+1):
         for d in range(self.residual_depth):
+          local_init = x
           x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convA'.format(str(step), str(d)))
           x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg), scope='level_{}_residual_{}_convB'.format(str(step), str(d)))
+          x = local_init + x
 
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)
@@ -103,6 +106,7 @@ class BaseModel(object):
 
       for step in range(1, self.step_depth+1):
         for d in range(self.residual_depth):
+          local_init = x
           with tf.variable_scope('level_{}_residual_{}_convA'.format(str(step), str(d))):
             x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
             x = batch_normalize(x, self.is_training)
@@ -112,6 +116,7 @@ class BaseModel(object):
             x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
             x = batch_normalize(x, self.is_training)
             x = lrelu(x)
+          x = local_init + x
 
         with tf.variable_scope('level_{}_img'.format(str(step))):
           height, width = self.current_step_img_size(step-1)

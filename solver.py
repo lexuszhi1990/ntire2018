@@ -83,6 +83,15 @@ For SR X8:
 
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-solver_v103 --g_ckpt_dir=./ckpt/edsr-solver_v103 --default_sr_method='EDSR_v103' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
 
+
+  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v251 --g_ckpt_dir=./ckpt/EDSR_v251 --default_sr_method='EDSR_v251' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
+
+  CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v252 --g_ckpt_dir=./ckpt/EDSR_v252 --default_sr_method='EDSR_v252' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
+
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v253 --g_ckpt_dir=./ckpt/EDSR_v253 --default_sr_method='EDSR_v253' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
+
+  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v254 --g_ckpt_dir=./ckpt/EDSR_v254 --default_sr_method='EDSR_v254' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
+
 '''
 
 from __future__ import absolute_import
