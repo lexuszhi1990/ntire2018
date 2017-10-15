@@ -82,6 +82,9 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-solver_v102 --g_ckpt_dir=./ckpt/edsr-solver_v102 --default_sr_method='EDSR_v102' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
 
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-solver_v103 --g_ckpt_dir=./ckpt/edsr-solver_v103 --default_sr_method='EDSR_v103' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
+  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v104 --g_ckpt_dir=./ckpt/EDSR_v104 --default_sr_method='EDSR_v104' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
+  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v105 --g_ckpt_dir=./ckpt/EDSR_v105 --default_sr_method='EDSR_v105' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
+  CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v106 --g_ckpt_dir=./ckpt/EDSR_v106 --default_sr_method='EDSR_v106' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
 
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-solver_v201 --g_ckpt_dir=./ckpt/edsr-solver_v201 --default_sr_method='EDSR_v201' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/edsr-EDSR_v202 --g_ckpt_dir=./ckpt/edsr-EDSR_v202 --default_sr_method='EDSR_v202' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
@@ -248,7 +251,12 @@ def main(_):
   #     for decay_rate in g_decay_rate_list:
   #       for lr in lr_list:
 
-  hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
+  # for k207 with these params:
+    # CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v106 --g_ckpt_dir=./ckpt/EDSR_v106 --default_sr_method='EDSR_v106' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
+  # archived best results with [0.0002, 0.1, 0.05, 1e-4]
+  # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
+
+  hyper_params = [[0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.9, 0.05, 1e-4]]
 
   # step-num and residual-depth trade-off params
   # hyper_params = [[0.00015, 0.1, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
