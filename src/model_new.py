@@ -160,6 +160,40 @@ class BaseModel(object):
 
         self.reconstructed_imgs.append(base_images)
 
+  def extract_recurrence_features_with_BN(self, reuse=False):
+    with tf.variable_scope(self.scope) as vs:
+      if reuse:
+        vs.reuse_variables()
+
+      x = layers.conv2d(self.inputs, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='init')
+
+      for step in range(1, self.step_depth+1):
+        init = x
+        for d in range(self.residual_depth):
+          with tf.variable_scope('level_{}_residual_{}_convA'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+          with tf.variable_scope('level_{}_residual_{}_convB'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+          x = init + x
+
+        with tf.variable_scope('level_{}_img'.format(str(step))):
+          height, width = self.current_step_img_size(step-1)
+          x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
+
+        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        self.extracted_features.append(net)
+
+      base_images = self.inputs
+      for step in range(1, self.step_depth+1):
+        height, width = self.current_step_img_size(step-1)
+        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_bilinear'.format(str(step)))
+
+        self.reconstructed_imgs.append(base_images)
+
   def extract_ed_block_features(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
       if reuse:
@@ -273,6 +307,13 @@ class EDSR_v105(BaseModel):
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
 
+# recurrence residual learning without BN
+class EDSR_v106(BaseModel):
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_with_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
 
 # for testing EDSRStepResidualTradeoff
 class EDSRStepResidualTradeoff(BaseModel):
@@ -309,7 +350,7 @@ class EDSR_v201(EDSRStepResidualTradeoff):
 
 class EDSR_v202(EDSRStepResidualTradeoff):
   '''
-    upscale: 2, step_depth: 1, residual_depth: 2x2
+    upscale: 2, step_depth: 2, residual_depth: 2x2
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -321,7 +362,7 @@ class EDSR_v202(EDSRStepResidualTradeoff):
 
 class EDSR_v203(EDSRStepResidualTradeoff):
   '''
-    upscale: 2, step_depth: 1, residual_depth: 2x2
+    upscale: 2, step_depth: 3, residual_depth: 2x2
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
 
