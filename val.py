@@ -40,8 +40,11 @@ usage:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v16 --model=./ckpt/lapser-solver_v16/LapSRN_v16-epoch-1-step-39096-2017-08-25-07-49.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
   v17:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v17 --model=./ckpt/lapser-solver_v17/LapSRN_v17-epoch-1-step-78192-2017-08-26-07-46.ckpt-78192 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
+<<<<<<< Updated upstream
   V18:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v18 --model=./ckpt/lapser-solver_v18/LapSRN_v18-epoch-1-step-39096-2017-08-27-02-47.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
+=======
+>>>>>>> Stashed changes
 
   v19:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v19 --model=./ckpt/lapser-solver_v19/LapSRN_v19-epoch-1-step-39096-2017-08-25-17-06.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
@@ -304,7 +307,7 @@ if __name__ == '__main__':
 
         shutil.copytree('{}/lapsrn/{}'.format(base_dataset_dir, opt.sr_method), '{}/{}'.format(dst_path, test_dataset))
         os.system('cp {} {}'.format(opt.model+'*', dst_path))
-        print('copied results to saved_models: {}'.format('{}/lapsrn/{}'.format(base_dataset_dir, opt.sr_method)))
+        print('copied results to saved_models: {}'.format('{}/{}'.format(base_dataset_dir, opt.sr_method)))
   else:
 
     if os.path.isdir(opt.image):

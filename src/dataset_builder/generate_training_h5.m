@@ -47,7 +47,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
       img_raw = imread(f_path);
 
       % randomly resize between 0.5 ~ 1.0
-      ratio = randi([5, 10]) * 0.1;
+      ratio = randi([9, 10]) * 0.1;
       img_raw = imresize(img_raw, ratio);
 
       % min width/height should be larger than patch size

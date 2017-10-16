@@ -8,10 +8,10 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
   % chunksz (used only in create mode), specifies number of samples to be stored per chunk (see HDF5 documentation on chunking) for creating HDF5 files with unbounded maximum size - TLDR; higher chunk sizes allow faster read-write operations
 
   % verify that format is right
-  dat_dims=size(data_l2);
-  date_l4_dims=size(data_l4);
-  date_l8_dims=size(data_l8);
-  lab_dims=size(labels);
+  lab_dims=size(data_l8);
+  dat_dims=size(labels);
+  date_l4_dims=size(data_l2);
+  date_l8_dims=size(data_l4);
   num_samples=dat_dims(end);
 
   assert(lab_dims(end)==num_samples, 'Number of samples should be matched between data and labels');
@@ -51,10 +51,10 @@ function [curr_dat_sz, curr_lab_sz] = store2hdf5_multipy(filename, data_l2, data
   end
 
   if ~isempty(data_l2)
-    h5write(filename, '/label_x8', single(labels), startloc.lab, size(labels));
-    h5write(filename, '/label_x4', single(data_l2), startloc.dat, size(data_l2));
-    h5write(filename, '/label_x2', single(data_l4), startloc.dat, size(data_l4));
-    h5write(filename, '/data', single(data_l8), startloc.dat, size(data_l8));
+    h5write(filename, '/label_x8', single(data_l8), startloc.lab, size(data_l8));
+    h5write(filename, '/label_x4', single(labels), startloc.dat, size(labels));
+    h5write(filename, '/label_x2', single(data_l2), startloc.dat, size(data_l2));
+    h5write(filename, '/data', single(data_l4), startloc.dat, size(data_l4));
   end
 
   if nargout

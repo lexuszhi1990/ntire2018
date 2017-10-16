@@ -833,6 +833,8 @@ class LapSRN_v18(LapSRN_v6):
     self.residual_depth = 10
     self.image_squeeze_channle = 512
 
+
+
 class LapSRN_v19(LapSRN_v6):
   '''
     drrn image_tune: 512 step_depth:1 residual_depth:20 normal_loss
