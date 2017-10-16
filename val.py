@@ -41,8 +41,11 @@ usage:
   v17:
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=LapSRN_v17 --model=./ckpt/lapser-solver_v17/LapSRN_v17-epoch-1-step-78192-2017-08-26-07-46.ckpt-78192 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   V18:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v18 --model=./ckpt/lapser-solver_v18/LapSRN_v18-epoch-1-step-39096-2017-08-27-02-47.ckpt-39096 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val  --validate_all
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
