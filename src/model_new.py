@@ -1198,6 +1198,7 @@ class EDSR_v326(ExpandSqueezeBaseModel):
 class EDSR_v327(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+    # same as EDSR_v324
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
 
