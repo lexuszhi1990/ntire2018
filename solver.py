@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
+
 '''
 usage:
   for v1:
@@ -152,6 +154,8 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v328 --g_ckpt_dir=./ckpt/EDSR_v328 --default_sr_method='EDSR_v328' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v329 --g_ckpt_dir=./ckpt/EDSR_v329 --default_sr_method='EDSR_v329' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v330 --g_ckpt_dir=./ckpt/EDSR_v330 --default_sr_method='EDSR_v330' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
+
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/LFW_SR_train_72.h5 --g_log_dir=./log/EDSR_LFW_v1 --g_ckpt_dir=./ckpt/EDSR_LFW_v1 --default_sr_method='EDSR_LFW_v1' --test_dataset_path=./dataset/test/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=4
 
 '''
 
