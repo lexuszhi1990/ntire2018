@@ -883,14 +883,14 @@ class EDSR_v255(EDSRStepResidualTradeoff):
     self.residual_depth = 5
 
 # for test expand-squeeze block
-def expandSqueezeBaseModel():
+class ExpandSqueezeBaseModel(BaseModel):
   def extract_features(self, reuse=False):
     self.extract_recurrence_features_without_BN(reuse)
 
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
 
-class EDSR_v301(expandSqueezeBaseModel):
+class EDSR_v301(ExpandSqueezeBaseModel):
   '''
     image_tune: 64x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
@@ -905,7 +905,7 @@ class EDSR_v301(expandSqueezeBaseModel):
     self.image_squeeze_channle = 64
     self.image_g_kernel_size = 3
 
-class EDSR_v302(expandSqueezeBaseModel):
+class EDSR_v302(ExpandSqueezeBaseModel):
   '''
     image_tune: 128x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
@@ -920,7 +920,7 @@ class EDSR_v302(expandSqueezeBaseModel):
     self.image_squeeze_channle = 128
     self.image_g_kernel_size = 3
 
-class EDSR_v303(expandSqueezeBaseModel):
+class EDSR_v303(ExpandSqueezeBaseModel):
   '''
     image_tune: 256x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
@@ -935,7 +935,7 @@ class EDSR_v303(expandSqueezeBaseModel):
     self.image_squeeze_channle = 256
     self.image_g_kernel_size = 3
 
-class EDSR_v304(expandSqueezeBaseModel):
+class EDSR_v304(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
@@ -950,7 +950,7 @@ class EDSR_v304(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3
 
-class EDSR_v305(expandSqueezeBaseModel):
+class EDSR_v305(ExpandSqueezeBaseModel):
   '''
     image_tune: 1024x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
@@ -965,7 +965,7 @@ class EDSR_v305(expandSqueezeBaseModel):
     self.image_squeeze_channle = 1024
     self.image_g_kernel_size = 3
 
-class EDSR_v306(expandSqueezeBaseModel):
+class EDSR_v306(ExpandSqueezeBaseModel):
   '''
     image_tune: 64x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
     contrast for expand-squeeze block
@@ -980,7 +980,7 @@ class EDSR_v306(expandSqueezeBaseModel):
     self.image_squeeze_channle = 64
     self.image_g_kernel_size = 5
 
-class EDSR_v307(expandSqueezeBaseModel):
+class EDSR_v307(ExpandSqueezeBaseModel):
   '''
     image_tune: 128x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
     contrast for expand-squeeze block
@@ -995,7 +995,7 @@ class EDSR_v307(expandSqueezeBaseModel):
     self.image_squeeze_channle = 128
     self.image_g_kernel_size = 5
 
-class EDSR_v308(expandSqueezeBaseModel):
+class EDSR_v308(ExpandSqueezeBaseModel):
   '''
     image_tune: 256x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
     contrast for expand-squeeze block
@@ -1010,7 +1010,7 @@ class EDSR_v308(expandSqueezeBaseModel):
     self.image_squeeze_channle = 256
     self.image_g_kernel_size = 5
 
-class EDSR_v309(expandSqueezeBaseModel):
+class EDSR_v309(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
     contrast for expand-squeeze block
@@ -1025,7 +1025,7 @@ class EDSR_v309(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 5
 
-class EDSR_v310(expandSqueezeBaseModel):
+class EDSR_v310(ExpandSqueezeBaseModel):
   '''
     image_tune: 1024x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
     contrast for expand-squeeze block
@@ -1040,7 +1040,7 @@ class EDSR_v310(expandSqueezeBaseModel):
     self.image_squeeze_channle = 1024
     self.image_g_kernel_size = 5
 
-class EDSR_v311(expandSqueezeBaseModel):
+class EDSR_v311(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 1
   '''
@@ -1054,7 +1054,7 @@ class EDSR_v311(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 1
 
-class EDSR_v312(expandSqueezeBaseModel):
+class EDSR_v312(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1068,7 +1068,7 @@ class EDSR_v312(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3
 
-class EDSR_v313(expandSqueezeBaseModel):
+class EDSR_v313(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
   '''
@@ -1082,7 +1082,7 @@ class EDSR_v313(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 5
 
-class EDSR_v314(expandSqueezeBaseModel):
+class EDSR_v314(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 7
   '''
@@ -1096,7 +1096,7 @@ class EDSR_v314(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 7
 
-class EDSR_v315(expandSqueezeBaseModel):
+class EDSR_v315(ExpandSqueezeBaseModel):
   '''
     image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 9
   '''
@@ -1111,7 +1111,7 @@ class EDSR_v315(expandSqueezeBaseModel):
     self.image_g_kernel_size = 1
 
 
-class EDSR_v321(expandSqueezeBaseModel):
+class EDSR_v321(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 64x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1125,7 +1125,7 @@ class EDSR_v321(expandSqueezeBaseModel):
     self.image_squeeze_channle = 64
     self.image_g_kernel_size = 3
 
-class EDSR_v322(expandSqueezeBaseModel):
+class EDSR_v322(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 128x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1139,7 +1139,7 @@ class EDSR_v322(expandSqueezeBaseModel):
     self.image_squeeze_channle = 128
     self.image_g_kernel_size = 3
 
-class EDSR_v323(expandSqueezeBaseModel):
+class EDSR_v323(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 256x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1153,7 +1153,7 @@ class EDSR_v323(expandSqueezeBaseModel):
     self.image_squeeze_channle = 256
     self.image_g_kernel_size = 3
 
-class EDSR_v324(expandSqueezeBaseModel):
+class EDSR_v324(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1167,7 +1167,7 @@ class EDSR_v324(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3
 
-class EDSR_v325(expandSqueezeBaseModel):
+class EDSR_v325(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 1024x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1181,7 +1181,7 @@ class EDSR_v325(expandSqueezeBaseModel):
     self.image_squeeze_channle = 1024
     self.image_g_kernel_size = 3
 
-class EDSR_v326(expandSqueezeBaseModel):
+class EDSR_v326(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 1
   '''
@@ -1195,7 +1195,7 @@ class EDSR_v326(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 1
 
-class EDSR_v327(expandSqueezeBaseModel):
+class EDSR_v327(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
   '''
@@ -1209,7 +1209,7 @@ class EDSR_v327(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3
 
-class EDSR_v328(expandSqueezeBaseModel):
+class EDSR_v328(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 5
   '''
@@ -1223,7 +1223,7 @@ class EDSR_v328(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 5
 
-class EDSR_v329(expandSqueezeBaseModel):
+class EDSR_v329(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 7
   '''
@@ -1237,7 +1237,7 @@ class EDSR_v329(expandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 7
 
-class EDSR_v330(expandSqueezeBaseModel):
+class EDSR_v330(ExpandSqueezeBaseModel):
   '''
     upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 9
   '''
