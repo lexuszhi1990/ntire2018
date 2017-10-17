@@ -62,7 +62,6 @@ usage:
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/lapsrn-solver_v33 --g_ckpt_dir=./ckpt/lapser-solver_v33 --default_sr_method='LapSRN_v33' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/lapsrn-solver_v34 --g_ckpt_dir=./ckpt/lapser-solver_v34 --default_sr_method='LapSRN_v34' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=4
 
-
 For SR X8:
   for LapSRN_v41:
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/lapsrn-LapSRN_v41 --g_ckpt_dir=./ckpt/lapser-LapSRN_v41 --default_sr_method='LapSRN_v41' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
@@ -157,6 +156,8 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v254 --g_ckpt_dir=./ckpt/EDSR_v254 --default_sr_method='EDSR_v254' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
 
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v255 --g_ckpt_dir=./ckpt/EDSR_v255 --default_sr_method='EDSR_v255' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
+
+  CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v321 --g_ckpt_dir=./ckpt/EDSR_v321 --default_sr_method='EDSR_v321' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
 
 '''
 
@@ -256,7 +257,7 @@ def main(_):
   # archived best results with [0.0002, 0.1, 0.05, 1e-4]
   # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
 
-  hyper_params = [[0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.9, 0.05, 1e-4]]
+  hyper_params = [[0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.1, 0.01, 1e-4], [0.0004, 0.5, 0.01, 1e-4]]
 
   # step-num and residual-depth trade-off params
   # hyper_params = [[0.00015, 0.1, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
