@@ -87,7 +87,7 @@ class BaseModel(object):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -122,7 +122,7 @@ class BaseModel(object):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -150,7 +150,7 @@ class BaseModel(object):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -184,7 +184,7 @@ class BaseModel(object):
           height, width = self.current_step_img_size(step-1)
           x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
 
-        net = layers.conv2d(x, 1, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
+        net = layers.conv2d(x, 1, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg), scope='level_{}_img'.format(str(step)))
         self.extracted_features.append(net)
 
       base_images = self.inputs
@@ -220,7 +220,7 @@ class BaseModel(object):
           x = init + x
 
         with tf.variable_scope('level_{}_upscaled_img'.format(str(step))):
-          net = layers.conv2d(x, self.image_squeeze_channle, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
+          net = layers.conv2d(x, self.image_squeeze_channle, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
           net = layers.conv2d(net, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=None, scope='level_{}_img'.format(str(step)))
           self.extracted_features.append(net)
 
@@ -883,9 +883,16 @@ class EDSR_v255(EDSRStepResidualTradeoff):
     self.residual_depth = 5
 
 # for test expand-squeeze block
-class EDSR_v301(BaseModel):
+def expandSqueezeBaseModel():
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_without_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
+
+class EDSR_v301(expandSqueezeBaseModel):
   '''
-    image_tune: 512x1 step_depth: 4, residual_depth: 5x2
+    image_tune: 64x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
     contrast for expand-squeeze block
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
@@ -895,9 +902,352 @@ class EDSR_v301(BaseModel):
     self.step_depth = 4
     self.kernel_size = 3
     self.residual_depth = 5
+    self.image_squeeze_channle = 64
+    self.image_g_kernel_size = 3
 
-  def extract_features(self, reuse=False):
-    self.extract_recurrence_features_without_BN(reuse)
+class EDSR_v302(expandSqueezeBaseModel):
+  '''
+    image_tune: 128x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
 
-  def reconstruct(self, reuse=False):
-    self.residual_reconstruct(reuse)
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 128
+    self.image_g_kernel_size = 3
+
+class EDSR_v303(expandSqueezeBaseModel):
+  '''
+    image_tune: 256x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 256
+    self.image_g_kernel_size = 3
+
+class EDSR_v304(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 3
+
+class EDSR_v305(expandSqueezeBaseModel):
+  '''
+    image_tune: 1024x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 1024
+    self.image_g_kernel_size = 3
+
+class EDSR_v306(expandSqueezeBaseModel):
+  '''
+    image_tune: 64x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 64
+    self.image_g_kernel_size = 5
+
+class EDSR_v307(expandSqueezeBaseModel):
+  '''
+    image_tune: 128x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 128
+    self.image_g_kernel_size = 5
+
+class EDSR_v308(expandSqueezeBaseModel):
+  '''
+    image_tune: 256x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 256
+    self.image_g_kernel_size = 5
+
+class EDSR_v309(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 5
+
+class EDSR_v310(expandSqueezeBaseModel):
+  '''
+    image_tune: 1024x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 1024
+    self.image_g_kernel_size = 5
+
+class EDSR_v311(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 1
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 1
+
+class EDSR_v312(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 3
+
+class EDSR_v313(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 5
+
+class EDSR_v314(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 7
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 7
+
+class EDSR_v315(expandSqueezeBaseModel):
+  '''
+    image_tune: 512x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 9
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 1
+
+
+class EDSR_v321(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 64x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 64
+    self.image_g_kernel_size = 3
+
+class EDSR_v322(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 128x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 128
+    self.image_g_kernel_size = 3
+
+class EDSR_v323(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 256x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 256
+    self.image_g_kernel_size = 3
+
+class EDSR_v324(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 3
+
+class EDSR_v325(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 1024x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 1024
+    self.image_g_kernel_size = 3
+
+class EDSR_v326(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 1
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 1
+
+class EDSR_v327(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 3
+
+class EDSR_v328(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 5
+
+class EDSR_v329(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 7
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 7
+
+class EDSR_v330(expandSqueezeBaseModel):
+  '''
+    upscale_factor=8 image_tune: 512x1 step_depth: 8, residual_depth: 5x2, image_g_kernel_size: 9
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 9
+

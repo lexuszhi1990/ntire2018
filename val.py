@@ -76,7 +76,30 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=EDSR_v104 --model=./ckpt/edsr-solver_v105/EDSR_v105-epoch-1-step-19548-2017-10-12-10-17.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=EDSR_v104 --model=./ckpt/EDSR_v106/EDSR_v106-epoch-1-step-19548-2017-10-16-09-10.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
 
-  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=32 --sr_method=EDSR_v211 --model=./ckpt/EDSR_v211/EDSR_v211-epoch-1-step-19548-2017-10-14-00-13.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v221 --model=./ckpt/EDSR_v221/EDSR_v221-epoch-1-step-19548-2017-10-10-10-54.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v222 --model=./ckpt/EDSR_v222/EDSR_v222-epoch-1-step-19548-2017-10-10-12-12.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v223 --model=./ckpt/EDSR_v223/EDSR_v223-epoch-1-step-19548-2017-10-11-01-19.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v224 --model=./ckpt/EDSR_v224/EDSR_v224-epoch-1-step-19548-2017-10-11-12-03.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v225 --model=./ckpt/EDSR_v225/EDSR_v225-epoch-1-step-19548-2017-10-11-12-24.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v228 --model=./ckpt/EDSR_v228/EDSR_v228-epoch-1-step-19548-2017-10-12-12-09.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_v241 --model=./ckpt/EDSR_v241/EDSR_v241-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v242 --model=./ckpt/EDSR_v242/EDSR_v242-epoch-1-step-19548-2017-10-12-17-48.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_v243 --model=./ckpt/EDSR_v243/EDSR_v243-epoch-1-step-19548-2017-10-12-19-27.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=EDSR_v244 --model=./ckpt/EDSR_v244/EDSR_v244-epoch-1-step-19548-2017-10-12-19-56.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v245 --model=./ckpt/EDSR_v245/EDSR_v245-epoch-1-step-19548-2017-10-12-20-50.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=2 --matlab_val --validate_all
+
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_v246 --model=./ckpt/EDSR_v246/EDSR_v246-epoch-1-step-19548-2017-10-16-07-09.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=EDSR_v247 --model=./ckpt/EDSR_v247/EDSR_v247-epoch-1-step-19548-2017-10-16-10-16.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=EDSR_v248 --model=./ckpt/EDSR_v248/EDSR_v248-epoch-1-step-19548-2017-10-16-09-19.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_v249 --model=./ckpt/EDSR_v249/EDSR_v249-epoch-1-step-19548-2017-10-16-11-15.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model=./ckpt/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v251 --model=./ckpt/EDSR_v251/EDSR_v251-epoch-1-step-19548-2017-10-10-03-56.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v252 --model=./ckpt/EDSR_v252/EDSR_v252-epoch-1-step-19548-2017-10-10-03-25.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=16 --sr_method=EDSR_v253 --model=./ckpt/EDSR_v253/EDSR_v253-epoch-1-step-19548-2017-10-10-04-08.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v254 --model=./ckpt/EDSR_v254/EDSR_v254-epoch-1-step-19548-2017-10-10-06-29.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v255 --model=./ckpt/EDSR_v255/EDSR_v255-epoch-1-step-19548-2017-10-10-16-24.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
 
 
 
@@ -100,7 +123,7 @@ from src.model import LapSRN_v40, LapSRN_v41, LapSRN_v42, LapSRN_v43, LapSRN_v44
 from src.model_new import EDSR_v100, EDSR_v101, EDSR_v102, EDSR_v103, EDSR_v104, EDSR_v105, EDSR_v106
 from src.model_new import EDSR_v201, EDSR_v202, EDSR_v203, EDSR_v204, EDSR_v205, EDSR_v206, EDSR_v207, EDSR_v208, EDSR_v209, EDSR_v210, EDSR_v211, EDSR_v212, EDSR_v213, EDSR_v214, EDSR_v215, EDSR_v216, EDSR_v217, EDSR_v218, EDSR_v219, EDSR_v220, EDSR_v221, EDSR_v222, EDSR_v223, EDSR_v224, EDSR_v225, EDSR_v226, EDSR_v227, EDSR_v228, EDSR_v229, EDSR_v230, EDSR_v241, EDSR_v242, EDSR_v243, EDSR_v244, EDSR_v245, EDSR_v246, EDSR_v247, EDSR_v248, EDSR_v249, EDSR_v250, EDSR_v251, EDSR_v252, EDSR_v253, EDSR_v254, EDSR_v255
 # from sr.model_new import EDSR_v231, EDSR_v232, EDSR_v233, EDSR_v234, EDSR_v235, EDSR_v236, EDSR_v237, EDSR_v238, EDSR_v239, EDSR_v240
-from src.model_new import EDSR_v301
+from src.model_new import EDSR_v301, EDSR_v302, EDSR_v303, EDSR_v304, EDSR_v305, EDSR_v306, EDSR_v307, EDSR_v308, EDSR_v309, EDSR_v310, EDSR_v311, EDSR_v312, EDSR_v313, EDSR_v314, EDSR_v315, EDSR_v321, EDSR_v322, EDSR_v323, EDSR_v324, EDSR_v325, EDSR_v326, EDSR_v327, EDSR_v328, EDSR_v329, EDSR_v330
 
 from src.utils import sess_configure, trainsform, transform_reverse
 
