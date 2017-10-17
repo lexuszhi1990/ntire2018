@@ -66,6 +66,21 @@ For SR X8:
   for LapSRN_44:
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=LapSRN_v44 --model=LapSRN_v44-epoch-1-step-78192-2017-08-19-16-28.ckpt-78192 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
 
+
+  For EDSR:
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v100 --model=./ckpt/edsr-solver_v7/EDSR_v100-epoch-1-step-19548-2017-10-10-23-59.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=EDSR_v101 --model=./ckpt/edsr-solver_v101/EDSR_v101-epoch-1-step-19548-2017-10-11-03-19.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=EDSR_v102 --model=./ckpt/edsr-solver_v102/EDSR_v102-epoch-1-step-19548-2017-10-10-11-21.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v103 --model=./ckpt/edsr-solver_v103/EDSR_v103-epoch-1-step-19548-2017-10-10-08-47.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_v104 --model=./ckpt/edsr-solver_v104/EDSR_v104-epoch-1-step-19548-2017-10-12-10-12.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=64 --sr_method=EDSR_v104 --model=./ckpt/edsr-solver_v105/EDSR_v105-epoch-1-step-19548-2017-10-12-10-17.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=64 --sr_method=EDSR_v104 --model=./ckpt/EDSR_v106/EDSR_v106-epoch-1-step-19548-2017-10-16-09-10.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=32 --sr_method=EDSR_v211 --model=./ckpt/EDSR_v211/EDSR_v211-epoch-1-step-19548-2017-10-14-00-13.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=4 --matlab_val --validate_all
+
+
+
+
 '''
 import time
 import argparse
@@ -141,7 +156,21 @@ def matlab_validation(dataset_dir, sr_method, scale):
 
   eng.quit()
 
+def load_models(sr_method, model_path):
+  # os.system('scp youlei@219.223.251.241:/home/youlei/workplace/srn_bishe/ckpt/EDSR_v215/EDSR_v215-epoch-1-step-19548-2017-10-12-13-44.ckpt-19548.index ./')
 
+  # g_dir = './ckpt/' + sr_method
+  g_dir = '/'.join(model_path.split('/')[:-1])
+  if tf.gfile.Exists(g_dir):
+    # tf.gfile.DeleteRecursively(g_dir)
+    return
+  else:
+    tf.gfile.MakeDirs(g_dir)
+
+    command = os.path.join('scp youlei@219.223.251.241:/home/youlei/workplace/srn_bishe/', model_path)
+    os.system(command + '.index ' + g_dir)
+    os.system(command + '.meta ' + g_dir)
+    os.system(command + '.data-00000-of-00001 ' + g_dir)
 
 def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
 
@@ -276,6 +305,8 @@ if __name__ == '__main__':
   scale_list = [2, 4, 8]
   parser = setup_options()
   opt = parser.parse_args()
+
+  load_models(opt.sr_method, opt.model)
 
   if opt.validate_all:
 
