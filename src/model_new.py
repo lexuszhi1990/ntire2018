@@ -194,7 +194,7 @@ class BaseModel(object):
 
         self.reconstructed_imgs.append(base_images)
 
-  def extract_ed_block_features(self, reuse=False):
+  def extract_ed_block_features_without_BN(self, reuse=False):
     with tf.variable_scope(self.scope) as vs:
       if reuse:
         vs.reuse_variables()
@@ -885,7 +885,7 @@ class EDSR_v255(EDSRStepResidualTradeoff):
 # for test expand-squeeze block
 class ExpandSqueezeBaseModel(BaseModel):
   def extract_features(self, reuse=False):
-    self.extract_recurrence_features_without_BN(reuse)
+    self.extract_ed_block_features_without_BN(reuse)
 
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
