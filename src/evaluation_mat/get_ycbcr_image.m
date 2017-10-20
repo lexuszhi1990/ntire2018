@@ -1,4 +1,4 @@
-function get_ycbcr_image(image_path, mat_path, scale)
+function bicubic_img_ycbcr = get_ycbcr_image(image_path, mat_path, scale)
     img = imread(image_path);
     img_raw = im2double(img);
     img_ycbcr = rgb2ycbcr(img_raw);

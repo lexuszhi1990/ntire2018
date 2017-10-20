@@ -3,7 +3,7 @@
 usage:
 CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v241 --model_path=./ckpt/EDSR_v241/EDSR_v241-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./tmp/analyzed_10_man.png --output_dir=./ --scale=2
 
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=../ckpt/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./00001.jpg --output_dir=./ --scale=4
+CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=./ckpt/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./00001.jpg --output_dir=./ --scale=4
 
 '''
 
@@ -116,7 +116,7 @@ def sr():
   eng.addpath(r'./src/evaluation_mat/ifc-drrn')
   eng.addpath(r'./src/evaluation_mat/matlabPyrTools')
 
-  eng.get_ycbcr_image(opt.image, mat_dir, opt.scale);
+  aa = eng.get_ycbcr_image(opt.image, mat_dir, opt.scale);
 
   image_hash = sio.loadmat(mat_dir)
   img_y = image_hash['img_y']
@@ -126,7 +126,7 @@ def sr():
   sio.savemat(mat_dir, image_hash)
 
   eng.save_ycbcr_image(mat_dir, saved_dir, bicubic_dir);
-  print("save image at {}, for %ds".format(saved_dir, elapsed_time))
+  print("save image at {}, for {}s".format(saved_dir, elapsed_time))
 
   eng.quit()
 
