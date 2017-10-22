@@ -299,6 +299,14 @@ class EDSR_v104(BaseModel):
   def reconstruct(self, reuse=False):
     self.normal_reconstruct(reuse)
 
+# recurrence learning with BN for sr
+class EDSR_v107(BaseModel):
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_with_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.normal_reconstruct(reuse)
+
 # recurrence residual learning without BN
 class EDSR_v105(BaseModel):
   def extract_features(self, reuse=False):
@@ -307,8 +315,24 @@ class EDSR_v105(BaseModel):
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
 
-# recurrence residual learning without BN
+# recurrence residual learning with BN
 class EDSR_v106(BaseModel):
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_with_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
+
+# recurrence residual learning with BN
+class EDSR_v108(BaseModel):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 3
+
   def extract_features(self, reuse=False):
     self.extract_recurrence_features_with_BN(reuse)
 
