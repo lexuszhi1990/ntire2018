@@ -3,7 +3,10 @@
 
 '''
 
-CUDA_VISIBLE_DEVICES=2 python gan_train.py --gpu_id=2 --dataset_dir=./dataset/LFW_SR_train_72.h5 --g_log_dir=./log/EDSR_LFW_v4 --g_ckpt_dir=./ckpt/EDSR_LFW_v4 --default_sr_method='EDSR_LFW_v4' --test_dataset_path=./dataset/test/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=128 --batch_size=4
+
+CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=4
+
+CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=4
 
 '''
 
@@ -100,13 +103,13 @@ def main(_):
     g_decay_steps = np.floor(np.log(g_decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*inner_epoches))
     d_decay_steps = np.floor(np.log(d_decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*inner_epoches))
 
-    saved_model = train(g_log_dir, gpu_id, g_ckpt_dir, dataset_dir, default_sr_method, batch_size, upscale_factor, default_channel, g_decay_steps, d_decay_steps, g_filter_num, d_filter_num, g_lr, d_lr, g_decay_rate, d_decay_rate, is_wgan)
+    saved_model = train(g_log_dir, gpu_id, g_ckpt_dir, dataset_dir, default_sr_method, batch_size, upscale_factor, default_channel, g_decay_steps, d_decay_steps, g_filter_num, d_filter_num, g_lr, d_lr, g_decay_rate, d_decay_rate, is_wgan, True)
     model_list.append(saved_model)
 
     print("===> Testing model")
     print(model_list)
     for model_path in model_list:
-      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, "SRGAN", model_path, gpu_id)
+      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
       results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
       pkl_results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
 
