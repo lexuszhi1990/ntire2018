@@ -3,7 +3,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
   usage:
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
-    generate_training_h5('./dataset/coco_selected', 5);
+    generate_training_h5('/home/mcc207/datasets/291', 5, "mat_train_391_x");
 %}
 
   f_lst = [];

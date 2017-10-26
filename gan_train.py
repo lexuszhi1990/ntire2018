@@ -31,13 +31,13 @@ def train(log_dir, gpu_id, ckpt_dir, dataset_dir, model_name, batch_size, upscal
 
       srgan = SRGAN(model_name, batch_size, upscale, channel, dataset.input_size, g_decay_steps, d_decay_steps, d_filter_num, g_filter_num, g_lr, d_lr, g_decay_rate, d_decay_rate, is_train)
 
-      with tf.variable_scope(srgan.scope):
-        if is_wgan:
-          srgan.build_wgan_model()
-        else:
-          srgan.build_gan_model()
+      if is_wgan:
+        srgan.build_wgan_model()
+      else:
+        srgan.build_gan_model()
 
-    all_variables = set([ var for var in tf.global_variables() if srgan.scope in var.name])
+    # all_variables = set([ var for var in tf.global_variables() if srgan.generator.scope in var.name or srgan.discriminator.scope in var.name ])
+    all_variables = tf.global_variables()
     saver = tf.train.Saver(all_variables, max_to_keep=3)
     # gan_variables = set(srgan.vars)
     # gan_saver = tf.train.Saver(all_variables, max_to_keep=5)
@@ -66,7 +66,7 @@ def train(log_dir, gpu_id, ckpt_dir, dataset_dir, model_name, batch_size, upscal
       print("[step:%d][step:%d/g], g_lr: %.6f, g_loss: %.6f, g_ct_l: %.6f, g_pred_l: %.6f, g_tv_l: %.6f"%(step, step, g_lr_, g_loss_, g_context_loss_, g_loss_pred_, g_tv_loss_))
 
 
-    ckpt_name = "{}-wgan-{}-epoch-{}-step-{}-{}.ckpt".format(model_name, is_wgan, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
+    ckpt_name = "{}-wgan-{}-step-{}-{}.ckpt".format(model_name, is_wgan, step, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
     saver.save(sess, os.path.join(ckpt_dir, ckpt_name), global_step=step)
     model_list.append(os.path.join(ckpt_dir, "{}-{}".format(ckpt_name, step)))
     print('save model at step: %d, in dir %s, name %s' %(step, ckpt_dir, ckpt_name))

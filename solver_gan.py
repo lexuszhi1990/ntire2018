@@ -6,6 +6,12 @@
 
 CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=4
 
+CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x2.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
+
+CUDA_VISIBLE_DEVICES=2 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --is_wgan --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
+
+CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=4
+
 CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=4
 
 '''
@@ -107,13 +113,15 @@ def main(_):
     model_list.append(saved_model)
 
     print("===> Testing model")
+    model_list = ['./ckpt/EDSR_v401/EDSR_v401-wgan-False-step-575-2017-10-26-09-09.ckpt-575']
     print(model_list)
-    for model_path in model_list:
-      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, filter_num, default_sr_method, model_path, gpu_id)
-      results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
-      pkl_results.append([model_path, PSNR, SSIM, EXEC_TIME, lr, decay_rate, reg, decay_final_rate])
 
-    print("===> a training round ends, lr: %f, decay_rate: %f, reg: %f. The saved models are\n"%(lr, decay_rate, reg))
+    for model_path in model_list:
+      PSNR, SSIM, MSSSIM, EXEC_TIME = SR(test_dataset_path, 2, upscale_factor, default_channel, g_filter_num, default_sr_method, model_path, gpu_id)
+      results.append([model_path, PSNR, SSIM, EXEC_TIME, g_lr, d_lr, g_decay_rate, d_decay_rate, reg, decay_final_rate])
+      pkl_results.append([model_path, PSNR, SSIM, EXEC_TIME, g_lr, d_lr, g_decay_rate, d_decay_rate, reg, decay_final_rate])
+
+    print("===> a training round ends, g_lr: %f, d_lr: %f, g_decay_rate: %f, d_decay_rate: %f, reg: %f. The saved models are\n"%(g_lr, d_lr, g_decay_rate, d_decay_rate, reg))
     print("===> Saving results")
     save_results(results, results_file, upscale_factor)
 
