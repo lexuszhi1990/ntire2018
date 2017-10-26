@@ -113,7 +113,6 @@ def main(_):
     model_list.append(saved_model)
 
     print("===> Testing model")
-    model_list = ['./ckpt/EDSR_v401/EDSR_v401-wgan-False-step-575-2017-10-26-09-09.ckpt-575']
     print(model_list)
 
     for model_path in model_list:
