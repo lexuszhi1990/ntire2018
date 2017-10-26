@@ -2,17 +2,13 @@
 #!/usr/bin/python
 
 '''
-
-
-CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=4
-
 CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x2.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
-CUDA_VISIBLE_DEVICES=2 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --is_wgan --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
-CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=4
+CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
-CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=4
+CUDA_VISIBLE_DEVICES=2 python solver_gan.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401_wgan --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --is_wgan  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
+
 
 '''
 
@@ -96,7 +92,7 @@ def main(_):
 
   pkl_results = []
 
-  hyper_params = [[0.0002, 0.0002, 0.1, 0.1, 0.05, 1e-4]]
+  hyper_params = [[0.0002, 0.0002, 0.1, 0.1, 0.05, 1e-4], [0.0001, 0.0001, 0.1, 0.1, 0.05, 1e-4], [0.0002, 0.0002, 0.8, 0.8, 0.05, 1e-4]]
 
   for g_lr, d_lr, g_decay_rate, d_decay_rate, decay_final_rate, reg in hyper_params:
     model_list = []
