@@ -46,9 +46,9 @@ function save_matrix(psnr, ssim, ifc, filename, images, precision)
         fprintf(file, sprintf('%%.%df\n', precision), var(ifc(1, 1:end)));
 
         fprintf(file, '%15s:\t', 'psnr/ssim/ifc:');
-        fprintf(file, sprintf('%%.%df/', 4), mean(psnr(1, 1:end)));
-        fprintf(file, sprintf('%%.%df/', 4), mean(ssim(1, 1:end)));
-        fprintf(file, sprintf('%%.%df\n', 4), mean(ifc(1, 1:end)));
+        fprintf(file, sprintf('%%.%df/', 3), mean(psnr(1, 1:end)));
+        fprintf(file, sprintf('%%.%df/', 3), mean(ssim(1, 1:end)));
+        fprintf(file, sprintf('%%.%df\n', 3), mean(ifc(1, 1:end)));
 
     end
 
