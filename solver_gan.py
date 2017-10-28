@@ -4,11 +4,9 @@
 '''
 CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x2.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
-
 CUDA_VISIBLE_DEVICES=1 python solver_gan.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401 --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
-CUDA_VISIBLE_DEVICES=2 python solver_gan.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401_wgan --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --is_wgan  --upscale_factor=4 --g_filter_num=32 --d_filter_num=64 --batch_size=1
-
+CUDA_VISIBLE_DEVICES=3 python solver_gan.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x8_x200.h5 --g_log_dir=./log/EDSR_v401 --g_ckpt_dir=./ckpt/EDSR_v401_wgan --default_sr_method='EDSR_v401' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --is_wgan  --upscale_factor=8 --g_filter_num=32 --d_filter_num=64 --batch_size=1
 
 '''
 
