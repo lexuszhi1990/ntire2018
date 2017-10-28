@@ -111,12 +111,17 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v254 --model=./ckpt/EDSR_v254/EDSR_v254-epoch-1-step-19548-2017-10-10-06-29.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v255 --model=./ckpt/EDSR_v255/EDSR_v255-epoch-1-step-19548-2017-10-10-16-24.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
 
+<<<<<<< HEAD
+  # for lfw dataset
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v3 --model=./ckpt/EDSR_LFW_v3/EDSR_LFW_v3-epoch-1-step-8360-2017-10-18-20-34.ckpt-8360 --image=./dataset/test/mat --scale=4 --matlab_val
+=======
 
 
 
 
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v1 --model=./ckpt/EDSR_LFW_v1/EDSR_LFW_v1-epoch-1-step-8360-2017-10-19-18-26.ckpt-8360 --image=./dataset/test_1 --scale=2 --matlab_val
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v1 --model=./ckpt/EDSR_LFW_v1/EDSR_LFW_v1-epoch-1-step-8360-2017-10-19-18-26.ckpt-8360 --image=./dataset/test_1 --scale=8 --matlab_val
+>>>>>>> f32f3e336de46642e0f5e2ff553cf1211cb384e6
 '''
 import time
 import argparse
