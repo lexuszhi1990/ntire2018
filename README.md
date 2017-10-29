@@ -111,3 +111,7 @@ head_GT_l4.png PNG 70x70 70x70+0+0 8-bit sRGB 9.05KB 0.000u 0:00.000
 
 $ identify woman_GT_l4.png
 woman_GT_l4.png PNG 57x86 57x86+0+0 8-bit sRGB 10.8KB 0.000u 0:00.000
+
+
+### references
+https://zhuanlan.zhihu.com/p/29394257
