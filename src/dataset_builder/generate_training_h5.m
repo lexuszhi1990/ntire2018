@@ -3,7 +3,11 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
   usage:
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
+<<<<<<< HEAD
+    generate_training_h5('./dataset/train', 1, 'LFW_SR_');
+=======
     generate_training_h5('/home/mcc207/datasets/291', 5, "mat_train_391_x");
+>>>>>>> f32f3e336de46642e0f5e2ff553cf1211cb384e6
 %}
 
   f_lst = [];
@@ -20,7 +24,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
   end
 
   count = 0;
-  patch_size = 256;
+  patch_size = 48;
   label = zeros(patch_size, patch_size,1, 1, 'single');
   data_l2 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
   data_l4 = zeros(patch_size/4, patch_size/4,1, 1, 'single');
@@ -45,9 +49,10 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
 
       f_path = fullfile(data_path,f_info.name);
       img_raw = imread(f_path);
+      % disp(size(img_raw));
 
       % randomly resize between 0.5 ~ 1.0
-      ratio = randi([9, 10]) * 0.1;
+      ratio = randi([7, 10]) * 0.1;
       img_raw = imresize(img_raw, ratio);
 
       % min width/height should be larger than patch size

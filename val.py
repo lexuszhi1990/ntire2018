@@ -111,12 +111,17 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v254 --model=./ckpt/EDSR_v254/EDSR_v254-epoch-1-step-19548-2017-10-10-06-29.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v255 --model=./ckpt/EDSR_v255/EDSR_v255-epoch-1-step-19548-2017-10-10-16-24.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
 
+<<<<<<< HEAD
+  # for lfw dataset
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v3 --model=./ckpt/EDSR_LFW_v3/EDSR_LFW_v3-epoch-1-step-8360-2017-10-18-20-34.ckpt-8360 --image=./dataset/test/mat --scale=4 --matlab_val
+=======
 
 
 
 
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v1 --model=./ckpt/EDSR_LFW_v1/EDSR_LFW_v1-epoch-1-step-8360-2017-10-19-18-26.ckpt-8360 --image=./dataset/test_1 --scale=2 --matlab_val
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v1 --model=./ckpt/EDSR_LFW_v1/EDSR_LFW_v1-epoch-1-step-8360-2017-10-19-18-26.ckpt-8360 --image=./dataset/test_1 --scale=8 --matlab_val
+>>>>>>> f32f3e336de46642e0f5e2ff553cf1211cb384e6
 '''
 import time
 import argparse
@@ -139,7 +144,10 @@ from src.model_new import EDSR_v201, EDSR_v202, EDSR_v203, EDSR_v204, EDSR_v205,
 from src.model_new import EDSR_v301, EDSR_v302, EDSR_v303, EDSR_v304, EDSR_v305, EDSR_v306, EDSR_v307, EDSR_v308, EDSR_v309, EDSR_v310, EDSR_v311, EDSR_v312, EDSR_v313, EDSR_v314, EDSR_v315, EDSR_v321, EDSR_v322, EDSR_v323, EDSR_v324, EDSR_v325, EDSR_v326, EDSR_v327, EDSR_v328, EDSR_v329, EDSR_v330
 from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4
 
-from src.gan import SRGAN, EDSR_v401
+from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4
+
+from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
+from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x4, LapSRN_baseline_x8
 
 from src.utils import sess_configure, trainsform, transform_reverse
 
