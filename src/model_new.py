@@ -914,6 +914,14 @@ class ExpandSqueezeBaseModel(BaseModel):
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
 
+  def total_variation_loss(self):
+    loss = 0.0
+    for l in range(self.step_depth):
+      # loss = loss + total_variation_loss(self.sr_imgs[l])
+      loss = loss + tf.reduce_sum(tf.image.total_variation(self.sr_imgs[l]))
+
+    return loss
+
 class EDSR_v301(ExpandSqueezeBaseModel):
   '''
     image_tune: 64x1 step_depth: 4, residual_depth: 5x2, image_g_kernel_size: 3
@@ -1332,3 +1340,31 @@ class EDSR_LFW_v4(ExpandSqueezeBaseModel):
     self.residual_depth = 5
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 5
+
+class EDSR_LFW_v5(ExpandSqueezeBaseModel):
+  '''
+    upscale_factor=4 image_tune: 512x1 step_depth: 4, residual_depth: 10x2, image_g_kernel_size: 5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 8
+    self.kernel_size = 3
+    self.residual_depth = 10
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 5
+
+class EDSR_LFW_v6(ExpandSqueezeBaseModel):
+  '''
+    upscale_factor=4 image_tune: 512x1 step_depth: 4, residual_depth: 6x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+
+    ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 6
+    self.image_squeeze_channle = 512
+    self.image_g_kernel_size = 3
