@@ -4,7 +4,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
 <<<<<<< HEAD
-    generate_training_h5('./dataset/train', 1, 'LFW_SR_');
+    generate_training_h5('./dataset/train', 36, 'LFW_SR_v1_');
 =======
     generate_training_h5('/home/mcc207/datasets/291', 5, "mat_train_391_x");
 >>>>>>> f32f3e336de46642e0f5e2ff553cf1211cb384e6
@@ -24,7 +24,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
   end
 
   count = 0;
-  patch_size = 48;
+  patch_size = 64;
   label = zeros(patch_size, patch_size,1, 1, 'single');
   data_l2 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
   data_l4 = zeros(patch_size/4, patch_size/4,1, 1, 'single');
@@ -108,7 +108,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
       batchdata_l8 = data_l8(:,:,:,last_read+1:last_read+chunksz);
 
       startloc = struct('dat',[1,1,1,totalct+1], 'lab', [1,1,1,totalct+1]);
-      curr_dat_sz = store2hdf5_multipy(savepath, batchdata_l2, batchdata_l4, batchdata_l8, batchlabs, ~created_flag, startloc, chunksz);
+      curr_dat_sz = store2hdf5_multipy_x8(savepath, batchdata_l2, batchdata_l4, batchdata_l8, batchlabs, ~created_flag, startloc, chunksz);
       created_flag = true;
       totalct = curr_dat_sz(end);
 

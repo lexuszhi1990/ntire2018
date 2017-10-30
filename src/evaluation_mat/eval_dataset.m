@@ -51,7 +51,7 @@ for n=1:numel(gt_lst)
 
   PSNR(n) = compute_psnr(gt_img_y_shaved, generated_img_y_shaved);
   SSIM(n) = compute_ssim(gt_img_y_shaved, generated_img_y_shaved);
-  IFC(n) = ifcvec(gt_img_y_shaved, generated_img_y_shaved);
+  IFC(n) = ifcvec(gt_img_y_double, generated_img_y_double);
   image_names = [image_names; {gt_img_name}];
 
   fprintf('--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', PSNR(n), SSIM(n), IFC(n));
