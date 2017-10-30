@@ -89,7 +89,7 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v221 --model=./ckpt/EDSR_v221/EDSR_v221-epoch-1-step-19548-2017-10-10-10-54.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=2 python val.py --gpu_id=2 --channel=1 --filter_num=16 --sr_method=EDSR_v222 --model=./ckpt/EDSR_v222/EDSR_v222-epoch-1-step-19548-2017-10-10-12-12.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v223 --model=./ckpt/EDSR_v223/EDSR_v223-epoch-1-step-19548-2017-10-11-01-19.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
-  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v224 --model=./ckpt/EDSR_v224/EDSR_v224-epoch-1-step-19548-2017-10-11-12-03.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
+  CUDA_VISIBLE_DEVICES=3 python val.py --gpu_id=3 --channel=1 --filter_num=16 --sr_method=EDSR_v224 --model=./ckpt/EDSR_v224/EDSR_v224-epoch-1-step-19548-2017-10-11-01-42.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v225 --model=./ckpt/EDSR_v225/EDSR_v225-epoch-1-step-19548-2017-10-11-12-24.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=16 --sr_method=EDSR_v228 --model=./ckpt/EDSR_v228/EDSR_v228-epoch-1-step-19548-2017-10-12-12-09.ckpt-19548 --image=./dataset/mat_test/set5/mat --scale=8 --matlab_val --validate_all
 
@@ -139,6 +139,9 @@ from src.model_new import EDSR_v301, EDSR_v302, EDSR_v303, EDSR_v304, EDSR_v305,
 
 from src.gan import SRGAN, EDSR_v401
 from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, EDSR_LFW_v5, EDSR_LFW_v6
+
+from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
+from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x4, LapSRN_baseline_x8
 
 from src.utils import sess_configure, trainsform, transform_reverse
 

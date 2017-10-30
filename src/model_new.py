@@ -230,6 +230,54 @@ class BaseModel(object):
         base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
         self.reconstructed_imgs.append(base_images)
 
+  def extract_ed_block_features_with_BN(self, reuse=False):
+    with tf.variable_scope(self.scope) as vs:
+      if reuse:
+        vs.reuse_variables()
+
+      with tf.variable_scope('init'):
+        x = deconv_layer(self.inputs, [self.kernel_size, self.kernel_size, self.filter_num, self.channel], [self.batch_size, self.height, self.width, self.filter_num], stride=1)
+        x = lrelu(x)
+
+      for step in range(1, self.step_depth+1):
+
+        with tf.variable_scope('level_{}_img'.format(str(step))):
+          height, width = self.current_step_img_size(step-1)
+          x = tf.image.resize_bilinear(x, size=[height, width], align_corners=False, name='level_{}_transpose_upscale'.format(str(step)))
+
+        init = x
+        for d in range(self.residual_depth):
+          with tf.variable_scope('level_{}_residual_{}_convA'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+          with tf.variable_scope('level_{}_residual_{}_convB'.format(str(step), str(d))):
+            x = layers.conv2d(x, self.filter_num, kernel_size=self.kernel_size, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer = layers.l2_regularizer(scale=self.reg))
+            x = batch_normalize(x, self.is_training)
+            x = lrelu(x)
+          local_init = x
+          x = local_init + x
+        x = init + x
+
+        with tf.variable_scope('level_{}_upscaled_img'.format(str(step))):
+          net = layers.conv2d(x, self.image_squeeze_channle, kernel_size=self.image_g_kernel_size, stride=1, padding='SAME', activation_fn=lrelu, biases_initializer=None, weights_regularizer=layers.l2_regularizer(scale=self.reg))
+          net = layers.conv2d(net, 1, kernel_size=1, stride=1, padding='SAME', activation_fn=None, biases_initializer=None, weights_regularizer=None, scope='level_{}_img'.format(str(step)))
+          self.extracted_features.append(net)
+
+      base_images = self.inputs
+      for step in range(1, self.step_depth+1):
+        height, width = self.current_step_img_size(step-1)
+        base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
+        self.reconstructed_imgs.append(base_images)
+
+  def total_variation_loss(self):
+    loss = 0.0
+    for l in range(self.step_depth):
+      # loss = loss + total_variation_loss(self.sr_imgs[l])
+      loss = loss + tf.reduce_sum(tf.image.total_variation(self.sr_imgs[l]))
+
+    return loss
+
   def l1_loss(self):
     loss = []
     for l in range(self.step_depth):
@@ -1371,3 +1419,115 @@ class EDSR_LFW_v6(ExpandSqueezeBaseModel):
     self.residual_depth = 10
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3
+
+class LapSRNBaseModel(BaseModel):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_without_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
+
+
+class LapSRN_baseline_x2(LapSRNBaseModel):
+  '''
+    upscale: 2, step_depth: 1, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    LapSRNBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+class LapSRN_baseline_x4(LapSRNBaseModel):
+  '''
+    upscale: 4, step_depth: 2, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    LapSRNBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+class LapSRN_baseline_x8(LapSRNBaseModel):
+  '''
+    upscale: 8, step_depth: 3, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    LapSRNBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 3
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+
+class SRGANBaseModel(BaseModel):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 2, step_depth: 1, residual_depth: 2x2
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 2
+
+  def extract_features(self, reuse=False):
+    self.extract_ed_block_features_with_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.normal_reconstruct(reuse)
+
+class SRGAN_x2(SRGANBaseModel):
+  '''
+    upscale: 2, step_depth: 1, residual_depth: 2x12
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    SRGANBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 14
+
+class SRGAN_x4(SRGANBaseModel):
+  '''
+    upscale: 4, step_depth: 1, residual_depth: 2x16
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    SRGANBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 16
+
+class SRGAN_x8(SRGANBaseModel):
+  '''
+    upscale: 8, step_depth: 1, residual_depth: 2x16
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
+
+    SRGANBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 1
+    self.kernel_size = 3
+    self.residual_depth = 18

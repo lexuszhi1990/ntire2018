@@ -11,6 +11,7 @@ import numpy as np
 import tensorflow as tf
 
 from src.gan import SRGAN, EDSR_v401
+from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
 
 from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
