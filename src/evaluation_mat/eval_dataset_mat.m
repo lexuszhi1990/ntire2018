@@ -7,6 +7,7 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
     addpath('./src/evaluation_mat/matlabPyrTools');
 
     eval_dataset_mat('./dataset/mat_test/set5', 'lapsrn/mat', 'LapSRN_v1', 4);
+    eval_dataset_mat('./dataset/test_1', 'lapsrn/mat', 'EDSR_LFW_v4', 4);
   %}
 
   dataset_gt_path = fullfile(dataset_dir, 'mat');

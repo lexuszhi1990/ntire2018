@@ -259,6 +259,9 @@ class BaseModel(object):
   def upscaled_img(self, index):
     return self.sr_imgs[-1]
 
+  def get_image(self, index):
+    return self.sr_imgs[(index*self.step_depth)//self.upscale_factor - 1]
+
 # baseline learning for without BN sr
 class EDSR_v100(BaseModel):
   def extract_features(self, reuse=False):
@@ -1343,7 +1346,7 @@ class EDSR_LFW_v4(ExpandSqueezeBaseModel):
 
 class EDSR_LFW_v5(ExpandSqueezeBaseModel):
   '''
-    upscale_factor=4 image_tune: 512x1 step_depth: 4, residual_depth: 10x2, image_g_kernel_size: 5
+    upscale_factor=8 image_tune: 512x1 step_depth: 4, residual_depth: 10x2, image_g_kernel_size: 5
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -1357,14 +1360,14 @@ class EDSR_LFW_v5(ExpandSqueezeBaseModel):
 
 class EDSR_LFW_v6(ExpandSqueezeBaseModel):
   '''
-    upscale_factor=4 image_tune: 512x1 step_depth: 4, residual_depth: 6x2, image_g_kernel_size: 3
+    upscale_factor=4 image_tune: 512x1 step_depth: 4, residual_depth: 10x2, image_g_kernel_size: 3
   '''
-  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
 
     ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
 
-    self.step_depth = 4
+    self.step_depth = 3
     self.kernel_size = 3
-    self.residual_depth = 6
+    self.residual_depth = 10
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 3

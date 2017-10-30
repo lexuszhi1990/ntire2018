@@ -5,7 +5,7 @@ from src.layer import *
 import tensorflow.contrib.layers as layers
 
 from src.model_new import ExpandSqueezeBaseModel
-from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, EDSR_LFW_v5
+from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, EDSR_LFW_v5, EDSR_LFW_v6
 
 # import sys
 # sys.path.append('../squeeze_det/lib')
