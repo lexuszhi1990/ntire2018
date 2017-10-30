@@ -5,6 +5,8 @@ from src.layer import *
 import tensorflow.contrib.layers as layers
 
 from src.model_new import ExpandSqueezeBaseModel
+from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
+
 
 # import sys
 # sys.path.append('../squeeze_det/lib')

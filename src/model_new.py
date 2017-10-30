@@ -270,6 +270,14 @@ class BaseModel(object):
         base_images = tf.image.resize_bilinear(base_images, size=[height, width], align_corners=False, name='level_{}_biliear'.format(str(step)))
         self.reconstructed_imgs.append(base_images)
 
+  def total_variation_loss(self):
+    loss = 0.0
+    for l in range(self.step_depth):
+      # loss = loss + total_variation_loss(self.sr_imgs[l])
+      loss = loss + tf.reduce_sum(tf.image.total_variation(self.sr_imgs[l]))
+
+    return loss
+
   def l1_loss(self):
     loss = []
     for l in range(self.step_depth):
