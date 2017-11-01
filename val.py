@@ -116,10 +116,14 @@ For SR X8:
 
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=128 --sr_method=EDSR_LFW_v3 --model=./ckpt/EDSR_LFW_v3/EDSR_LFW_v3-epoch-1-step-8360-2017-10-18-20-34.ckpt-8360 --image=./dataset/test/mat --scale=4 --matlab_val
 
+<<<<<<< Updated upstream
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v4 --model=./ckpt/EDSR_LFW_v4_wgan/EDSR_LFW_v4-wgan-True-step-8359-2017-10-28-12-54.ckpt-8359 --image=./dataset/test_1/mat --scale=3 --matlab_val
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v4 --model=./ckpt/EDSR_LFW_v4_wgan/EDSR_LFW_v4-wgan-True-step-8359-2017-10-28-12-54.ckpt-8359 --image=./dataset/test_1/mat --scale=4 --matlab_val
 
   CUDA_VISIBLE_DEVICES=1 python val.py --gpu_id=1 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v5 --model=./ckpt/EDSR_LFW_v5_wgan/EDSR_LFW_v5-wgan-True-step-2089-2017-10-28-17-11.ckpt-2089 --image=./dataset/test_1/mat --scale=8 --matlab_val
+=======
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v4 --model=./ckpt/EDSR_LFW_v4_wgan/EDSR_LFW_v4-wgan-True-step-8359-2017-10-28-12-54.ckpt-8359 --image=./dataset/test/mat --scale=2 --matlab_val
+>>>>>>> Stashed changes
 '''
 import time
 import argparse
@@ -352,7 +356,6 @@ if __name__ == '__main__':
   opt = parser.parse_args()
 
   load_models(opt.sr_method, opt.model)
-
 
   if opt.validate_all:
 
