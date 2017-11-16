@@ -154,7 +154,10 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v326 --g_ckpt_dir=./ckpt/EDSR_v326 --default_sr_method='EDSR_v326' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v328 --g_ckpt_dir=./ckpt/EDSR_v328 --default_sr_method='EDSR_v328' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v329 --g_ckpt_dir=./ckpt/EDSR_v329 --default_sr_method='EDSR_v329' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
-  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v330 --g_ckpt_dir=./ckpt/EDSR_v330 --default_sr_method='EDSR_v330' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --fnilter_num=64 --batch_size=4
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v330 --g_ckpt_dir=./ckpt/EDSR_v330 --default_sr_method='EDSR_v330' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=4
+
+  # 400 weight loss
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_V400 --g_ckpt_dir=./ckpt/EDSR_V400 --default_sr_method='EDSR_V400' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
 
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/SRGAN_x4_base --g_ckpt_dir=./ckpt/SRGAN_x4_base --default_sr_method='SRGAN_x4' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=32 --batch_size=8
 
@@ -261,8 +264,9 @@ def main(_):
   # archived best results with [0.0002, 0.1, 0.05, 1e-4]
   # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00015, 0.1, 0.01, 1e-4], [0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.2, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
 
-  # hyper_params = [[0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.1, 0.01, 1e-4], [0.0004, 0.5, 0.01, 1e-4]]
-  hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
+  # for k40
+  hyper_params = [[0.0002, 0.1, 0.05, 1e-4], [0.0002, 0.1, 0.05, 1e-3], [0.0002, 0.1, 0.01, 1e-4], [0.0004, 0.5, 0.01, 1e-4]]
+  # hyper_params = [[0.0001, 0.1, 0.05, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.0003, 0.70, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]
 
   # step-num and residual-depth trade-off params
   # hyper_params = [[0.00015, 0.1, 0.01, 1e-4], [0.00025, 0.50, 0.01, 1e-3], [0.00035, 0.80, 0.01, 1e-3]]

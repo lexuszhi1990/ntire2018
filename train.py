@@ -23,6 +23,7 @@ from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, ED
 from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x4, LapSRN_baseline_x8
 from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4
 from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
+from src.model_new import EDSR_V400
 
 from src.dataset import TrainDatasetFromHdf5
 from src.utils import setup_project, sess_configure, tf_flag_setup, transform_reverse
