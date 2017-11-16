@@ -64,6 +64,10 @@ function [] = generate_test_images(dataset_path)
     bicubic_l2_x2_ycbcr = imresize(label_x4_ycbcr, 2,'bicubic');
     label_x4_y = label_x4_ycbcr(:,:,1);
 
+    label_x3_ycbcr = imresize(img_ycbcr, 3/8,'bicubic');
+    bicubic_l3_x3_ycbcr = imresize(label_x3_ycbcr, 3,'bicubic');
+    label_x3_y = label_x3_ycbcr(:,:,1);
+
     label_x2_ycbcr = imresize(img_ycbcr, 1/4,'bicubic');
     bicubic_l4_x4_ycbcr = imresize(label_x2_ycbcr, 4,'bicubic');
     label_x2_y = label_x2_ycbcr(:,:,1);
@@ -73,7 +77,7 @@ function [] = generate_test_images(dataset_path)
     label_x1_y = label_x1_ycbcr(:,:,1);
 
     lm_path = fullfile(mat_dir, image_names{1});
-    save(lm_path, 'img_rgb', 'label_x8_ycbcr', 'label_x8_y', 'label_x4_ycbcr', 'label_x4_y', 'label_x2_ycbcr', 'label_x2_y', 'label_x1_ycbcr', 'label_x1_y', 'bicubic_l8_x8_ycbcr', 'bicubic_l2_x2_ycbcr', 'bicubic_l4_x4_ycbcr');
+    save(lm_path, 'img_rgb', 'label_x8_ycbcr', 'label_x8_y', 'label_x4_ycbcr', 'label_x4_y', 'label_x3_ycbcr', 'label_x3_y', 'label_x2_ycbcr', 'label_x2_y', 'label_x1_ycbcr', 'label_x1_y', 'bicubic_l8_x8_ycbcr', 'bicubic_l3_x3_ycbcr', 'bicubic_l2_x2_ycbcr', 'bicubic_l4_x4_ycbcr');
     disp(['save image ' lm_path]);
 
     patch_name = sprintf('%s.png',image_names{1});

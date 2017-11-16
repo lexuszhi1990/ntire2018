@@ -7,6 +7,7 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
     addpath('./src/evaluation_mat/matlabPyrTools');
 
     eval_dataset_mat('./dataset/mat_test/set5', 'lapsrn/mat', 'LapSRN_v1', 4);
+    eval_dataset_mat('./dataset/test_1', 'lapsrn/mat', 'EDSR_LFW_v4', 4);
   %}
 
   dataset_gt_path = fullfile(dataset_dir, 'mat');
@@ -44,7 +45,9 @@ function [PSNR, SSIM, IFC] = eval_dataset_mat(dataset_dir, method_dir, sr_method
 
     PSNR(n) = compute_psnr(gt_img_y_shaved, upscaled_img_y_shaved);
     SSIM(n) = compute_ssim(gt_img_y_shaved, upscaled_img_y_shaved);
-    IFC(n) = compute_ifc(double(gt_img_y_shaved), double(upscaled_img_y_shaved));
+    % IFC(n) = compute_ifc(double(gt_img_y_shaved), double(upscaled_img_y_shaved));
+    % IFC(n) = ifcvec(double(shave(gt_img_y, 4)), double(shave(upscaled_img_y, 4)));
+    IFC(n) = compute_ifc(double(gt_img_y), double(upscaled_img_y));
     image_names = [image_names; {gt_img_name}];
 
     fprintf('--PSNR: %.4f;\tSSIM: %.4f;\tIFC: %.4f\n', PSNR(n), SSIM(n), IFC(n));

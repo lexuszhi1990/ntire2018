@@ -5,6 +5,13 @@ CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --fi
 
 CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=./ckpt/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./00001.jpg --output_dir=./ --scale=4
 
+
+
+
+CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v2 --model_path=./ckpt/EDSR_LFW_v2/EDSR_LFW_v2-epoch-1-step-8360-2017-10-20-17-15.ckpt-8360 --image=./test/faces/IMG_4677_face_0_l2.png --output_dir=./ --scale=2
+
+CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v4 --model_path=./ckpt/EDSR_LFW_v4/EDSR_LFW_v4-epoch-1-step-8360-2017-10-20-17-26.ckpt-8360 --output_dir=./ --scale=4  --image=./test/faces/IMG_4677_face_0_l2.png
+
 '''
 
 import time
