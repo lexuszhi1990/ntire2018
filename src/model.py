@@ -463,6 +463,10 @@ class BaselapV1(object):
     # r = int(index * self.step_depth / self.upscale_factor - 1)
     return self.sr_imgs[-1]
 
+  def get_image(self, index):
+    # r = int(index * self.step_depth / self.upscale_factor - 1)
+    return self.sr_imgs[-1]
+
 class LapSRN_v3(BaselapV1):
 
   def extract_features(self, reuse=False):
