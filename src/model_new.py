@@ -278,6 +278,16 @@ class BaseModel(object):
 
     return loss
 
+  def weighted_loss(self):
+    loss = []
+    base = (self.step_depth-1)/2
+    for l in range(self.step_depth):
+      step_loss = (l+base)/float(self.step_depth)*self.l1_charbonnier_loss(self.sr_imgs[l], self.gt_imgs[l])
+      loss.append(step_loss)
+
+    loss = tf.reduce_sum(loss)
+    return loss
+
   def l1_loss(self):
     loss = []
     for l in range(self.step_depth):
@@ -1346,6 +1356,113 @@ class EDSR_v330(ExpandSqueezeBaseModel):
     self.image_squeeze_channle = 512
     self.image_g_kernel_size = 9
 
+
+# weighted loss
+
+
+# class EDSR_v250(EDSRStepResidualTradeoff):
+#   '''
+#     upscale: 4, step_depth: 4, residual_depth: 2x5
+#   '''
+#   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+#     BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+#     self.step_depth = 4
+#     self.kernel_size = 3
+#     self.residual_depth = 5
+# for testing EDSRStepResidualTradeoff
+class EDSRWeightLoss(BaseModel):
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+
+  def extract_features(self, reuse=False):
+    self.extract_recurrence_features_without_BN(reuse)
+
+  def reconstruct(self, reuse=False):
+    self.residual_reconstruct(reuse)
+
+  def l1_loss(self):
+    return self.weighted_loss()
+
+class EDSR_V500(EDSRWeightLoss):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 4, step_depth: 4, residual_depth: 2x5
+  '''
+  pass
+
+class EDSR_V501(EDSRWeightLoss):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 2, step_depth: 2, residual_depth: 2x6
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 6
+
+class EDSR_V502(EDSRWeightLoss):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 6, step_depth: 2, residual_depth: 2x4
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=1e-4, scope='edsr'):
+
+    BaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 4
+
+
+class EDSRWeightLossES(ExpandSqueezeBaseModel):
+  '''
+    image_tune: 64x1 step_depth: 2, residual_depth: 2x6, image_g_kernel_size: 3
+    contrast for expand-squeeze block
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 2
+    self.kernel_size = 3
+    self.residual_depth = 6
+    self.image_squeeze_channle = 64
+    self.image_g_kernel_size = 3
+
+  def l1_loss(self):
+    return self.weighted_loss()
+
+class EDSR_V510(EDSRWeightLossES):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 6, step_depth: 2, residual_depth: 2x6
+  '''
+  pass
+
+class EDSR_V511(EDSRWeightLossES):
+  '''
+    for step-num and residual-depth trade-off test, init params are
+    upscale: 6, step_depth: 4, residual_depth: 2x5
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 5
+    self.image_squeeze_channle = 64
+    self.image_g_kernel_size = 3
 
 # for SR LFW Faces
 class EDSR_LFW_v1(ExpandSqueezeBaseModel):
