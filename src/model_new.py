@@ -969,7 +969,7 @@ class EDSR_v255(EDSRStepResidualTradeoff):
 
 class EDSR_v256(EDSRStepResidualTradeoff):
   '''
-    upscale: 8, step_depth: 6, residual_depth: 2x5
+    upscale: 8, step_depth: 6, residual_depth: 2x4
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=8, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -977,7 +977,7 @@ class EDSR_v256(EDSRStepResidualTradeoff):
 
     self.step_depth = 6
     self.kernel_size = 3
-    self.residual_depth = 5
+    self.residual_depth = 4
 
 # for test expand-squeeze block
 class ExpandSqueezeBaseModel(BaseModel):
