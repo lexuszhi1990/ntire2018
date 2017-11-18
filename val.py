@@ -252,7 +252,7 @@ def generator(input_img, batch_size, scale, channel, filter_num, model_name, mod
       model.init_gt_imgs()
       model.extract_features()
       model.reconstruct()
-      upscaled_tf_img = model.upscaled_img(scale)
+      upscaled_tf_img = model.get_image(scale)
 
       saver = tf.train.Saver()
       if os.path.isdir(model_path):
