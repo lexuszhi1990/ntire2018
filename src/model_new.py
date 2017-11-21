@@ -1648,14 +1648,14 @@ class SRGANBaseModel(BaseModel):
     self.residual_depth = 2
 
   def extract_features(self, reuse=False):
-    self.extract_ed_block_features_with_BN(reuse)
+    self.extract_baseline_features_without_BN(reuse)
 
   def reconstruct(self, reuse=False):
-    self.normal_reconstruct(reuse)
+    self.residual_reconstruct(reuse)
 
 class SRGAN_x2(SRGANBaseModel):
   '''
-    upscale: 2, step_depth: 1, residual_depth: 2x12
+    upscale: 2, step_depth: 1, residual_depth: 2x14
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -1667,7 +1667,7 @@ class SRGAN_x2(SRGANBaseModel):
 
 class SRGAN_x4(SRGANBaseModel):
   '''
-    upscale: 4, step_depth: 1, residual_depth: 2x16
+    upscale: 4, step_depth: 1, residual_depth: 2x15
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=2, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -1675,7 +1675,7 @@ class SRGAN_x4(SRGANBaseModel):
 
     self.step_depth = 1
     self.kernel_size = 3
-    self.residual_depth = 16
+    self.residual_depth = 15
 
 class SRGAN_x8(SRGANBaseModel):
   '''
@@ -1687,4 +1687,4 @@ class SRGAN_x8(SRGANBaseModel):
 
     self.step_depth = 1
     self.kernel_size = 3
-    self.residual_depth = 18
+    self.residual_depth = 16
