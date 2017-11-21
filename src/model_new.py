@@ -1213,7 +1213,21 @@ class EDSR_v315(ExpandSqueezeBaseModel):
     self.kernel_size = 3
     self.residual_depth = 5
     self.image_squeeze_channle = 512
-    self.image_g_kernel_size = 1
+    self.image_g_kernel_size = 9
+
+class EDSR_v316(ExpandSqueezeBaseModel):
+  '''
+    image_tune: 1024x1 step_depth: 4, residual_depth: 6x2, image_g_kernel_size: 3
+  '''
+  def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
+
+    ExpandSqueezeBaseModel.__init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor, filter_num, reg, scope)
+
+    self.step_depth = 4
+    self.kernel_size = 3
+    self.residual_depth = 6
+    self.image_squeeze_channle = 1024
+    self.image_g_kernel_size = 3
 
 
 class EDSR_v321(ExpandSqueezeBaseModel):
@@ -1578,11 +1592,10 @@ class LapSRNBaseModel(BaseModel):
     self.residual_depth = 2
 
   def extract_features(self, reuse=False):
-    self.extract_recurrence_features_without_BN(reuse)
+    self.extract_baseline_features_without_BN(reuse)
 
   def reconstruct(self, reuse=False):
     self.residual_reconstruct(reuse)
-
 
 class LapSRN_baseline_x2(LapSRNBaseModel):
   '''
@@ -1610,7 +1623,7 @@ class LapSRN_baseline_x4(LapSRNBaseModel):
 
 class LapSRN_baseline_x8(LapSRNBaseModel):
   '''
-    upscale: 8, step_depth: 3, residual_depth: 2x5
+    upscale: 8, step_depth: 3, residual_depth: 2x3
   '''
   def __init__(self, inputs, gt_img_x2, gt_img_x4, gt_img_x8, image_size, is_training, upscale_factor=4, filter_num=64, reg=5e-4, scope='edsr'):
 
@@ -1618,7 +1631,7 @@ class LapSRN_baseline_x8(LapSRNBaseModel):
 
     self.step_depth = 3
     self.kernel_size = 3
-    self.residual_depth = 5
+    self.residual_depth = 3
 
 
 class SRGANBaseModel(BaseModel):

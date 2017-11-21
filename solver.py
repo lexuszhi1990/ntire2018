@@ -138,6 +138,8 @@ For SR X8:
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v249 --g_ckpt_dir=./ckpt/EDSR_v249 --default_sr_method='EDSR_v249' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=4
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v250 --g_ckpt_dir=./ckpt/EDSR_v250 --default_sr_method='EDSR_v250' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
 
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/EDSR_v316 --g_ckpt_dir=./ckpt/EDSR_v316 --default_sr_method='EDSR_v316' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
+
   # 放大倍数为8, 相同的级联总数，不同的子级联深度
   CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v251 --g_ckpt_dir=./ckpt/EDSR_v251 --default_sr_method='EDSR_v251' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
   CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_v252 --g_ckpt_dir=./ckpt/EDSR_v252 --default_sr_method='EDSR_v252' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=16 --batch_size=4
