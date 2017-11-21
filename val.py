@@ -155,7 +155,7 @@ from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, ED
 from src.model_new import SRGAN_x2, SRGAN_x4, SRGAN_x8
 from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x4, LapSRN_baseline_x8
 
-from src.model_new import EDSR_V500 , EDSR_V501 , EDSR_V510, EDSR_V511
+from src.model_new import EDSR_V500 , EDSR_V501 , EDSR_V510, EDSR_V511 , EDSR_V512
 
 from src.utils import sess_configure, trainsform, transform_reverse
 

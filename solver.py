@@ -168,6 +168,9 @@ For SR X8:
 # 511 weight loss
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_V511 --g_ckpt_dir=./ckpt/EDSR_V511 --default_sr_method='EDSR_V511' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=4
 
+# 512 weight loss
+  CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/EDSR_V512 --g_ckpt_dir=./ckpt/EDSR_V512 --default_sr_method='EDSR_V512' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=4
+
 
   CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/SRGAN_x4_base --g_ckpt_dir=./ckpt/SRGAN_x4_base --default_sr_method='SRGAN_x4' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=32 --batch_size=8
 
