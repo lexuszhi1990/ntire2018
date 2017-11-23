@@ -181,7 +181,11 @@ CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/mat_t
 
 # srgan baseline
 CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/SRGAN_x2 --g_ckpt_dir=./ckpt/SRGAN_x2 --default_sr_method='SRGAN_x2' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=2
+CUDA_VISIBLE_DEVICES=0 python solver.py --gpu_id=0 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/SRGAN_x2_v1 --g_ckpt_dir=./ckpt/SRGAN_x2_v1 --default_sr_method='SRGAN_x2_v1' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=2
+CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x2_x200.h5 --g_log_dir=./log/SRGAN_x2_v2 --g_ckpt_dir=./ckpt/SRGAN_x2_v2 --default_sr_method='SRGAN_x2_v2' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=2 --filter_num=64 --batch_size=2
+
 CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x4_x200.h5 --g_log_dir=./log/SRGAN_x4 --g_ckpt_dir=./ckpt/SRGAN_x4 --default_sr_method='SRGAN_x4' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=4 --filter_num=64 --batch_size=8
+
 CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/mat_train_391_x200.h5 --g_log_dir=./log/SRGAN_x8 --g_ckpt_dir=./ckpt/SRGAN_x8 --default_sr_method='SRGAN_x8' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1  --upscale_factor=8 --filter_num=64 --batch_size=8
 
 # lfw
