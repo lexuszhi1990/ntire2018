@@ -20,8 +20,7 @@ from src.model_new import EDSR_v201, EDSR_v202, EDSR_v203, EDSR_v204, EDSR_v205,
 # from sr.model_new import EDSR_v231, EDSR_v232, EDSR_v233, EDSR_v234, EDSR_v235, EDSR_v236, EDSR_v237, EDSR_v238, EDSR_v239, EDSR_v240
 from src.model_new import EDSR_v301, EDSR_v302, EDSR_v303, EDSR_v304, EDSR_v305, EDSR_v306, EDSR_v307, EDSR_v308, EDSR_v309, EDSR_v310, EDSR_v311, EDSR_v312, EDSR_v313, EDSR_v314, EDSR_v315, EDSR_v316, EDSR_v321, EDSR_v322, EDSR_v323, EDSR_v324, EDSR_v325, EDSR_v326, EDSR_v327, EDSR_v328, EDSR_v329, EDSR_v330
 from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4, EDSR_LFW_v5, EDSR_LFW_v6
-from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x4, LapSRN_baseline_x8
-from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4
+from src.model_new import LapSRN_baseline_x2, LapSRN_baseline_x2_v1, LapSRN_baseline_x2_v2, LapSRN_baseline_x4, LapSRN_baseline_x4_v1, LapSRN_baseline_x4_v2, LapSRN_baseline_x8, LapSRN_baseline_x8_v1, LapSRN_baseline_x8_v2
 from src.model_new import SRGAN_x2, SRGAN_x2_v1, SRGAN_x2_v2, SRGAN_x4, SRGAN_x4_v1, SRGAN_x4_v2, SRGAN_x8, SRGAN_x8_v1, SRGAN_x8_v2
 from src.model_new import EDSR_V500 , EDSR_V501 , EDSR_V510 , EDSR_V511 , EDSR_V512
 
