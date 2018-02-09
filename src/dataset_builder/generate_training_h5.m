@@ -1,19 +1,54 @@
-function [label] = generate_training_h5(data_path, epoches, saved_name)
+function [label] = generate_training_h5(HR_path, LR_path, epoches, saved_name)
 %{
   usage:
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
-<<<<<<< HEAD
-    generate_training_h5('./dataset/train', 36, 'LFW_SR_v1_');
-=======
-    generate_training_h5('/home/mcc207/datasets/291', 5, "mat_train_391_x");
->>>>>>> f32f3e336de46642e0f5e2ff553cf1211cb384e6
+    generate_training_h5('../dataset/DIV2K_train_HR', '../dataset/DIV2K_train_LR_difficult', 5, 'div2k_x');
+
+  dev:
+    HR_path = '../dataset/DIV2K_train_HR';
+    LR_path = '../dataset/DIV2K_train_LR_difficult';
+
+    f_lst = [];
+    f_lst = [f_lst; dir(fullfile(HR_path, '*.png'))];
+    f_info = f_lst(1);
+    f_path = fullfile(HR_path,f_info.name);
+    hr_img_raw = imread(f_path);
+
+    split_names = strsplit(f_info.name, '.');
+    lr_img_path = strcat(LR_path, '/', char(split_names(1)), 'x4d.png');
+    lr_img_raw = imread(lr_img_path);
+
+
+    patch_size = 64;
+    [lr_img_patch, hr_img_patch] = random_crop_x4(lr_img_raw, hr_img_raw, patch_size);
+    [lr_img, hr_img] = random_rotate_and_flip_double(lr_img_patch, hr_img_patch);
+
+    lr_img = im2double(lr_img);
+    lr_img_ycbcy = rgb2ycbcr(lr_img);
+
+    hr_img = im2double(hr_img);
+    hr_img_ycbcy = rgb2ycbcr(hr_img);
+
+    hr_img_y = hr_img_ycbcy(:, :, 1);
+    lr_img_y = lr_img_ycbcy(:, :, 1);
+
+    data_l2_y = imresize(hr_img_y, 1/2, 'bicubic');
+    data_l4_y = imresize(hr_img_y, 1/4, 'bicubic');
+    data_l8_y = imresize(hr_img_y, 1/8, 'bicubic');
+
+    count = count+1;
+    label(:, :, :, count) = hr_img_y;
+    data_l2(:, :, :, count) = data_l2_y;
+    data_l4(:, :, :, count) = lr_img_y;
+    data_l8(:, :, :, count) = data_l8_y;
+
 %}
 
   f_lst = [];
-  f_lst = [f_lst; dir(fullfile(data_path, '*.jpg'))];
-  f_lst = [f_lst; dir(fullfile(data_path, '*.bmp'))];
-  f_lst = [f_lst; dir(fullfile(data_path, '*.png'))];
+  f_lst = [f_lst; dir(fullfile(HR_path, '*.jpg'))];
+  f_lst = [f_lst; dir(fullfile(HR_path, '*.bmp'))];
+  f_lst = [f_lst; dir(fullfile(HR_path, '*.png'))];
 
   if( ~exist('epoches', 'var') )
       epoches = 1;
@@ -25,10 +60,10 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
 
   count = 0;
   patch_size = 64;
-  label = zeros(patch_size, patch_size,1, 1, 'single');
-  data_l2 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
-  data_l4 = zeros(patch_size/4, patch_size/4,1, 1, 'single');
-  data_l8 = zeros(patch_size/8, patch_size/8,1, 1, 'single');
+  label = zeros(patch_size*4, patch_size*4,1, 1, 'single');
+  data_l2 = zeros(patch_size*2, patch_size*2,1, 1, 'single');
+  data_l4 = zeros(patch_size, patch_size,1, 1, 'single');
+  data_l8 = zeros(patch_size/2, patch_size/2,1, 1, 'single');
 
   %% writing to HDF5
   chunksz = 16;
@@ -38,57 +73,43 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
   disp(savepath);
 
   for epoch = 1:epoches
-
     f_lst = f_lst(randperm(length(f_lst)));
-
     for f_iter = 1:numel(f_lst)
       f_info = f_lst(f_iter);
       if f_info.name == '.'
           continue;
       end
 
-      f_path = fullfile(data_path,f_info.name);
-      img_raw = imread(f_path);
-      % disp(size(img_raw));
+      f_path = fullfile(HR_path,f_info.name);
+      hr_img_raw = imread(f_path);
 
-      % randomly resize between 0.5 ~ 1.0
-      ratio = randi([7, 10]) * 0.1;
-      img_raw = imresize(img_raw, ratio);
+      split_names = strsplit(f_info.name, '.');
+      lr_img_path = strcat(LR_path, '/', char(split_names(1)), 'x4d.png');
+      lr_img_raw = imread(lr_img_path);
 
-      % min width/height should be larger than patch size
-      if( size(img_raw, 1) < patch_size || size(img_raw, 2) < patch_size )
-        img_raw = vllab_imresize(img_raw, patch_size);
-      end
 
-      % random crop with size
-      cropped_img = random_crop(img_raw, patch_size);
+      patch_size = 64;
+      [lr_img_patch, hr_img_patch] = random_crop_x4(lr_img_raw, hr_img_raw, patch_size);
+      [lr_img, hr_img] = random_rotate_and_flip_double(lr_img_patch, hr_img_patch);
 
-      % random rotate and flip
-      image = random_rotate_and_flip(cropped_img);
+      lr_img = im2double(lr_img);
+      lr_img_ycbcy = rgb2ycbcr(lr_img);
 
-      if size(img_raw, 3) == 3
-        image = image;
-      else
-        disp(f_info);
-        disp('only one channel for this image');
-        continue;
-      end
+      hr_img = im2double(hr_img);
+      hr_img_ycbcy = rgb2ycbcr(hr_img);
 
-      image = im2double(image);
-      img_ycbcy = rgb2ycbcr(image);
+      hr_img_y = hr_img_ycbcy(:, :, 1);
+      lr_img_y = lr_img_ycbcy(:, :, 1);
 
-      img_y = img_ycbcy(:, :, 1);
-      data_l2_y = imresize(img_y, 1/2, 'bicubic');
-      data_l4_y = imresize(img_y, 1/4, 'bicubic');
-      data_l8_y = imresize(img_y, 1/8, 'bicubic');
+      data_l2_y = imresize(hr_img_y, 1/2, 'bicubic');
+      data_l4_y = imresize(hr_img_y, 1/4, 'bicubic');
+      data_l8_y = imresize(hr_img_y, 1/8, 'bicubic');
 
       count = count+1;
-      label(:, :, :, count) = img_y;
+      label(:, :, :, count) = hr_img_y;
       data_l2(:, :, :, count) = data_l2_y;
-      data_l4(:, :, :, count) = data_l4_y;
+      data_l4(:, :, :, count) = lr_img_y;
       data_l8(:, :, :, count) = data_l8_y;
-
-      disp(f_path);
     end
 
     disp([num2str(epoch) 'end...']);
@@ -108,7 +129,7 @@ function [label] = generate_training_h5(data_path, epoches, saved_name)
       batchdata_l8 = data_l8(:,:,:,last_read+1:last_read+chunksz);
 
       startloc = struct('dat',[1,1,1,totalct+1], 'lab', [1,1,1,totalct+1]);
-      curr_dat_sz = store2hdf5_multipy_x8(savepath, batchdata_l2, batchdata_l4, batchdata_l8, batchlabs, ~created_flag, startloc, chunksz);
+      curr_dat_sz = store2hdf5_multipy_x4(savepath, batchdata_l2, batchdata_l4, batchdata_l8, batchlabs, ~created_flag, startloc, chunksz);
       created_flag = true;
       totalct = curr_dat_sz(end);
 
