@@ -13,3 +13,5 @@ src/evaluation_mat/ifc-*
 .*.py
 *.swp
 *.DS_Store
+
+.*.m

@@ -24,7 +24,7 @@ class TrainDatasetFromHdf5(object):
         self.batch_ids = self.total_size // self.batch_size
         self.input_size = [self.gt_height//self.upscale, self.gt_width//self.upscale]
 
-    def batch_transpose(self,images):
+    def batch_transpose(self, images):
         return np.array([image.T for image in images])
 
     def transform(self, image):
