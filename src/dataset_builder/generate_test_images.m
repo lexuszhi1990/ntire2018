@@ -4,7 +4,7 @@ function [] = generate_test_images(dataset_path)
   usage:
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
-    generate_test_images('./dataset/mat_test/set14');
+    generate_test_images('./dataset/val_difficult/raw');
 %}
 
   scale_list = [2, 3, 4, 8];

@@ -2,6 +2,9 @@
 '''
 usage:
 
+
+  CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v14 --model=../../srn_bishe/saved_models/x4/LapSRN_v14/LapSRN_v14-epoch-1-step-9774-2017-07-31-21-52.ckpt-9774  --image=./dataset/val_difficult/mat --scale=4
+
   v1:
   CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v1 --model=./ckpt/lapser-solver_v1/LapSRN_v1-epoch-2-step-203-2017-07-16-15-12.ckpt-203 --image=./dataset/mat_test/set5/mat --scale=4
 

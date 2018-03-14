@@ -2,12 +2,11 @@ import cv2
 import time, math
 import numpy as np
 
-from src.evaluation import psnr as compute_psnr
-from src.evaluation import _SSIMForMultiScale as compute_ssim
+from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 
-gt_img_path = './dataset/test/set14/GT/face.png'
-compared_img_path = './dataset/test/set14/lapsrn/v3/face_l4_lapsrn_x4.png'
-bicubic_img_path = './dataset/test/set14/bicubic/face_l4_bicubic_x4.png'
+gt_img_path = './0801x4d_x4.png'
+compared_img_path = './0801x4d_bicubic_x4.png'
+bicubic_img_path = './0801x4d_bicubic_x4.png'
 
 gt_img = cv2.imread(gt_img_path)
 upscaled_img = cv2.imread(compared_img_path)

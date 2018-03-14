@@ -3,7 +3,7 @@
 usage:
 CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v241 --model_path=./ckpt/EDSR_v241/EDSR_v241-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./tmp/analyzed_10_man.png --output_dir=./ --scale=2
 
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=./ckpt/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./00001.jpg --output_dir=./ --scale=4
+CUDA_VISIBLE_DEVICES=3 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=../../srn_bishe/saved_models/x4/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./0801x4d.png --output_dir=./ --scale=4
 
 
 
