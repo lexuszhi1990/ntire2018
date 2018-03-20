@@ -2,29 +2,28 @@
 '''
 '''
 
+import time
+import argparse
+import os
+import numpy as np
+from glob import glob
+import scipy.io as sio
+import shutil
+import tensorflow as tf
 import matlab
 import matlab.engine
+
 from src.utils import sess_configure, trainsform, transform_reverse
 from src.eval_dataset import eval_dataset
 from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 
+from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14, LapSRN_v15, LapSRN_v16, LapSRN_v17, LapSRN_v18, LapSRN_v19
+
 eng = matlab.engine.start_matlab()
 eng.addpath(r'./src/evaluation_mat', nargout=0)
-eng.addpath(r'./src/evaluation_mat/ifc-drrn')
-eng.addpath(r'./src/evaluation_mat/matlabPyrTools')
 
 def stop_matlab():
   eng.quit()
-
-def load_img_from_mat(img_mat_path, scale):
-  image_hash = sio.loadmat(img_mat_path)
-
-  im_l_y = image_hash['label_x{}_y'.format(8//scale)]
-  im_bicubic_ycbcr = image_hash['bicubic_l{}_x{}_ycbcr'.format(scale, scale)]
-  im_bicubic_ycbcr = np.clip(im_bicubic_ycbcr*255., 0, 255.)
-  img_gt = image_hash['label_x8_y']
-
-  return im_l_y, im_bicubic_ycbcr, img_gt
 
 def val_img_path(img_path, scale, sr_method, output_dir=None, verbose=False):
   img_name = os.path.basename(img_path).split('.')[0]
@@ -45,7 +44,6 @@ def val_img_path(img_path, scale, sr_method, output_dir=None, verbose=False):
 def save_img(image, img_path, scale, sr_method, output_dir):
   output_img_path = val_img_path(img_path)
   imsave(output_img_path, image)
-
   print("upscaled image size {}".format(np.shape(image)))
   print("save image at {}".format(output_img_path))
 
@@ -163,135 +161,87 @@ def cal_image_index(gt_img_y, upscaled_img_y, scale):
 
   return psnr, ssim, msssim
 
-input_img = img_y
-batch_size = 1
-scale = 4
-channel = 1
-filter_num = 64
-gpu_id = 3
-pad = 2
-sr_method= 'edsr'
-model_name = 'LapSRN_v7'
-model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
-output_dir = '.'
+def build_image(input_img, model_path, model_name, batch_size, scale, channel, filter_num, sr_method, gpu_id):
 
+  height, width = input_img.shape
+  hr_img = np.zeros((height*4, width*4))
 
+  img_1 = input_img[:height/3+2,:width/3+2]
+  upscaled_img = generator(img_1, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_1 = upscaled_img[0][:upscaled_img[0].shape[0]-2*scale, :upscaled_img[0].shape[1]-2*scale, 0]
+  hr_img[:height/3*scale,:width/3*scale] = upscaed_img_1
 
-img_path = '0801x4d.png'
+  img_2 = input_img[:height/3+2,width/3-1:width/3*2+1]
+  upscaled_img = generator(img_2, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_2 = upscaled_img[0][:upscaled_height-2*scale, scale:upscaled_width-scale, 0]
+  hr_img[:height/3*scale,width/3*scale:width/3*2*scale] = upscaed_img_2
 
+  img_3 = input_img[:height/3,width/3*2:]
+  upscaled_img = generator(img_3, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_3 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[:height/3*scale,width/3*2*scale:] = upscaed_img_3
 
-saved_dir, mat_dir, bicubic_dir = val_img_path(img_path, scale, sr_method, output_dir=None, verbose=True)
-eng.get_ycbcr_image(img_path, mat_dir, scale);
-image_hash = sio.loadmat(mat_dir)
-input_img = image_hash['img_y']
+  img_4 = input_img[height/3:height/3*2,:width/3]
+  upscaled_img = generator(img_4, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_4 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*scale:height/3*2*scale,:width/3*scale] = upscaed_img_4
 
-height, width = input_img.shape
-hr_img = np.zeros((height*4, width*4))
+  img_5 = input_img[height/3:height/3*2,width/3:width/3*2]
+  upscaled_img = generator(img_5, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_5 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*scale:height/3*2*scale,width/3*scale:width/3*2*scale] = upscaed_img_5
 
-img_1 = input_img[:height/3+pad,:width/3+pad]
-upscaled_img = generator(img_1, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_1 = upscaled_img[0][:upscaled_img[0].shape[0]-pad*4, :upscaled_img[0].shape[1]-pad*4, 0]
-hr_img[:height/3*4,:width/3*4] = upscaed_img_1
+  img_6 = input_img[height/3:height/3*2,width/3*2:]
+  upscaled_img = generator(img_6, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_6 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*scale:height/3*2*scale,width/3*2*scale:] = upscaed_img_6
 
-img_2 = input_img[:height/3+2,width/3-1:width/3*2+1]
-upscaled_img = generator(img_2, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_2 = upscaled_img[0][:upscaled_height-pad*4, 4:upscaled_width-4, 0]
-hr_img[:height/3*4,width/3*4:width/3*2*4] = upscaed_img_2
+  img_7 = input_img[height/3*2:,:width/3]
+  upscaled_img = generator(img_7, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_7 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*2*scale:,:width/3*scale] = upscaed_img_7
 
-img_3 = input_img[:height/3,width/3*2:]
-upscaled_img = generator(img_3, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_3 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[:height/3*4,width/3*2*4:] = upscaed_img_3
+  img_8 = input_img[height/3*2:,width/3:width/3*2]
+  upscaled_img = generator(img_8, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_8 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*2*scale:,width/3*scale:width/3*2*scale] = upscaed_img_8
 
-img_4 = input_img[height/3:height/3*2,:width/3]
-upscaled_img = generator(img_4, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_4 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*4:height/3*2*4,:width/3*4] = upscaed_img_4
+  img_9 = input_img[height/3*2:,width/3*2:]
+  upscaled_img = generator(img_9, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+  upscaled_height, upscaled_width, _ = upscaled_img[0].shape
+  upscaed_img_9 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  hr_img[height/3*2*scale:,width/3*2*scale:] = upscaed_img_9
 
-img_5 = input_img[height/3:height/3*2,width/3:width/3*2]
-upscaled_img = generator(img_5, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_5 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*4:height/3*2*4,width/3*4:width/3*2*4] = upscaed_img_5
+  return hr_img
 
-img_6 = input_img[height/3:height/3*2,width/3*2:]
-upscaled_img = generator(img_6, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_6 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*4:height/3*2*4,width/3*2*4:] = upscaed_img_6
+def SR(dataset_dir, model_path, model_name, gpu_id=3, batch_size=1, scale=4, channel=1, filter_num=64, sr_method='edsr'):
 
-img_7 = input_img[height/3*2:,:width/3]
-upscaled_img = generator(img_7, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_7 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*2*4:,:width/3*4] = upscaed_img_7
-
-img_8 = input_img[height/3*2:,width/3:width/3*2]
-upscaled_img = generator(img_8, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_8 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*2*4:,width/3*4:width/3*2*4] = upscaed_img_8
-
-img_9 = input_img[height/3*2:,width/3*2:]
-upscaled_img = generator(img_9, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
-upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-upscaed_img_9 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
-hr_img[height/3*2*4:,width/3*2*4:] = upscaed_img_9
-
-
-def SR(dataset_dir, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id):
-
-  dataset_image_path = os.path.join(dataset_dir, '*.mat')
-
-  PSNR = []
-  SSIM = []
-  MSSSIM = []
-  EXEC_TIME = []
-
-  # scale_list = [2, 4, 8]
-  # for scale in scale_list[0:np.log2(init_scale).astype(int)]:
-  psnrs = []
-  ssims = []
-  msssims = []
-  exec_time = []
-
+  dataset_image_path = os.path.join(dataset_dir, '*.png')
   for filepath in glob(dataset_image_path):
 
-    tf.reset_default_graph()
+    saved_dir, mat_dir, bicubic_dir = val_img_path(filepath, scale, sr_method, output_dir=None, verbose=True)
+    null = eng.get_ycbcr_image(filepath, mat_dir, scale);
+    image_hash = sio.loadmat(mat_dir)
+    input_img = image_hash['img_y']
 
-    im_l_y, im_h_ycbcr, img_gt_y = load_img_from_mat(filepath, scale)
-    im_h_y, elapsed_time = generator(im_l_y, batch_size, scale, channel, filter_num, sr_method, model_path, gpu_id)
-    save_mat(im_h_y, filepath, sr_method, scale)
+    im_h_y = build_image(input_img, model_path, model_name, batch_size, scale, channel, filter_num, sr_method, gpu_id)
 
-    psnr, ssim, msssim = cal_image_index(img_gt_y, im_h_y[:,:,0], scale)
-    psnrs.append(psnr)
-    ssims.append(ssim)
-    msssims.append(msssim)
-    exec_time.append(elapsed_time)
-
-    print("for image %s, scale: %d, average exec time: %.4fs\n-- PSNR/SSIM/MSSSIM: %.4f/%.4f/%.4f\n"%(filepath, scale, elapsed_time, psnr, ssim, msssim))
-
-  PSNR.append(psnrs)
-  SSIM.append(ssims)
-  MSSSIM.append(msssims)
-  EXEC_TIME.append(exec_time)
-
-  return PSNR, SSIM, MSSSIM, EXEC_TIME
+    save_mat(im_h_y, mat_dir)
+    null = eng.save_ycbcr_image(mat_dir, saved_dir, bicubic_dir)
 
 
+if __name__ == '__main__':
+  model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
+  model_name = 'LapSRN_v7'
 
-img_path = '0801x4d.png'
-scale = 4
-output_dir = '.'
+  SR('dataset/test', model_path, model_name)
 
-saved_dir, mat_dir, bicubic_dir = val_img_path(img_path, scale, output_dir)
-
-null = eng.get_ycbcr_image(img_path, mat_dir, scale);
-image_hash = sio.loadmat(mat_dir)
-img_y = image_hash['img_y']
-save_mat(hr_img, mat_dir)
-null = eng.save_ycbcr_image(mat_dir, saved_dir, bicubic_dir)
+  stop_matlab()
