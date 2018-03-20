@@ -5,6 +5,10 @@
 usage:
 CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/EDSR_v313 --g_ckpt_dir=./ckpt/EDSR_v313 --default_sr_method='EDSR_v313' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
 
+CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7 --g_ckpt_dir=./ckpt/LapSRN_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
+
+CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7 --g_ckpt_dir=./ckpt/LapSRN_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --continued_training --defalut_model_path=./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --batch_size=1
+
 '''
 
 from __future__ import absolute_import
@@ -42,7 +46,7 @@ def setup_options():
   parser = argparse.ArgumentParser(description="LapSRN Test")
   parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
   parser.add_argument("--epoches", default=5, type=int, help="max epoches")
-  parser.add_argument("--inner_epoches", default=6, type=int, help="inner epoches")
+  parser.add_argument("--inner_epoches", default=1, type=int, help="inner epoches")
   parser.add_argument("--batch_size", default=2, type=int, help="batch size")
   parser.add_argument("--dataset_dir", default="null", type=str, help="image path")
   parser.add_argument("--g_ckpt_dir", default="null", type=str, help="g_ckpt_dir path")
@@ -53,6 +57,8 @@ def setup_options():
   parser.add_argument("--upscale_factor", default=4, type=int, help="scale factor, Default: 4")
   parser.add_argument("--filter_num", default=64, type=int, help="filter_num")
   parser.add_argument("--default_channel", default=1, type=int, help="default_channel")
+  parser.add_argument('--continued_training', action='store_true', help='continued training')
+  parser.add_argument('--defalut_model_path', default="null", help='defalut_model_path')
 
   return parser
 
@@ -75,6 +81,8 @@ def main(_):
   debug = opt.debug
   upscale_factor = opt.upscale_factor
   filter_num = opt.filter_num
+  continued_training = opt.continued_training
+  defalut_model_path = opt.defalut_model_path
 
   results_file = "./tmp/results-{}-scale-{}-{}.txt".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
   results_pkl_file = "./tmp/results-{}-scale-{}-{}.pkl".format(default_sr_method, upscale_factor, time.strftime('%Y-%m-%d-%H-%M',time.localtime(time.time())))
@@ -120,8 +128,8 @@ def main(_):
       dataset = TrainDatasetFromHdf5(file_path=dataset_dir, batch_size=batch_size, upscale=upscale_factor)
       g_decay_steps = np.floor(np.log(decay_rate)/np.log(decay_final_rate) * (dataset.batch_ids*epoches*inner_epoches))
 
-      model_path = model_list[-1] if len(model_list) != 0 else "None"
-      saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, epoch!=0, default_sr_method, model_path, debug)
+      model_path = model_list[-1] if len(model_list) != 0 else defalut_model_path
+      saved_model = train(batch_size, upscale_factor, inner_epoches, lr, reg, filter_num, decay_rate, g_decay_steps, dataset_dir, g_ckpt_dir, g_log_dir, gpu_id, continued_training, default_sr_method, model_path, debug)
       model_list.append(saved_model)
 
     print("===> Testing model")
