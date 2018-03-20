@@ -3,7 +3,7 @@ function [label] = generate_training_h5(HR_path, LR_path, epoches, saved_name)
   usage:
     addpath('./src/evaluation_mat');
     addpath('./src/dataset_builder');
-    generate_training_h5('../dataset/DIV2K_train_HR', '../dataset/DIV2K_train_LR_difficult', 5, 'div2k_x');
+    generate_training_h5('../dataset/DIV2K_train_HR', '../dataset/DIV2K_train_LR_difficult', 150, 'div2k_x');
 
   dev:
     HR_path = '../dataset/DIV2K_train_HR';
@@ -59,7 +59,7 @@ function [label] = generate_training_h5(HR_path, LR_path, epoches, saved_name)
   end
 
   count = 0;
-  patch_size = 64;
+  patch_size = 96;
   label = zeros(patch_size*4, patch_size*4,1, 1, 'single');
   data_l2 = zeros(patch_size*2, patch_size*2,1, 1, 'single');
   data_l4 = zeros(patch_size, patch_size,1, 1, 'single');
@@ -87,8 +87,6 @@ function [label] = generate_training_h5(HR_path, LR_path, epoches, saved_name)
       lr_img_path = strcat(LR_path, '/', char(split_names(1)), 'x4d.png');
       lr_img_raw = imread(lr_img_path);
 
-
-      patch_size = 64;
       [lr_img_patch, hr_img_patch] = random_crop_x4(lr_img_raw, hr_img_raw, patch_size);
       [lr_img, hr_img] = random_rotate_and_flip_double(lr_img_patch, hr_img_patch);
 

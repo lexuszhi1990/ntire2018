@@ -41,6 +41,21 @@ def val_img_path(img_path, scale, sr_method, output_dir=None, verbose=False):
   else:
     return os.path.join(base_dir, upscaled_img_name), os.path.join(base_dir, upscaled_mat_name), os.path.join(base_dir, bicubic_img_name)
 
+def get_save_path(img_path, scale, sr_method, output_dir=None, verbose=False):
+  img_base_name = os.path.basename(img_path).split('.')[0]
+  upscaled_mat_name =  "{}.mat".format(img_base_name, scale)
+  bicubic_img_name =  "{}_bicubic_x{}.png".format(img_base_name, scale)
+
+  if output_dir is not None and os.path.isdir(output_dir):
+    base_dir = output_dir
+  else:
+    base_dir = os.path.dirname(img_path)
+
+  if verbose is False:
+    return os.path.join(base_dir, os.path.basename(img_path))
+  else:
+    return os.path.join(base_dir, os.path.basename(img_path)), os.path.join(base_dir, upscaled_mat_name), os.path.join(base_dir, bicubic_img_name)
+
 def save_img(image, img_path, scale, sr_method, output_dir):
   output_img_path = val_img_path(img_path)
   imsave(output_img_path, image)
@@ -222,12 +237,12 @@ def build_image(input_img, model_path, model_name, batch_size, scale, channel, f
 
   return hr_img
 
-def SR(dataset_dir, model_path, model_name, gpu_id=3, batch_size=1, scale=4, channel=1, filter_num=64, sr_method='edsr'):
+def SR(dataset_dir, model_path, model_name, output_dir=None,gpu_id=3, batch_size=1, scale=4, channel=1, filter_num=64, sr_method='edsr'):
 
   dataset_image_path = os.path.join(dataset_dir, '*.png')
   for filepath in glob(dataset_image_path):
 
-    saved_dir, mat_dir, bicubic_dir = val_img_path(filepath, scale, sr_method, output_dir=None, verbose=True)
+    saved_dir, mat_dir, bicubic_dir = get_save_path(filepath, scale, sr_method, output_dir=output_dir, verbose=True)
     null = eng.get_ycbcr_image(filepath, mat_dir, scale);
     image_hash = sio.loadmat(mat_dir)
     input_img = image_hash['img_y']
@@ -241,7 +256,8 @@ def SR(dataset_dir, model_path, model_name, gpu_id=3, batch_size=1, scale=4, cha
 if __name__ == '__main__':
   model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
   model_name = 'LapSRN_v7'
-
-  SR('dataset/test', model_path, model_name)
+  img_dir = '../dataset/DIV2K_valid_LR_difficult'
+  output_dir = './'
+  SR(img_dir, model_path, model_name)
 
   stop_matlab()
