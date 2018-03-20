@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import time
 import argparse
@@ -10,7 +10,6 @@ import matlab
 import matlab.engine
 from src.cv2_utils import *
 from src.utils import sess_configure, trainsform, transform_reverse
-
 
 from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14, LapSRN_v15, LapSRN_v16, LapSRN_v17, LapSRN_v18, LapSRN_v19
 
@@ -50,7 +49,8 @@ aa = eng.get_ycbcr_image(img_path, mat_dir, scale);
 
 image_hash = sio.loadmat(mat_dir)
 img_y = image_hash['img_y']
-
+save_mat(hr_img, mat_dir)
+eng.save_ycbcr_image(mat_dir, saved_dir, mat_dir)
 
 ### split the image and train
 input_img = img_y
@@ -58,28 +58,37 @@ batch_size = 1
 scale = 4
 channel = 1
 filter_num = 64
-model_name = ''
-model_path = ''
 gpu_id = 3
+pad = 2
 model_name = 'LapSRN_v7'
 model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
 
+from val import generator
+generator(img_1, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def generator(input_img, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id):
+
 height, width = input_img.shape
+hr_img = np.zeros((height*4, width*4))
 
-img_1 = input_img[:height/3+2,:width/3+2]
-img_2 = input_img[:height/3,width/3:width/3*2]
-img_3 = input_img[:height/3,width/3*2:]
-img_4 = input_img[height/3:height/3*2,:width/3]
-img_5 = input_img[height/3:height/3*2,width/3:width/3*2]
-img_6 = input_img[height/3:height/3*2,width/3*2:]
-img_7 = input_img[height/3*2:,:width/3]
-img_8 = input_img[height/3*2:,width/3:width/3*2]
-img_9 = input_img[height/3*2:,width/3*2:]
-
+img_1 = input_img[:height/3+pad,:width/3+pad]
 batch_images = np.zeros((batch_size, img_1.shape[0], img_1.shape[1], channel))
 batch_images[0, :, :, 0] = img_1
 img_size = img_1.shape
-
 with tf.device("/gpu:{}".format(str(gpu_id))):
   inputs = tf.placeholder(tf.float32, [batch_size, None, None, channel])
   gt_img_x2 = tf.placeholder(tf.float32, [batch_size, None, None, channel])
@@ -99,14 +108,21 @@ saver = tf.train.Saver()
 saver.restore(sess, model_path)
 upscaled_img = sess.run(upscaled_tf_img, feed_dict={inputs: batch_images, is_training: False})
 
-###
->>> img_1.shape
-(113, 170)
->>> upscaled_img[0].shape
-(452, 680, 1)
-
-
-upscaed_img_1 = upscaled_img[0][:upscaled_img[0].shape[0]-2*4, :upscaled_img[0].shape[1]-2*4, 0]
-
-hr_img = np.zeros((height*4, width*4))
+upscaed_img_1 = upscaled_img[0][:upscaled_img[0].shape[0]-pad*4, :upscaled_img[0].shape[1]-pad*4, 0]
 hr_img[:height/3*4,:width/3*4] = upscaed_img_1
+
+"""
+>>> img_1.shape
+(115, 172)
+>>> upscaed_img_1.shape
+(452, 680)
+"""
+
+img_2 = input_img[:height/3,width/3:width/3*2]
+img_3 = input_img[:height/3,width/3*2:]
+img_4 = input_img[height/3:height/3*2,:width/3]
+img_5 = input_img[height/3:height/3*2,width/3:width/3*2]
+img_6 = input_img[height/3:height/3*2,width/3*2:]
+img_7 = input_img[height/3*2:,:width/3]
+img_8 = input_img[height/3*2:,width/3:width/3*2]
+img_9 = input_img[height/3*2:,width/3*2:]
