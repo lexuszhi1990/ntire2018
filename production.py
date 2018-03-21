@@ -204,7 +204,7 @@ def build_image(input_img, model_path, model_name, batch_size, scale, channel, f
   img_4 = input_img[height/3-1:height/3*2+1,:width/3+2]
   upscaled_img = generator(img_4, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_4 = upscaled_img[0][scale:upscaled_height+scale, :upscaled_width-2*scale, 0]
+  upscaed_img_4 = upscaled_img[0][scale:upscaled_height-scale, :upscaled_width-2*scale, 0]
   hr_img[height/3*scale:height/3*2*scale,:width/3*scale] = upscaed_img_4
 
   img_5 = input_img[height/3-1:height/3*2+1,width/3-1:width/3*2+1]
