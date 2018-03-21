@@ -18,9 +18,11 @@ from src.eval_dataset import eval_dataset
 from src.evaluation import shave_bd, compute_psnr, compute_ssim, compute_msssim
 
 from src.model import LapSRN_v1, LapSRN_v2, LapSRN_v3, LapSRN_v4, LapSRN_v5, LapSRN_v6, LapSRN_v7, LapSRN_v8, LapSRN_v9, LapSRN_v10, LapSRN_v11, LapSRN_v12, LapSRN_v13, LapSRN_v14, LapSRN_v15, LapSRN_v16, LapSRN_v17, LapSRN_v18, LapSRN_v19
+from src.model_new import EDSR_v301, EDSR_v302, EDSR_v303, EDSR_v304, EDSR_v305, EDSR_v306, EDSR_v307, EDSR_v308, EDSR_v309, EDSR_v310, EDSR_v311, EDSR_v312, EDSR_v313, EDSR_v314, EDSR_v315, EDSR_v316, EDSR_v321, EDSR_v322, EDSR_v323, EDSR_v324, EDSR_v325, EDSR_v326, EDSR_v327, EDSR_v328, EDSR_v329, EDSR_v330
 
 eng = matlab.engine.start_matlab()
 eng.addpath(r'./src/evaluation_mat', nargout=0)
+eng.addpath(r'./src/dataset_builder', nargout=0)
 
 def stop_matlab():
   eng.quit()
@@ -254,10 +256,18 @@ def SR(dataset_dir, model_path, model_name, output_dir=None,gpu_id=3, batch_size
 
 
 if __name__ == '__main__':
-  model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
-  model_name = 'LapSRN_v7'
+  # v1:
+  # model_path ='./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774'
+  # model_name = 'LapSRN_v7'
+  # img_dir = '../dataset/DIV2K_valid_LR_difficult'
+  # output_dir = './'
+
+  # v2:
+  model_path ='./ckpt/k40_EDSR313/EDSR_v313-epoch-1-step-10000-2018-03-21-20-03.ckpt-10000'
+  model_name = 'EDSR_v313'
   img_dir = '../dataset/DIV2K_valid_LR_difficult'
-  output_dir = './'
-  SR(img_dir, model_path, model_name)
+  output_dir = '../dataset/VALIDATION/res_v2'
+
+  SR(img_dir, model_path, model_name, output_dir=output_dir, gpu_id=3)
 
   stop_matlab()

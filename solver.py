@@ -3,11 +3,11 @@
 
 '''
 usage:
-CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/EDSR_v313 --g_ckpt_dir=./ckpt/EDSR_v313 --default_sr_method='EDSR_v313' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
+CUDA_VISIBLE_DEVICES=1 python solver.py --gpu_id=1 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/EDSR_v316 --g_ckpt_dir=./ckpt/EDSR_v316 --default_sr_method='EDSR_v316' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
 
 CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7 --g_ckpt_dir=./ckpt/LapSRN_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=4
 
-CUDA_VISIBLE_DEVICES=2 python solver.py --gpu_id=2 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7 --g_ckpt_dir=./ckpt/LapSRN_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --continued_training --defalut_model_path=./saved_models/x4/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --batch_size=1
+CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7_c --g_ckpt_dir=./ckpt/LapSRN_v7_c --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --continued_training --defalut_model_path=./ckpt/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --batch_size=1
 
 '''
 
