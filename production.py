@@ -195,46 +195,46 @@ def build_image(input_img, model_path, model_name, batch_size, scale, channel, f
   upscaed_img_2 = upscaled_img[0][:upscaled_height-2*scale, scale:upscaled_width-scale, 0]
   hr_img[:height/3*scale,width/3*scale:width/3*2*scale] = upscaed_img_2
 
-  img_3 = input_img[:height/3,width/3*2:]
+  img_3 = input_img[:height/3+2,width/3*2-2:]
   upscaled_img = generator(img_3, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_3 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_3 = upscaled_img[0][:upscaled_height-2*scale, 2*scale:, 0]
   hr_img[:height/3*scale,width/3*2*scale:] = upscaed_img_3
 
-  img_4 = input_img[height/3:height/3*2,:width/3]
+  img_4 = input_img[height/3-1:height/3*2+1,:width/3+2]
   upscaled_img = generator(img_4, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_4 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_4 = upscaled_img[0][scale:upscaled_height+scale, :upscaled_width-2*scale, 0]
   hr_img[height/3*scale:height/3*2*scale,:width/3*scale] = upscaed_img_4
 
-  img_5 = input_img[height/3:height/3*2,width/3:width/3*2]
+  img_5 = input_img[height/3-1:height/3*2+1,width/3-1:width/3*2+1]
   upscaled_img = generator(img_5, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_5 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_5 = upscaled_img[0][scale:upscaled_height-scale, scale:upscaled_width-scale, 0]
   hr_img[height/3*scale:height/3*2*scale,width/3*scale:width/3*2*scale] = upscaed_img_5
 
-  img_6 = input_img[height/3:height/3*2,width/3*2:]
+  img_6 = input_img[height/3-1:height/3*2+1,width/3*2-2:]
   upscaled_img = generator(img_6, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_6 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_6 = upscaled_img[0][scale:upscaled_height-scale, scale*2:, 0]
   hr_img[height/3*scale:height/3*2*scale,width/3*2*scale:] = upscaed_img_6
 
-  img_7 = input_img[height/3*2:,:width/3]
+  img_7 = input_img[height/3*2-2:,:width/3+2]
   upscaled_img = generator(img_7, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_7 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_7 = upscaled_img[0][scale*2:upscaled_height, :upscaled_width-scale*2, 0]
   hr_img[height/3*2*scale:,:width/3*scale] = upscaed_img_7
 
-  img_8 = input_img[height/3*2:,width/3:width/3*2]
+  img_8 = input_img[height/3*2-2:,width/3-1:width/3*2+1]
   upscaled_img = generator(img_8, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_8 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_8 = upscaled_img[0][scale*2:upscaled_height, scale:upscaled_width-scale, 0]
   hr_img[height/3*2*scale:,width/3*scale:width/3*2*scale] = upscaed_img_8
 
-  img_9 = input_img[height/3*2:,width/3*2:]
+  img_9 = input_img[height/3*2-2:,width/3*2-2:]
   upscaled_img = generator(img_9, batch_size, scale, channel, filter_num, model_name, model_path, gpu_id)
   upscaled_height, upscaled_width, _ = upscaled_img[0].shape
-  upscaed_img_9 = upscaled_img[0][:upscaled_height, :upscaled_width, 0]
+  upscaed_img_9 = upscaled_img[0][2*scale:upscaled_height, 2*scale:upscaled_width, 0]
   hr_img[height/3*2*scale:,width/3*2*scale:] = upscaed_img_9
 
   return hr_img
