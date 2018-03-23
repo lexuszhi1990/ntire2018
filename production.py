@@ -43,20 +43,15 @@ def val_img_path(img_path, scale, sr_method, output_dir=None, verbose=False):
   else:
     return os.path.join(base_dir, upscaled_img_name), os.path.join(base_dir, upscaled_mat_name), os.path.join(base_dir, bicubic_img_name)
 
-def get_save_path(img_path, scale, sr_method, output_dir=None, verbose=False):
+def get_save_path(img_path, scale, sr_method, output_dir, verbose=False):
   img_base_name = os.path.basename(img_path).split('.')[0]
   upscaled_mat_name =  "{}.mat".format(img_base_name, scale)
   bicubic_img_name =  "{}_bicubic_x{}.png".format(img_base_name, scale)
 
-  if output_dir is not None and os.path.isdir(output_dir):
-    base_dir = output_dir
-  else:
-    base_dir = os.path.dirname(img_path)
-
   if verbose is False:
-    return os.path.join(base_dir, os.path.basename(img_path))
+    return os.path.join(output_dir, os.path.basename(img_path))
   else:
-    return os.path.join(base_dir, os.path.basename(img_path)), os.path.join(base_dir, upscaled_mat_name), os.path.join(base_dir, bicubic_img_name)
+    return os.path.join(output_dir, os.path.basename(img_path)), os.path.join(output_dir, upscaled_mat_name), os.path.join(output_dir, bicubic_img_name)
 
 def save_img(image, img_path, scale, sr_method, output_dir):
   output_img_path = val_img_path(img_path)
