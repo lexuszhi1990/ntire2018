@@ -280,16 +280,16 @@ if __name__ == '__main__':
   # img_dir = '../dataset/DIV2K_valid_LR_difficult'
   # output_dir =' ../dataset/VALIDATION_V3/res'
 
-  # model_path = 'ckpt/LapSRN_v7c/LapSRN_v7-epoch-1-step-20000-2018-03-23-17-15.ckpt-20000'
-  # model_name = 'LapSRN_v7'
-  # img_dir = '../dataset/DIV2K_test_LR_difficult'
-  # output_dir = '../dataset/TEST_V1'
+  model_path = 'ckpt/LapSRN_v7c/LapSRN_v7-epoch-1-step-20000-2018-03-23-17-15.ckpt-20000'
+  model_name = 'LapSRN_v7'
+  img_dir = '../dataset/DIV2K_test_LR_difficult'
+  output_dir = '../dataset/TEST_V1'
 
   # v4
-  model_path = 'ckpt/EDSR_v316/EDSR_v316-epoch-1-step-20000-2018-03-22-10-44.ckpt-20000'
-  model_name = 'EDSR_v316'
-  img_dir = '../dataset/DIV2K_valid_LR_difficult'
-  output_dir =' ../dataset/VALIDATION_V4/res'
+  # model_path = 'ckpt/EDSR_v316/EDSR_v316-epoch-1-step-20000-2018-03-22-10-44.ckpt-20000'
+  # model_name = 'EDSR_v316'
+  # img_dir = '../dataset/DIV2K_valid_LR_difficult'
+  # output_dir =' ../dataset/VALIDATION_V4/res'
 
   # done
   # model_path = 'ckpt/EDSR_v316/EDSR_v316-epoch-1-step-20000-2018-03-22-10-44.ckpt-20000'
