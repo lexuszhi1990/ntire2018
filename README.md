@@ -31,14 +31,35 @@ CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --fi
 ### train
 
 ```
-CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7_c --g_ckpt_dir=./ckpt/LapSRN_v7_c --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --continued_training --defalut_model_path=./ckpt/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --batch_size=2
+CUDA_VISIBLE_DEVICES=3 python solver.py --gpu_id=3 --dataset_dir=./dataset/div2k_difficulty_x50.h5 --g_log_dir=./log/LapSRN_v7 --g_ckpt_dir=./ckpt/LapSRN_v7 --default_sr_method='LapSRN_v7' --test_dataset_path=./dataset/mat_test/set5/mat --epoches=1 --inner_epoches=1 --default_channel=1 --upscale_factor=4 --filter_num=64 --batch_size=2
 ```
 
 ### datasets and models
 
-the image dataset and models are uploaded on [baiduyun]()
+the image dataset and models are uploaded on [baiduyun](https://pan.baidu.com/s/1kNNfCbLb7x_-Fl20SqXiPQ)
 
-### results
+### results on div2k dificult validation
+
+update the `model_path`, `model_name`, `img_dir`, `output_dir` in `ntire_test.py` file:
+
+```
+model_path = 'ckpt/EDSR_v313/EDSR_v313-epoch-1-step-20000-2018-02-12-02-56.ckpt-20000'
+model_name = 'EDSR_v313'
+img_dir = '../dataset/DIV2K_valid_LR_difficult'
+output_dir =' ../dataset/VALIDATION_V4/res'
+```
+
+then 'python ntire_test.py' to generate the super-resolution images.
+current results is
+```
+PSNR:21.744125
+SSIM:0.460918
+```
+
+### results on public datasets
+
+generate the image the test:
+`CUDA_VISIBLE_DEVICES=0 python val.py --gpu_id=0 --channel=1 --filter_num=64 --sr_method=LapSRN_v7 --model=./ckpt/LapSRN_v7/LapSRN_v7-epoch-2-step-9774-2017-07-23-13-59.ckpt-9774 --image=./dataset/mat_test/set5/mat --scale=4`
 
 the (pnsr/ssim/ifc) results on set5/set14/bsd100 results:
 
