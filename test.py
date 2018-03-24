@@ -1,8 +1,4 @@
 #!/usr/bin/python
-'''
-usage:
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v315 --model_path=./ckpt/EDSR_v315/EDSR_v315-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./tmp/analyzed_10_man.png --output_dir=./ --scale=2
-'''
 
 import time
 import argparse
