@@ -1,17 +1,7 @@
 #!/usr/bin/python
 '''
 usage:
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v241 --model_path=./ckpt/EDSR_v241/EDSR_v241-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./tmp/analyzed_10_man.png --output_dir=./ --scale=2
-
-CUDA_VISIBLE_DEVICES=3 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v250 --model_path=../../srn_bishe/saved_models/x4/EDSR_v250/EDSR_v250-epoch-1-step-19548-2017-10-16-13-17.ckpt-19548 --image=./0801x4d.png --output_dir=./ --scale=4
-
-
-
-
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v2 --model_path=./ckpt/EDSR_LFW_v2/EDSR_LFW_v2-epoch-1-step-8360-2017-10-20-17-15.ckpt-8360 --image=./test/faces/IMG_4677_face_0_l2.png --output_dir=./ --scale=2
-
-CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_LFW_v4 --model_path=./ckpt/EDSR_LFW_v4/EDSR_LFW_v4-epoch-1-step-8360-2017-10-20-17-26.ckpt-8360 --output_dir=./ --scale=4  --image=./test/faces/IMG_4677_face_0_l2.png
-
+CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v315 --model_path=./ckpt/EDSR_v315/EDSR_v315-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --image=./tmp/analyzed_10_man.png --output_dir=./ --scale=2
 '''
 
 import time
@@ -34,9 +24,6 @@ from src.model_new import EDSR_LFW_v1, EDSR_LFW_v2, EDSR_LFW_v3, EDSR_LFW_v4
 
 from src.cv2_utils import *
 from src.utils import sess_configure, trainsform, transform_reverse
-
-
-# CUDA_VISIBLE_DEVICES=0 python test.py --gpu_id=0 --batch_size=1 --channel=1 --filter_num=64 --sr_method=EDSR_v241 --model_path=./ckpt/EDSR_v241/EDSR_v241-epoch-1-step-19548-2017-10-12-16-02.ckpt-19548 --output_dir=./ --image=./tmp/analyzed_10_man.png --scale=2
 
 parser = argparse.ArgumentParser(description="EDSR Test")
 parser.add_argument("--gpu_id", default=3, type=int, help="GPU id")
